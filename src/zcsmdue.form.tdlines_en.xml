@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-16"?>
+<abapGit version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <TDLINES>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>MAIN</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>T1</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;20.6&apos; CM WIDTH &apos;19.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;0.0&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;0.6&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;6.8&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;8.9&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;11.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;13.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;15.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;17.0&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A3</TDFORMAT>
+     <TDLINE>&lt;C1&gt;&amp;WA_TAB2-SR+0(3)&amp; &amp;WA_TAB2-MAKTX+0(35)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE> &amp;WA_TAB2-CHARG+0(10)&amp; &amp;WA_TAB2-HSDAT+0(10)&amp; &amp;WA_TAB2-VFDAT+0(10)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE> &amp;WA_TAB2-DATE1+0(10)&amp; &amp;WA_TAB2-CSPEM(F T9R)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>T2</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&amp;uline(132)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW1</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;1.40&apos; CM WIDTH &apos;19.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;0.0&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;0.6&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;6.8&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;8.9&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;11.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;13.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;15.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;17.0&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Sr.  Product Name &amp;space(22)&amp; Batch &amp;space(5)&amp; Mfg. &amp;space(5)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE> Exp. &amp;space(5)&amp; Due &amp;space(5)&amp; Qty &amp;space(5)&amp; Shipper&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;NO  &amp;space(48)&amp; Date &amp;space(5)&amp; Date &amp;space(5)&amp; Date &amp;space(15)&amp; No.</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW2</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;1.8&apos; CM WIDTH &apos;19.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;9.5&apos; CM WIDTH 0 TW FRAME 9 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&amp;space(20)&amp; Prepared By &amp;space(30)&amp; Checked BY</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&amp;space(20)&amp; Sign/Date &amp;space(33)&amp; Sign/Date</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW3</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;1.5&apos; CM WIDTH &apos;19.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;B1&gt; BLUE CROSS LABORATORIES PVT LTD. &amp;kunnr(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>LIST OF CONTROL SAMPLES FOR DESTRUCTION &amp;space(5)&amp; YEAR:</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW4</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>lobo</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;1.5&apos; CM WIDTH &apos;19.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BITMAP &apos;ZBCLOGO&apos; OBJECT GRAPHICS ID BMAP TYPE BCOL DPI 150</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW5</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Format No.: SOP/QAD/074-04-F1 (Ref. SOP No.:SOP/QAD/074)</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>IF &amp;PLANT&amp; EQ &apos;1000&apos;.</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;C3&gt;Format No.: SOP/QAD/074-06-F1 (Ref. SOP No.:SOP/QAD/074)&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>ENDIF.</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>&amp;SPACE(10)&amp; Page No.&amp;page&amp;</TDLINE>
+    </TLINE>
+   </TDLINES>
+  </asx:values>
+ </asx:abap>
+</abapGit>

@@ -1,0 +1,2176 @@
+*&---------------------------------------------------------------------*
+*& Report  ZGRN_VALUATION_MSME7
+*&developed by Jyotsna
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+REPORT ZGRN_VALUATION_MSME10.
+
+TABLES : MSEG,
+         BKPF,
+         BSE_CLR,
+         EKPO,
+         EKKO,
+         LFA1,
+         JEST,
+         QAVE,
+         RBKP.
+
+TYPE-POOLS:  SLIS.
+
+DATA: G_REPID     LIKE SY-REPID,
+      FIELDCAT    TYPE SLIS_T_FIELDCAT_ALV,
+      WA_FIELDCAT LIKE LINE OF FIELDCAT,
+      SORT        TYPE SLIS_T_SORTINFO_ALV,
+      WA_SORT     LIKE LINE OF SORT,
+      LAYOUT      TYPE SLIS_LAYOUT_ALV.
+
+DATA : GR_ALVGRID    TYPE REF TO CL_GUI_ALV_GRID,
+       GR_CCONTAINER TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+       GT_FCAT       TYPE LVC_T_FCAT,
+       GS_LAYO       TYPE LVC_S_LAYO.
+
+
+
+DATA : OK_CODE LIKE SY-UCOMM.
+
+DATA : T_MAT TYPE STRING.
+DATA: T_VBE  TYPE BKPF-BELNR,
+      T_VBE1 TYPE BKPF-GJAHR.
+
+DATA: VARIANT TYPE DISVARIANT.
+DATA: MAKTX TYPE MAKT-MAKTX.
+
+DATA : IT_MSEG  TYPE TABLE OF MSEG,
+       WA_MSEG  TYPE MSEG,
+       IT_MKPF  TYPE TABLE OF MKPF,
+       WA_MKPF  TYPE MKPF,
+       IT_QALS  TYPE TABLE OF QALS,
+       WA_QALS  TYPE QALS,
+       IT_LFB1  TYPE TABLE OF LFB1,
+       WA_LFB1  TYPE LFB1,
+       IT_EKKO  TYPE TABLE OF EKKO,
+       WA_EKKO  TYPE EKKO,
+       IT_EKPO  TYPE TABLE OF EKPO,
+       WA_EKPO  TYPE EKPO,
+       IT_EKBE  TYPE TABLE OF EKBE,
+       WA_EKBE  TYPE EKBE,
+       IT_EKBE1 TYPE TABLE OF EKBE,
+       WA_EKBE1 TYPE EKBE,
+       IT_RSEG  TYPE TABLE OF RSEG,
+       WA_RSEG  TYPE RSEG,
+       IT_MSEG1 TYPE TABLE OF MSEG,  "REVERSAL
+       WA_MSEG1 TYPE MSEG.
+
+
+TYPES : BEGIN OF ITAB1,
+          EBELN TYPE EKBE-EBELN,
+          EBELP TYPE EKBE-EBELP,
+          MATNR TYPE EKBE-MATNR,
+          CHARG TYPE EKBE-CHARG,
+          WERKS TYPE EKBE-WERKS,
+          TXZ01 TYPE EKPO-TXZ01,
+          GRN   TYPE EKBE-BELNR,
+          BUDAT TYPE EKBE-BUDAT,
+          BWART TYPE EKBE-BWART,
+          BWETP TYPE EKBE-BEWTP,
+          MENGE TYPE EKBE-MENGE,
+          DMBTR TYPE EKBE-DMBTR,
+          POQTY TYPE EKPO-MENGE,
+        END OF ITAB1.
+
+TYPES : BEGIN OF ITAB2,
+          EBELN  TYPE EKBE-EBELN,
+          EBELP  TYPE EKBE-EBELP,
+          MATNR  TYPE EKBE-MATNR,
+          CHARG  TYPE EKBE-CHARG,
+          WERKS  TYPE EKBE-WERKS,
+          TXZ01  TYPE EKPO-TXZ01,
+          GRN    TYPE EKBE-BELNR,
+          BUDAT  TYPE EKBE-BUDAT,
+          BWART  TYPE EKBE-BWART,
+          BWETP  TYPE EKBE-BEWTP,
+          MENGE  TYPE EKBE-MENGE,
+          DMBTR  TYPE EKBE-DMBTR,
+          POQTY  TYPE EKPO-MENGE,
+          GJAHR  TYPE RSEG-GJAHR,
+          BELNR  TYPE RSEG-BELNR,
+          MENGE1 TYPE RSEG-MENGE,
+          WRBTR  TYPE RSEG-WRBTR,
+          TBTKZ  TYPE RSEG-TBTKZ,
+        END OF ITAB2.
+
+TYPES : BEGIN OF ITAB3,
+          EBELN     TYPE EKBE-EBELN,
+          EBELP     TYPE EKBE-EBELP,
+          MATNR     TYPE EKBE-MATNR,
+          CHARG     TYPE EKBE-CHARG,
+          WERKS     TYPE EKBE-WERKS,
+          TXZ01     TYPE EKPO-TXZ01,
+          GRN       TYPE EKBE-BELNR,
+          BUDAT     TYPE EKBE-BUDAT,
+          BWART     TYPE EKBE-BWART,
+          BWETP     TYPE EKBE-BEWTP,
+          MENGE     TYPE EKBE-MENGE,
+          DMBTR     TYPE EKBE-DMBTR,
+          POQTY     TYPE EKPO-MENGE,
+          GJAHR     TYPE RSEG-GJAHR,
+          BELNR     TYPE RSEG-BELNR,
+          MENGE1    TYPE RSEG-MENGE,
+          WRBTR     TYPE RSEG-WRBTR,
+          TBTKZ     TYPE RSEG-TBTKZ,
+          FIDOC     TYPE BKPF-BELNR,
+          FIDOCDT   TYPE BKPF-BUDAT,
+
+          LIFNR     TYPE LFA1-LIFNR,
+          BSART     TYPE EKKO-BSART,
+          NAME1     TYPE LFA1-NAME1,
+          ORT01     TYPE LFA1-ORT01,
+          BELNR_CLR TYPE BSE_CLR-BELNR_CLR,
+          GJAHR_CLR TYPE BSE_CLR-GJAHR_CLR,
+        END OF ITAB3.
+
+TYPES : BEGIN OF ITAB4,
+          EBELN      TYPE EKBE-EBELN,
+          EBELP      TYPE EKBE-EBELP,
+          MATNR      TYPE EKBE-MATNR,
+          CHARG      TYPE EKBE-CHARG,
+          WERKS      TYPE EKBE-WERKS,
+          TXZ01      TYPE EKPO-TXZ01,
+          GRN        TYPE EKBE-BELNR,
+          BUDAT      TYPE EKBE-BUDAT,
+          BWART      TYPE EKBE-BWART,
+          BWETP      TYPE EKBE-BEWTP,
+          MENGE      TYPE EKBE-MENGE,
+          DMBTR      TYPE EKBE-DMBTR,
+          POQTY      TYPE EKPO-MENGE,
+          GJAHR      TYPE RSEG-GJAHR,
+          BELNR      TYPE RSEG-BELNR,
+          MENGE1     TYPE RSEG-MENGE,
+          WRBTR      TYPE RSEG-WRBTR,
+          TBTKZ      TYPE RSEG-TBTKZ,
+          FIDOC      TYPE BKPF-BELNR,
+          FIDOCDT    TYPE BKPF-BUDAT,
+
+          LIFNR      TYPE LFA1-LIFNR,
+          BSART      TYPE EKKO-BSART,
+          NAME1      TYPE LFA1-NAME1,
+          ORT01      TYPE LFA1-ORT01,
+          BELNR_CLR  TYPE BSE_CLR-BELNR_CLR,
+          GJAHR_CLR  TYPE BSE_CLR-GJAHR_CLR,
+          PRUEFLOS   TYPE QALS-PRUEFLOS,
+          STATUS(25) TYPE C,
+          VDATUM     TYPE QAVE-VDATUM,
+        END OF ITAB4.
+
+TYPES : BEGIN OF ITAB5,
+          EBELN      TYPE EKBE-EBELN,
+          EBELP      TYPE EKBE-EBELP,
+          MATNR      TYPE EKBE-MATNR,
+          CHARG      TYPE EKBE-CHARG,
+          WERKS      TYPE EKBE-WERKS,
+          TXZ01      TYPE EKPO-TXZ01,
+          GRN        TYPE EKBE-BELNR,
+          BUDAT      TYPE EKBE-BUDAT,
+          BWART      TYPE EKBE-BWART,
+          BWETP      TYPE EKBE-BEWTP,
+          MENGE      TYPE EKBE-MENGE,
+          DMBTR      TYPE EKBE-DMBTR,
+          POQTY      TYPE EKPO-MENGE,
+          GJAHR      TYPE RSEG-GJAHR,
+          BELNR      TYPE RSEG-BELNR,
+          MENGE1     TYPE RSEG-MENGE,
+          WRBTR      TYPE RSEG-WRBTR,
+          TBTKZ      TYPE RSEG-TBTKZ,
+          FIDOC      TYPE BKPF-BELNR,
+          FIDOCDT    TYPE BKPF-BUDAT,
+
+          LIFNR      TYPE LFA1-LIFNR,
+          BSART      TYPE EKKO-BSART,
+          NAME1      TYPE LFA1-NAME1,
+          ORT01      TYPE LFA1-ORT01,
+          BELNR_CLR  TYPE BSE_CLR-BELNR_CLR,
+          GJAHR_CLR  TYPE BSE_CLR-GJAHR_CLR,
+          PRUEFLOS   TYPE QALS-PRUEFLOS,
+          STATUS(25) TYPE C,
+          VDATUM     TYPE QAVE-VDATUM,
+          RMWWR      TYPE RBKP-RMWWR,
+          XBLNR      TYPE RBKP-XBLNR,
+          DUEDT      TYPE SY-DATUM,
+          BLDAT      TYPE BKPF-BLDAT,
+        END OF ITAB5.
+
+TYPES : BEGIN OF ITAB6,
+          EBELN      TYPE EKBE-EBELN,
+          EBELP      TYPE EKBE-EBELP,
+          MATNR      TYPE EKBE-MATNR,
+          CHARG      TYPE EKBE-CHARG,
+          WERKS      TYPE EKBE-WERKS,
+          TXZ01      TYPE EKPO-TXZ01,
+          GRN        TYPE EKBE-BELNR,
+          BUDAT      TYPE EKBE-BUDAT,
+          BWART      TYPE EKBE-BWART,
+          BWETP      TYPE EKBE-BEWTP,
+          MENGE      TYPE EKBE-MENGE,
+          DMBTR      TYPE EKBE-DMBTR,
+          POQTY      TYPE EKPO-MENGE,
+          GJAHR      TYPE RSEG-GJAHR,
+          BELNR      TYPE RSEG-BELNR,
+          MENGE1     TYPE RSEG-MENGE,
+          WRBTR      TYPE RSEG-WRBTR,
+          TBTKZ      TYPE RSEG-TBTKZ,
+          FIDOC      TYPE BKPF-BELNR,
+          FIDOCDT    TYPE BKPF-BUDAT,
+
+          LIFNR      TYPE LFA1-LIFNR,
+          BSART      TYPE EKKO-BSART,
+          NAME1      TYPE LFA1-NAME1,
+          ORT01      TYPE LFA1-ORT01,
+          BELNR_CLR  TYPE BSE_CLR-BELNR_CLR,
+          GJAHR_CLR  TYPE BSE_CLR-GJAHR_CLR,
+          PRUEFLOS   TYPE QALS-PRUEFLOS,
+          STATUS(25) TYPE C,
+          VDATUM     TYPE QAVE-VDATUM,
+          RMWWR      TYPE RBKP-RMWWR,
+          XBLNR      TYPE RBKP-XBLNR,
+          DUEDT      TYPE SY-DATUM,
+          BLDAT      TYPE BKPF-BLDAT,
+          DDAYS      TYPE I,
+        END OF ITAB6.
+
+TYPES : BEGIN OF NSK2,
+          EBELN      TYPE EKBE-EBELN,
+          EBELP      TYPE EKBE-EBELP,
+          MATNR      TYPE EKBE-MATNR,
+          CHARG      TYPE EKBE-CHARG,
+          WERKS      TYPE EKBE-WERKS,
+          TXZ01      TYPE EKPO-TXZ01,
+          GRN        TYPE EKBE-BELNR,
+          BUDAT      TYPE EKBE-BUDAT,
+          BWART      TYPE EKBE-BWART,
+          BWETP      TYPE EKBE-BEWTP,
+          MENGE(15)  TYPE C,
+          DMBTR(15)  TYPE C,
+*          POQTY      TYPE EKPO-MENGE,
+          POQTY(15)  TYPE C,
+          GJAHR      TYPE RSEG-GJAHR,
+          BELNR      TYPE RSEG-BELNR,
+          MENGE1(15) TYPE C,
+          WRBTR(15)  TYPE C,
+          TBTKZ      TYPE RSEG-TBTKZ,
+          FIDOC      TYPE BKPF-BELNR,
+          FIDOCDT    TYPE BKPF-BUDAT,
+
+          LIFNR      TYPE LFA1-LIFNR,
+          BSART      TYPE EKKO-BSART,
+          NAME1      TYPE LFA1-NAME1,
+          ORT01      TYPE LFA1-ORT01,
+          BELNR_CLR  TYPE BSE_CLR-BELNR_CLR,
+          GJAHR_CLR  TYPE BSE_CLR-GJAHR_CLR,
+          PRUEFLOS   TYPE QALS-PRUEFLOS,
+          STATUS(25) TYPE C,
+          VDATUM     TYPE QAVE-VDATUM,
+          RMWWR(15)  TYPE C,
+          XBLNR      TYPE RBKP-XBLNR,
+          DUEDT      TYPE SY-DATUM,
+          BLDAT      TYPE BKPF-BLDAT,
+          DDAYS(10)  TYPE C,
+        END OF NSK2.
+
+TYPES : BEGIN OF ITAB7,
+          WERKS   TYPE MSEG-WERKS,
+          GRN     TYPE EKBE-BELNR,
+          BUDAT   TYPE EKBE-BUDAT,
+          BWART   TYPE EKBE-BWART,
+          BWETP   TYPE EKBE-BEWTP,
+          DMBTR   TYPE EKBE-DMBTR,
+          GJAHR   TYPE RSEG-GJAHR,
+          BELNR   TYPE RSEG-BELNR,
+          TBTKZ   TYPE RSEG-TBTKZ,
+          RMWWR   TYPE RBKP-RMWWR,
+          FIDOC   TYPE BKPF-BELNR,
+          FIDOCDT TYPE BKPF-BUDAT,
+          LIFNR   TYPE LFA1-LIFNR,
+          NAME1   TYPE LFA1-NAME1,
+          ORT01   TYPE LFA1-ORT01,
+          XBLNR   TYPE RBKP-XBLNR,
+          DUEDT   TYPE SY-DATUM,
+          BLDAT   TYPE BKPF-BLDAT,
+          DDAYS   TYPE I,
+        END OF ITAB7.
+
+DATA : IT_TAB1 TYPE TABLE OF ITAB1,
+       WA_TAB1 TYPE ITAB1,
+       IT_TAB2 TYPE TABLE OF ITAB2,
+       WA_TAB2 TYPE ITAB2,
+       IT_TAB3 TYPE TABLE OF ITAB3,
+       WA_TAB3 TYPE ITAB3,
+       IT_TAB4 TYPE TABLE OF ITAB4,
+       WA_TAB4 TYPE ITAB4,
+       IT_TAB5 TYPE TABLE OF ITAB5,
+       WA_TAB5 TYPE ITAB5,
+       IT_TAB6 TYPE TABLE OF ITAB6,
+       WA_TAB6 TYPE ITAB6,
+       IT_NSK1 TYPE TABLE OF ITAB6,
+       WA_NSK1 TYPE ITAB6,
+       IT_NSK2 TYPE TABLE OF NSK2,
+       WA_NSK2 TYPE NSK2,
+       IT_GOA2 TYPE TABLE OF NSK2,
+       WA_GOA2 TYPE NSK2,
+       IT_GOA1 TYPE TABLE OF ITAB6,
+       WA_GOA1 TYPE ITAB6,
+       IT_TAB7 TYPE TABLE OF ITAB7,
+       WA_TAB7 TYPE ITAB7,
+       IT_TAB8 TYPE TABLE OF ITAB7,
+       WA_TAB8 TYPE ITAB7.
+
+DATA: AWKEY TYPE BKPF-AWKEY,
+      A     TYPE I.
+DATA: DUEDATE TYPE SY-DATUM.
+DATA: DAYS TYPE I.
+DATA: DATE1  TYPE SY-DATUM,
+      DATE11 TYPE SY-DATUM,
+      DATE12 TYPE SY-DATUM.
+********************************************************
+TYPES:
+  T_DOCUMENT_DATA TYPE  SODOCCHGI1,
+  T_PACKING_LIST  TYPE  SOPCKLSTI1,
+  T_ATTACHMENT    TYPE  SOLISTI1,
+  T_BODY_MSG      TYPE  SOLISTI1,
+  T_RECEIVERS     TYPE  SOMLRECI1.
+
+DATA : W_ATTACHMENT  TYPE  T_ATTACHMENT,
+       W_ATTACHMENT1 TYPE  T_ATTACHMENT,
+       W_BODY_MSG    TYPE  T_BODY_MSG,
+       W_RECEIVERS   TYPE  T_RECEIVERS.
+DATA : W_DOCUMENT_DATA TYPE  T_DOCUMENT_DATA,
+       W_PACKING_LIST  TYPE  T_PACKING_LIST,
+       I_BODY_MSG      TYPE STANDARD TABLE OF T_BODY_MSG,
+       I_DOCUMENT_DATA TYPE STANDARD TABLE OF T_DOCUMENT_DATA,
+       I_PACKING_LIST  TYPE STANDARD TABLE OF T_PACKING_LIST,
+       I_ATTACHMENT    TYPE STANDARD TABLE OF T_ATTACHMENT,
+       I_RECEIVERS     TYPE STANDARD TABLE OF T_RECEIVERS.
+
+DATA : G_SENT_TO_ALL      TYPE SONV-FLAG,
+       G_TAB_LINES        TYPE I,
+       G_ATTACHMENT_LINES TYPE I.
+
+DATA : WA_DAT(10)  TYPE C.
+DATA: WA_DAT1(10) TYPE C.
+DATA: WA_DAT2(10) TYPE C.
+DATA: WA_DAT3(10) TYPE C.
+DATA: WA_DAT4(10) TYPE C.
+DATA: QTY1(15) TYPE C.
+CONSTANTS: CON_TAB     TYPE C VALUE CL_ABAP_CHAR_UTILITIES=>HORIZONTAL_TAB,
+           CON_CRET(2) TYPE C VALUE CL_ABAP_CHAR_UTILITIES=>CR_LF.
+*************************************************************
+
+SELECTION-SCREEN BEGIN OF BLOCK MERKMALE1 WITH FRAME TITLE TEXT-001.
+*select-options : s_date for mkpf-budat obligatory,
+*                 material for mseg-matnr,
+*                 mov for mseg-bwart.
+*select-options : vendor for mseg-lifnr,
+*                 bsart for ekko-bsart.
+*
+SELECT-OPTIONS PLANT FOR MSEG-WERKS OBLIGATORY.
+PARAMETERS : R1 RADIOBUTTON GROUP R1,
+             R2 RADIOBUTTON GROUP R1,
+             R3 RADIOBUTTON GROUP R1,
+             R4 RADIOBUTTON GROUP R1.
+*parameters:   year  like mkpf-mjahr obligatory.
+*selection-screen end of block merkmale1 .
+*
+*selection-screen begin of block merkmale2 with frame title text-001.
+*parameters : a1 radiobutton group r1,
+*             a2 radiobutton group r1.
+SELECTION-SCREEN END OF BLOCK MERKMALE1 .
+
+INITIALIZATION.
+  G_REPID = SY-REPID.
+
+START-OF-SELECTION.
+
+  PERFORM FORM1.
+  IF R1 EQ 'X'.
+    PERFORM DISPLAY.
+  ELSEIF R2 EQ 'X'.
+    PERFORM SUMMARY.
+  ELSEIF R3 EQ 'X'.
+    IF SY-HOST EQ 'SAPQLT' OR SY-HOST EQ 'SAPDEV'.
+    ELSE.
+      PERFORM QCEMAIL.
+    ENDIF.
+  ELSEIF R4 EQ 'X'.
+    IF SY-HOST EQ 'SAPQLT' OR SY-HOST EQ 'SAPDEV'.
+*    IF  SY-HOST EQ 'SAPDEV'.
+    ELSE.
+      PERFORM ACCEMAIL.
+    ENDIF.
+  ENDIF.
+
+*&---------------------------------------------------------------------*
+*&      Form  FORM1
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM FORM1 .
+  DATE11+6(2) = '01'.
+  DATE11+4(2) = '04'.
+  IF SY-DATUM+4(2) GE '04'.
+    DATE11+0(4) = SY-DATUM+0(4).
+  ELSE.
+    DATE11+0(4) = SY-DATUM+0(4) - 1.
+  ENDIF.
+
+  DATE12 = SY-DATUM - 180.
+  DATE12+6(2) = '01'.
+
+  IF DATE11 LT DATE12.
+    DATE1 = DATE11.
+  ELSE.
+    DATE1 = DATE12.
+  ENDIF.
+
+
+
+  SELECT * FROM LFB1 INTO TABLE IT_LFB1 WHERE LIFNR GE '0000010000' AND LIFNR LE '0000019999' AND BUKRS EQ '1000' AND MINDK IN ('MS1','MS2','MS3','MSM').
+*   select * from lfb1 into table it_lfb1 where lifnr eq '0000010124' and bukrs eq 'BCLL' and mindk eq 'MSM'.
+  IF SY-SUBRC EQ 0.
+    SELECT * FROM EKKO INTO TABLE IT_EKKO FOR ALL ENTRIES IN IT_LFB1 WHERE LIFNR EQ IT_LFB1-LIFNR.
+*      aedat ge date1 and
+    IF SY-SUBRC EQ 0.
+      SELECT * FROM EKPO INTO TABLE IT_EKPO FOR ALL ENTRIES IN IT_EKKO WHERE EBELN EQ IT_EKKO-EBELN AND WERKS IN PLANT AND LOEKZ EQ SPACE.
+      IF SY-SUBRC EQ 0.
+        SELECT * FROM EKBE INTO TABLE IT_EKBE FOR ALL ENTRIES IN IT_EKPO WHERE EBELN EQ IT_EKPO-EBELN AND EBELP EQ IT_EKPO-EBELP AND BEWTP EQ 'E'
+          AND BUDAT GE DATE1 .
+*******REVERSAL GRN*********
+        SELECT * FROM EKBE INTO TABLE IT_EKBE1 FOR ALL ENTRIES IN IT_EKPO WHERE EBELN EQ IT_EKPO-EBELN AND EBELP EQ IT_EKPO-EBELP AND BEWTP EQ 'E'
+      AND BUDAT GE DATE1 AND BWART EQ '102'.
+        IF SY-SUBRC EQ 0.
+          SELECT * FROM MSEG INTO TABLE IT_MSEG1 FOR ALL ENTRIES IN IT_EKBE1 WHERE MBLNR EQ IT_EKBE1-BELNR AND EBELN EQ IT_EKBE1-EBELN AND EBELP EQ IT_EKBE1-EBELP.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+*  select * from rseg into table it_rseg for all entries in it_ekbe where bukrs eq 'BCLL' and  ebeln eq it_ekbe-ebeln
+*  and ebelp eq it_ekbe-ebelp .
+**      and lfbnr eq it_tab1-grn.
+**    and ekorg in org
+** and bsart in po_typ.
+**  if sy-subrc ne 0.
+**    exit.
+**  endif.
+*GRN REVERSAL***
+
+
+************************************************
+  LOOP AT IT_EKBE INTO WA_EKBE WHERE BWART NE '102' .
+    IF WA_EKBE-SHKZG EQ 'H'.
+      WA_EKBE-MENGE = WA_EKBE-MENGE * ( - 1 ).
+      WA_EKBE-DMBTR = WA_EKBE-DMBTR * ( - 1 ).
+    ENDIF.
+    WA_TAB1-EBELN = WA_EKBE-EBELN.
+    WA_TAB1-EBELP = WA_EKBE-EBELP.
+    WA_TAB1-MATNR = WA_EKBE-MATNR.
+    WA_TAB1-CHARG = WA_EKBE-CHARG.
+    WA_TAB1-WERKS = WA_EKBE-WERKS.
+    WA_TAB1-GRN = WA_EKBE-BELNR.
+    WA_TAB1-BUDAT = WA_EKBE-BUDAT.
+    WA_TAB1-BWART = WA_EKBE-BWART.
+    WA_TAB1-BWETP = WA_EKBE-BEWTP.
+    WA_TAB1-MENGE = WA_EKBE-MENGE.
+    WA_TAB1-DMBTR = WA_EKBE-DMBTR.
+    READ TABLE IT_EKPO INTO WA_EKPO WITH KEY EBELN = WA_EKBE-EBELN EBELP = WA_EKBE-EBELP.
+    IF SY-SUBRC EQ 0.
+      WA_TAB1-POQTY = WA_EKPO-MENGE.
+      WA_TAB1-TXZ01 = WA_EKPO-TXZ01.
+    ENDIF.
+    COLLECT WA_TAB1 INTO IT_TAB1.
+    CLEAR WA_TAB1.
+  ENDLOOP.
+
+***********GRN REVERSAL****************
+
+  LOOP AT IT_TAB1 INTO WA_TAB1.
+    READ TABLE IT_MSEG1 INTO WA_MSEG1 WITH KEY SMBLN = WA_TAB1-GRN.
+    IF SY-SUBRC EQ 0.
+      DELETE IT_TAB1 WHERE GRN = WA_TAB1-GRN.
+    ENDIF.
+  ENDLOOP.
+****************
+
+
+*
+  IF IT_TAB1 IS NOT INITIAL.
+    SELECT * FROM RSEG INTO TABLE IT_RSEG FOR ALL ENTRIES IN IT_TAB1 WHERE BUKRS EQ '1000' AND EBELN EQ IT_TAB1-EBELN AND EBELP EQ IT_TAB1-EBELP
+      AND LFBNR EQ IT_TAB1-GRN .
+  ENDIF.
+
+*remove reversal docs.
+
+  LOOP AT IT_RSEG INTO WA_RSEG.
+    SELECT SINGLE * FROM RBKP WHERE BELNR EQ WA_RSEG-BELNR AND GJAHR = WA_RSEG-GJAHR AND STBLG EQ SPACE.
+    IF SY-SUBRC EQ 4.
+      DELETE IT_RSEG WHERE BELNR EQ WA_RSEG-BELNR AND GJAHR = WA_RSEG-GJAHR.
+    ENDIF.
+*    clear : awkey.
+*    concatenate wa_rseg-belnr wa_rseg-gjahr into awkey.
+*
+**    write : / wa_rseg-belnr,wa_rseg-gjahr,wa_rseg-ebeln,wa_rseg-ebelp,wa_rseg-lfbnr.
+*    select single * from bkpf where bukrs eq 'BCLL' and gjahr eq wa_rseg-gjahr and awkey eq awkey and xreversal eq space.
+*    if sy-subrc eq 4.
+*      delete it_rseg where belnr eq wa_rseg-belnr and gjahr = wa_rseg-gjahr.
+*    endif.
+*
+  ENDLOOP.
+
+*  SORT IT_RSEG
+
+*
+  LOOP AT IT_TAB1 INTO WA_TAB1.
+*    format color 1.
+*    write : / 'rec1', wa_tab1-ebeln,wa_tab1-ebelp,wa_tab1-poqty,wa_tab1-grn,wa_tab1-budat,wa_tab1-bwart,wa_tab1-bwetp,wa_tab1-menge,wa_tab1-dmbtr.
+    LOOP AT IT_RSEG INTO WA_RSEG WHERE EBELN = WA_TAB1-EBELN AND EBELP = WA_TAB1-EBELP AND LFBNR EQ WA_TAB1-GRN.
+      IF SY-SUBRC EQ 0.
+        IF WA_RSEG-SHKZG EQ 'H'.
+          WA_RSEG-MENGE = WA_RSEG-MENGE * ( - 1 ).
+          WA_RSEG-WRBTR = WA_RSEG-WRBTR * ( - 1 ).
+        ENDIF.
+*        format color 2.
+*        write : / 'MIRO', wa_rseg-gjahr,wa_rseg-belnr,wa_rseg-menge,wa_rseg-wrbtr,wa_rseg-tbtkz.
+        WA_TAB2-EBELN = WA_TAB1-EBELN.
+        WA_TAB2-EBELP = WA_TAB1-EBELP.
+        WA_TAB2-MATNR = WA_TAB1-MATNR.
+        WA_TAB2-CHARG = WA_TAB1-CHARG.
+        WA_TAB2-WERKS = WA_TAB1-WERKS.
+        WA_TAB2-TXZ01 = WA_TAB1-TXZ01.
+        WA_TAB2-POQTY = WA_TAB1-POQTY.
+        WA_TAB2-GRN = WA_TAB1-GRN.
+        WA_TAB2-BUDAT = WA_TAB1-BUDAT.
+        WA_TAB2-BWART = WA_TAB1-BWART.
+        WA_TAB2-BWETP = WA_TAB1-BWETP.
+        WA_TAB2-MENGE = WA_TAB1-MENGE.
+        WA_TAB2-DMBTR = WA_TAB1-DMBTR.
+        WA_TAB2-GJAHR = WA_RSEG-GJAHR.
+        WA_TAB2-BELNR = WA_RSEG-BELNR.
+        WA_TAB2-MENGE1 = WA_RSEG-MENGE.
+        WA_TAB2-WRBTR = WA_RSEG-WRBTR.
+        WA_TAB2-TBTKZ = WA_RSEG-TBTKZ.
+        COLLECT WA_TAB2 INTO IT_TAB2.
+        CLEAR WA_TAB2.
+      ENDIF.
+    ENDLOOP.
+    CLEAR SY-SUBRC.
+  ENDLOOP.
+
+  LOOP AT IT_TAB1 INTO WA_TAB1 .
+*    format color 1.
+*    write : / 'rec1', wa_tab1-ebeln,wa_tab1-ebelp,wa_tab1-poqty,wa_tab1-grn,wa_tab1-budat,wa_tab1-bwart,wa_tab1-bwetp,wa_tab1-menge,wa_tab1-dmbtr.
+    READ TABLE IT_RSEG INTO WA_RSEG WITH KEY EBELN = WA_TAB1-EBELN EBELP = WA_TAB1-EBELP.
+    IF SY-SUBRC EQ 4.
+      WA_TAB2-EBELN = WA_TAB1-EBELN.
+      WA_TAB2-EBELP = WA_TAB1-EBELP.
+      WA_TAB2-MATNR = WA_TAB1-MATNR.
+      WA_TAB2-CHARG = WA_TAB1-CHARG.
+      WA_TAB2-WERKS = WA_TAB1-WERKS.
+      WA_TAB2-TXZ01 = WA_TAB1-TXZ01.
+      WA_TAB2-POQTY = WA_TAB1-POQTY.
+      WA_TAB2-GRN = WA_TAB1-GRN.
+      WA_TAB2-BUDAT = WA_TAB1-BUDAT.
+      WA_TAB2-BWART = WA_TAB1-BWART.
+      WA_TAB2-BWETP = WA_TAB1-BWETP.
+      WA_TAB2-MENGE = WA_TAB1-MENGE.
+      WA_TAB2-DMBTR = WA_TAB1-DMBTR.
+      WA_TAB2-GJAHR = SPACE.
+      WA_TAB2-BELNR = SPACE.
+      WA_TAB2-MENGE1 = 0.
+      WA_TAB2-WRBTR = 0.
+      WA_TAB2-TBTKZ = SPACE.
+      COLLECT WA_TAB2 INTO IT_TAB2.
+      CLEAR WA_TAB2.
+    ENDIF.
+    CLEAR SY-SUBRC.
+  ENDLOOP.
+
+  LOOP AT IT_TAB2 INTO WA_TAB2.
+*    write : / 'rec1', wa_tab2-ebeln,wa_tab2-ebelp,wa_tab2-poqty,wa_tab2-grn,wa_tab2-budat,wa_tab2-bwart,wa_tab2-bwetp,wa_tab2-menge,wa_tab2-dmbtr.
+*    write :  'MIRO', wa_tab2-gjahr,wa_tab2-belnr,wa_tab2-menge,wa_tab2-wrbtr,wa_tab2-tbtkz.
+    WA_TAB3-EBELN = WA_TAB2-EBELN.
+    WA_TAB3-EBELP = WA_TAB2-EBELP.
+    WA_TAB3-MATNR = WA_TAB2-MATNR.
+    WA_TAB3-CHARG = WA_TAB2-CHARG.
+    WA_TAB3-WERKS = WA_TAB2-WERKS.
+    WA_TAB3-TXZ01 = WA_TAB2-TXZ01.
+    WA_TAB3-POQTY = WA_TAB2-POQTY.
+    WA_TAB3-GRN = WA_TAB2-GRN.
+    WA_TAB3-BUDAT = WA_TAB2-BUDAT.
+    WA_TAB3-BWART = WA_TAB2-BWART.
+    WA_TAB3-BWETP = WA_TAB2-BWETP.
+    WA_TAB3-MENGE = WA_TAB2-MENGE.
+    WA_TAB3-DMBTR = WA_TAB2-DMBTR.
+    WA_TAB3-GJAHR = WA_TAB2-GJAHR.
+    WA_TAB3-BELNR = WA_TAB2-BELNR.
+    WA_TAB3-MENGE1 = WA_TAB2-MENGE1.
+    WA_TAB3-WRBTR = WA_TAB2-WRBTR.
+    WA_TAB3-TBTKZ = WA_TAB2-TBTKZ.
+    SELECT SINGLE * FROM EKKO WHERE EBELN EQ WA_TAB2-EBELN.
+    IF SY-SUBRC EQ 0.
+      WA_TAB3-LIFNR = EKKO-LIFNR.
+      WA_TAB3-BSART = EKKO-BSART.
+      SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ EKKO-LIFNR.
+      IF SY-SUBRC EQ 0.
+        WA_TAB3-NAME1 = LFA1-NAME1.
+        WA_TAB3-ORT01 = LFA1-ORT01.
+      ENDIF.
+    ENDIF.
+    CLEAR : AWKEY.
+    CONCATENATE WA_TAB2-BELNR WA_TAB2-GJAHR INTO AWKEY.
+    SELECT SINGLE * FROM BKPF WHERE BUKRS EQ '1000' AND GJAHR EQ WA_TAB2-GJAHR AND AWKEY EQ AWKEY AND XREVERSAL EQ SPACE.
+    IF SY-SUBRC EQ 0.
+      WA_TAB3-FIDOC = BKPF-BELNR.
+      WA_TAB3-FIDOCDT = BKPF-BUDAT.
+      SELECT SINGLE * FROM BSE_CLR WHERE BUKRS_CLR EQ '1000' AND BUKRS EQ '1000' AND BELNR EQ BKPF-BELNR AND GJAHR EQ BKPF-GJAHR .
+*        and agzei gt 0.
+      IF SY-SUBRC EQ 0.
+        WA_TAB3-BELNR_CLR = BSE_CLR-BELNR_CLR.
+        WA_TAB3-GJAHR_CLR = BSE_CLR-GJAHR_CLR.
+      ENDIF.
+    ENDIF.
+    COLLECT WA_TAB3 INTO IT_TAB3.
+    CLEAR WA_TAB3.
+  ENDLOOP.
+
+  SORT IT_TAB3 BY EBELP EBELN GRN.
+*******************************************************************
+  IF IT_TAB3 IS NOT INITIAL.
+    SELECT * FROM QALS INTO TABLE IT_QALS FOR ALL ENTRIES IN IT_TAB3 WHERE MBLNR EQ IT_TAB3-GRN AND WERK EQ IT_TAB3-WERKS AND MATNR EQ IT_TAB3-MATNR
+      AND CHARG EQ IT_TAB3-CHARG.
+  ENDIF.
+  LOOP AT IT_QALS INTO WA_QALS.
+    SELECT SINGLE * FROM JEST WHERE OBJNR EQ WA_QALS-OBJNR AND STAT EQ 'I0224'.
+    IF SY-SUBRC EQ 0.
+      DELETE IT_QALS WHERE PRUEFLOS EQ WA_QALS-PRUEFLOS.
+    ENDIF.
+  ENDLOOP.
+  SORT IT_QALS DESCENDING BY ENSTEHDAT ENTSTEZEIT.
+*****************************************************************
+  SORT IT_TAB3 BY EBELP EBELN GRN.
+  LOOP AT IT_TAB3 INTO WA_TAB3 WHERE BELNR_CLR EQ 0.
+    CLEAR : A.
+    WA_TAB4-MATNR = WA_TAB3-MATNR.
+    WA_TAB4-CHARG = WA_TAB3-CHARG.
+    WA_TAB4-WERKS = WA_TAB3-WERKS.
+    WA_TAB4-TXZ01 = WA_TAB3-TXZ01.
+    WA_TAB4-EBELN = WA_TAB3-EBELN.
+    WA_TAB4-EBELP = WA_TAB3-EBELP.
+    WA_TAB4-POQTY = WA_TAB3-POQTY.
+    WA_TAB4-GRN = WA_TAB3-GRN.
+    WA_TAB4-LIFNR = WA_TAB3-LIFNR.
+    WA_TAB4-NAME1 = WA_TAB3-NAME1.
+    WA_TAB4-ORT01 = WA_TAB3-ORT01.
+*****QC STATUS***********
+    READ TABLE IT_QALS INTO WA_QALS WITH KEY MBLNR = WA_TAB3-GRN MATNR = WA_TAB3-MATNR CHARG = WA_TAB3-CHARG WERK = WA_TAB3-WERKS.
+    IF SY-SUBRC EQ 0.
+      WA_TAB4-PRUEFLOS = WA_QALS-PRUEFLOS.
+      SELECT SINGLE * FROM QAVE WHERE PRUEFLOS EQ WA_QALS-PRUEFLOS.
+      IF SY-SUBRC EQ 0.
+        WA_TAB4-VDATUM = QAVE-VDATUM.
+        IF QAVE-VBEWERTUNG EQ 'A'.
+          WA_TAB4-STATUS = 'ACCEPTED'.
+        ELSEIF QAVE-VBEWERTUNG EQ 'R'.
+          WA_TAB4-STATUS = 'REJECTED'.
+        ELSEIF QAVE-VBEWERTUNG EQ 'PA'.
+          WA_TAB4-STATUS = 'PARTIALLY ACCEPTED'.
+        ENDIF.
+      ELSE.
+        WA_TAB4-STATUS = 'UNDER PROCESS'.
+      ENDIF.
+    ENDIF.
+
+*******************************************
+    WA_TAB4-BUDAT = WA_TAB3-BUDAT.
+    WA_TAB4-BWART = WA_TAB3-BWART.
+    WA_TAB4-BWETP = WA_TAB3-BWETP.
+    ON CHANGE OF WA_TAB3-EBELN.
+      A = 1.
+    ENDON.
+    ON CHANGE OF WA_TAB3-EBELP.
+      A = 1.
+    ENDON.
+    ON CHANGE OF WA_TAB3-GRN.
+      A = 1.
+    ENDON.
+    IF A EQ 1.
+      WA_TAB4-MENGE = WA_TAB3-MENGE.
+      WA_TAB4-DMBTR = WA_TAB3-DMBTR.
+    ENDIF.
+
+    WA_TAB4-GJAHR = WA_TAB3-GJAHR.
+    WA_TAB4-BELNR = WA_TAB3-BELNR.
+    WA_TAB4-MENGE1 = WA_TAB3-MENGE1.
+    WA_TAB4-WRBTR = WA_TAB3-WRBTR.
+    WA_TAB4-TBTKZ = WA_TAB3-TBTKZ.
+    WA_TAB4-FIDOC = WA_TAB3-FIDOC.
+    WA_TAB4-FIDOCDT = WA_TAB3-FIDOCDT.
+    COLLECT WA_TAB4 INTO IT_TAB4.
+    CLEAR WA_TAB4.
+  ENDLOOP.
+
+  SORT IT_TAB4 BY GJAHR BELNR.
+  LOOP AT IT_TAB4 INTO WA_TAB4.
+    WA_TAB5-MATNR = WA_TAB4-MATNR.
+    WA_TAB5-CHARG = WA_TAB4-CHARG.
+    WA_TAB5-WERKS = WA_TAB4-WERKS.
+    WA_TAB5-TXZ01 = WA_TAB4-TXZ01.
+    WA_TAB5-EBELN = WA_TAB4-EBELN.
+    WA_TAB5-EBELP = WA_TAB4-EBELP.
+    WA_TAB5-POQTY = WA_TAB4-POQTY.
+    WA_TAB5-GRN = WA_TAB4-GRN.
+    WA_TAB5-LIFNR = WA_TAB4-LIFNR.
+    WA_TAB5-NAME1 = WA_TAB4-NAME1.
+    WA_TAB5-ORT01 = WA_TAB4-ORT01.
+*****QC STATUS***********
+    WA_TAB5-PRUEFLOS = WA_TAB4-PRUEFLOS.
+    WA_TAB5-VDATUM = WA_TAB4-VDATUM.
+    WA_TAB5-STATUS = WA_TAB4-STATUS.
+*******************************************
+    WA_TAB5-BUDAT = WA_TAB4-BUDAT.
+    WA_TAB5-BWART = WA_TAB4-BWART.
+    WA_TAB5-BWETP = WA_TAB4-BWETP.
+    WA_TAB5-MENGE = WA_TAB4-MENGE.
+    WA_TAB5-DMBTR = WA_TAB4-DMBTR.
+    WA_TAB5-GJAHR = WA_TAB4-GJAHR.
+    WA_TAB5-BELNR = WA_TAB4-BELNR.
+    ON CHANGE OF WA_TAB4-BELNR.
+      SELECT SINGLE * FROM RBKP WHERE BELNR EQ WA_TAB4-BELNR AND GJAHR EQ WA_TAB4-GJAHR.
+      IF SY-SUBRC EQ 0.
+        READ TABLE IT_RSEG INTO WA_RSEG WITH KEY BELNR = WA_TAB4-BELNR GJAHR = WA_TAB4-GJAHR.
+        IF SY-SUBRC EQ 0.
+          IF WA_RSEG-SHKZG EQ 'H'.
+            RBKP-RMWWR = RBKP-RMWWR * ( - 1 ).
+          ENDIF.
+        ENDIF.
+        WA_TAB5-RMWWR = RBKP-RMWWR.
+        WA_TAB5-XBLNR = RBKP-XBLNR.
+        WA_TAB5-DUEDT = RBKP-ZFBDT + RBKP-ZBD1T.  "DUE DATE
+        WA_TAB5-BLDAT = RBKP-BLDAT.
+      ENDIF.
+    ENDON.
+    WA_TAB5-MENGE1 = WA_TAB4-MENGE1.
+    WA_TAB5-WRBTR = WA_TAB4-WRBTR.
+    WA_TAB5-TBTKZ = WA_TAB4-TBTKZ.
+    WA_TAB5-FIDOC = WA_TAB4-FIDOC.
+    WA_TAB5-FIDOCDT = WA_TAB4-FIDOCDT.
+    COLLECT WA_TAB5 INTO IT_TAB5.
+    CLEAR WA_TAB5.
+  ENDLOOP.
+
+
+  SORT IT_TAB5 BY EBELN EBELP.
+
+  LOOP AT IT_TAB5 INTO WA_TAB5.
+    CLEAR : A.
+    WA_TAB6-MATNR = WA_TAB5-MATNR.
+    WA_TAB6-CHARG = WA_TAB5-CHARG.
+    WA_TAB6-WERKS = WA_TAB5-WERKS.
+    WA_TAB6-TXZ01 = WA_TAB5-TXZ01.
+    WA_TAB6-EBELN = WA_TAB5-EBELN.
+    WA_TAB6-EBELP = WA_TAB5-EBELP.
+    ON CHANGE OF WA_TAB5-EBELN.
+      A = 1.
+    ENDON.
+    ON CHANGE OF WA_TAB5-EBELP.
+      A = 1.
+    ENDON.
+    IF A = 1.
+      WA_TAB6-POQTY = WA_TAB5-POQTY.
+    ENDIF.
+    WA_TAB6-GRN = WA_TAB5-GRN.
+    WA_TAB6-LIFNR = WA_TAB5-LIFNR.
+    WA_TAB6-NAME1 = WA_TAB5-NAME1.
+    WA_TAB6-ORT01 = WA_TAB5-ORT01.
+*****QC STATUS***********
+    WA_TAB6-PRUEFLOS = WA_TAB5-PRUEFLOS.
+    WA_TAB6-VDATUM = WA_TAB5-VDATUM.
+    WA_TAB6-STATUS = WA_TAB5-STATUS.
+*******************************************
+    WA_TAB6-BUDAT = WA_TAB5-BUDAT.
+    WA_TAB6-DDAYS = SY-DATUM -  WA_TAB5-BUDAT.
+    WA_TAB6-BWART = WA_TAB5-BWART.
+    WA_TAB6-BWETP = WA_TAB5-BWETP.
+    WA_TAB6-MENGE = WA_TAB5-MENGE.
+    WA_TAB6-DMBTR = WA_TAB5-DMBTR.
+    WA_TAB6-GJAHR = WA_TAB5-GJAHR.
+    WA_TAB6-BELNR = WA_TAB5-BELNR.
+    WA_TAB6-RMWWR = WA_TAB5-RMWWR.
+    WA_TAB6-XBLNR = WA_TAB5-XBLNR.
+    WA_TAB6-DUEDT = WA_TAB5-DUEDT. "DUE DATE
+    WA_TAB6-BLDAT = WA_TAB5-BLDAT.
+    WA_TAB6-MENGE1 = WA_TAB5-MENGE1.
+    WA_TAB6-WRBTR = WA_TAB5-WRBTR.
+    WA_TAB6-TBTKZ = WA_TAB5-TBTKZ.
+    WA_TAB6-FIDOC = WA_TAB5-FIDOC.
+    WA_TAB6-FIDOCDT = WA_TAB5-FIDOCDT.
+    COLLECT WA_TAB6 INTO IT_TAB6.
+    CLEAR WA_TAB6.
+  ENDLOOP.
+
+  SORT IT_TAB6 BY LIFNR EBELN EBELP GRN BELNR.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM DISPLAY .
+
+
+
+  WA_FIELDCAT-FIELDNAME = 'PRUEFLOS'.
+  WA_FIELDCAT-SELTEXT_L = 'INSP. LOT'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'STATUS'.
+  WA_FIELDCAT-SELTEXT_L = 'INSP STATUS'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'VDATUM'.
+  WA_FIELDCAT-SELTEXT_L = 'QC ACP/REJ DATE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'WERKS'.
+  WA_FIELDCAT-SELTEXT_L = 'PLANT'.
+*  WA_FIELDCAT-outputlen = '20'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MATNR'.
+  WA_FIELDCAT-SELTEXT_L = 'MATERIAL CODE'.
+*  WA_FIELDCAT-outputlen = '20'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'TXZ01'.
+  WA_FIELDCAT-SELTEXT_L = 'MATERIAL NAME'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'LIFNR'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR CODE'.
+*  WA_FIELDCAT-outputlen = '20'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+
+  WA_FIELDCAT-FIELDNAME = 'NAME1'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR NAME'.
+*  WA_FIELDCAT-outputlen = '20'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+
+  WA_FIELDCAT-FIELDNAME = 'ORT01'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR CITY'.
+*  WA_FIELDCAT-outputlen = '20'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+
+  WA_FIELDCAT-FIELDNAME = 'EBELN'.
+  WA_FIELDCAT-SELTEXT_L = 'PO NO'.
+*  WA_FIELDCAT-outputlen = '20'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'EBELP'.
+  WA_FIELDCAT-SELTEXT_L = 'PO ITEM NO.'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'POQTY'.
+  WA_FIELDCAT-SELTEXT_L = 'PO QTY'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'GRN'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BUDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN POSTING DATE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BWART'.
+  WA_FIELDCAT-SELTEXT_L = 'MOV'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+*  WA_FIELDCAT-fieldname = 'BWETP'.
+*  WA_FIELDCAT-SELTEXT_L = 'CN/DN'.
+**  WA_FIELDCAT-outputlen = '80'.
+*  append WA_FIELDCAT to FIELDCAT.
+*  clear WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MENGE'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN QTY'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'DMBTR'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN VALUE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'GJAHR'.
+  WA_FIELDCAT-SELTEXT_L = 'FI YEAR'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+*  loop at it_tab3 into wa_tab3 where belnr_clr eq space.
+*    write : / '3', wa_tab3-matnr,wa_tab3-txz01,wa_tab3-ebeln,wa_tab3-ebelp,wa_tab3-poqty, wa_tab3-grn,wa_tab3-budat,wa_tab3-bwart,wa_tab3-bwetp,
+*    wa_tab3-menge,wa_tab3-dmbtr,wa_tab3-gjahr, wa_tab3-belnr ,wa_tab3-menge1,wa_tab3-wrbtr , wa_tab3-tbtkz,
+*      wa_tab3-fidoc, wa_tab3-fidocdt.
+*  endloop.
+
+  WA_FIELDCAT-FIELDNAME = 'BELNR'.
+  WA_FIELDCAT-SELTEXT_L = 'MIRO DOC NO.'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MENGE1'.
+  WA_FIELDCAT-SELTEXT_L = 'MIRO QTY'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'WRBTR'.
+  WA_FIELDCAT-SELTEXT_L = 'MIRO BASE VAL'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'RMWWR'.
+  WA_FIELDCAT-SELTEXT_L = 'MIRO TOTAL VALUE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'XBLNR'.
+  WA_FIELDCAT-SELTEXT_L = 'BILL NO.'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BLDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'BILL DATE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'DUEDT'.
+  WA_FIELDCAT-SELTEXT_L = 'DUE DATE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'TBTKZ'.
+  WA_FIELDCAT-SELTEXT_L = 'CN/DN IND'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'FIDOC'.
+  WA_FIELDCAT-SELTEXT_L = 'FI DOC NO.'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'FIDOCDT'.
+  WA_FIELDCAT-SELTEXT_L = 'FI DOC POSTING DATE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'DDAYS'.
+  WA_FIELDCAT-SELTEXT_L = 'DAYS FROM GRN'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+
+*  wa_fieldcat-fieldname = 'KUNAG'.
+*  wa_fieldcat-seltext_s = 'RECEIPIENT PLANT'.
+*  append wa_fieldcat to fieldcat.
+*
+*  wa_fieldcat-fieldname = 'RSTCD3'.
+*  wa_fieldcat-seltext_s = 'RECEIPIENT''S GST NO'.
+*  append wa_fieldcat to fieldcat.
+*
+*  wa_fieldcat-fieldname = 'RST'.
+*  wa_fieldcat-seltext_s = 'RECEPIENT''S STATE CODE'.
+*  append wa_fieldcat to fieldcat.
+
+
+
+  LAYOUT-ZEBRA = 'X'.
+  LAYOUT-COLWIDTH_OPTIMIZE = 'X'.
+  LAYOUT-WINDOW_TITLEBAR  = 'MSME VENDOR STATUS'.
+
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+*     I_INTERFACE_CHECK       = ' '
+*     I_BYPASSING_BUFFER      = ' '
+*     I_BUFFER_ACTIVE         = ' '
+      I_CALLBACK_PROGRAM      = G_REPID
+*     I_CALLBACK_PF_STATUS_SET          = ' '
+      I_CALLBACK_USER_COMMAND = 'USER_COMM'
+      I_CALLBACK_TOP_OF_PAGE  = 'TOP'
+*     I_CALLBACK_HTML_TOP_OF_PAGE       = ' '
+*     I_CALLBACK_HTML_END_OF_LIST       = ' '
+*     I_STRUCTURE_NAME        =
+*     I_BACKGROUND_ID         = ' '
+*     I_GRID_TITLE            =
+*     I_GRID_SETTINGS         =
+      IS_LAYOUT               = LAYOUT
+      IT_FIELDCAT             = FIELDCAT
+*     IT_EXCLUDING            =
+*     IT_SPECIAL_GROUPS       =
+*     IT_SORT                 =
+*     IT_FILTER               =
+*     IS_SEL_HIDE             =
+*     I_DEFAULT               = 'X'
+      I_SAVE                  = 'A'
+*     IS_VARIANT              =
+*     IT_EVENTS               =
+*     IT_EVENT_EXIT           =
+*     IS_PRINT                =
+*     IS_REPREP_ID            =
+*     I_SCREEN_START_COLUMN   = 0
+*     I_SCREEN_START_LINE     = 0
+*     I_SCREEN_END_COLUMN     = 0
+*     I_SCREEN_END_LINE       = 0
+*     I_HTML_HEIGHT_TOP       = 0
+*     I_HTML_HEIGHT_END       = 0
+*     IT_ALV_GRAPHICS         =
+*     IT_HYPERLINK            =
+*     IT_ADD_FIELDCAT         =
+*     IT_EXCEPT_QINFO         =
+*     IR_SALV_FULLSCREEN_ADAPTER        =
+* IMPORTING
+*     E_EXIT_CAUSED_BY_CALLER =
+*     ES_EXIT_CAUSED_BY_USER  =
+    TABLES
+      T_OUTTAB                = IT_TAB6
+    EXCEPTIONS
+      PROGRAM_ERROR           = 1
+      OTHERS                  = 2.
+  IF SY-SUBRC <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+ENDFORM.
+
+FORM TOP.
+
+  DATA: COMMENT    TYPE SLIS_T_LISTHEADER,
+        WA_COMMENT LIKE LINE OF COMMENT.
+
+  WA_COMMENT-TYP = 'A'.
+  WA_COMMENT-INFO = 'MSME STATUS'.
+*  WA_COMMENT-INFO = P_FRMDT.
+  APPEND WA_COMMENT TO COMMENT.
+
+  CALL FUNCTION 'REUSE_ALV_COMMENTARY_WRITE'
+    EXPORTING
+      IT_LIST_COMMENTARY = COMMENT
+*     I_LOGO             = 'ENJOYSAP_LOGO'
+*     I_END_OF_LIST_GRID =
+*     I_ALV_FORM         =
+    .
+
+  CLEAR COMMENT.
+
+ENDFORM.                    "TOP
+
+
+
+*&---------------------------------------------------------------------*
+*&      Form  USER_COMM
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->UCOMM      text
+*      -->SELFIELD   text
+*----------------------------------------------------------------------*
+FORM USER_COMM USING UCOMM LIKE SY-UCOMM
+                     SELFIELD TYPE SLIS_SELFIELD.
+
+
+
+  CASE SELFIELD-FIELDNAME.
+    WHEN 'EBELN'.
+      SET PARAMETER ID 'BES' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'ME23N' AND SKIP FIRST SCREEN.
+    WHEN 'GRN'.
+      SET PARAMETER ID 'MBN' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'MB03' AND SKIP FIRST SCREEN.
+    WHEN 'FIDOC'.
+      SET PARAMETER ID 'BLN' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'FB03' AND SKIP FIRST SCREEN.
+    WHEN 'LIFNR'.
+      SET PARAMETER ID 'LIF' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'XK03' AND SKIP FIRST SCREEN.
+    WHEN 'BELNR'.
+      SET PARAMETER ID 'RBN' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'MIR4' AND SKIP FIRST SCREEN.
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.                    "USER_COMM
+*&---------------------------------------------------------------------*
+*&      Form  SUMMARY
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM SUMMARY .
+
+  LOOP AT IT_TAB6 INTO WA_TAB6.
+    WA_TAB7-WERKS = WA_TAB6-WERKS.
+    WA_TAB7-GRN = WA_TAB6-GRN.
+    WA_TAB7-BUDAT = WA_TAB6-BUDAT.
+    WA_TAB7-BWART = WA_TAB6-BWART.
+    WA_TAB7-BWETP = WA_TAB6-BWETP.
+    WA_TAB7-DMBTR = WA_TAB6-DMBTR.
+    WA_TAB7-GJAHR = WA_TAB6-GJAHR.
+    WA_TAB7-BELNR = WA_TAB6-BELNR.
+    WA_TAB7-RMWWR = WA_TAB6-RMWWR.
+    WA_TAB7-TBTKZ = WA_TAB6-TBTKZ.
+    WA_TAB7-FIDOC = WA_TAB6-FIDOC.
+    WA_TAB7-FIDOCDT = WA_TAB6-FIDOCDT.
+    WA_TAB7-LIFNR = WA_TAB6-LIFNR.
+    WA_TAB7-NAME1 = WA_TAB6-NAME1.
+    WA_TAB7-ORT01 = WA_TAB6-ORT01.
+*    wa_tab7-xblnr = wa_tab6-xblnr.
+*    wa_tab7-bldat = wa_tab6-bldat.
+*    wa_tab7-duedt = wa_tab6-duedt.
+    COLLECT WA_TAB7 INTO IT_TAB7.
+    CLEAR WA_TAB7.
+*    write : / '3', wa_tab3-matnr,wa_tab3-txz01,wa_tab3-ebeln,wa_tab3-ebelp,wa_tab3-poqty, wa_tab3-grn,wa_tab3-budat,wa_tab3-bwart,wa_tab3-bwetp,
+*    wa_tab3-menge,wa_tab3-dmbtr,wa_tab3-gjahr, wa_tab3-belnr ,wa_tab3-menge1,wa_tab3-wrbtr , wa_tab3-tbtkz,
+*      wa_tab3-fidoc, wa_tab3-fidocdt.
+  ENDLOOP.
+  SORT IT_TAB6 DESCENDING BY XBLNR.
+  LOOP AT IT_TAB7 INTO WA_TAB7.
+    WA_TAB8-WERKS = WA_TAB7-WERKS.
+    WA_TAB8-GRN = WA_TAB7-GRN.
+    WA_TAB8-BUDAT = WA_TAB7-BUDAT.
+    WA_TAB8-BWART = WA_TAB7-BWART.
+    WA_TAB8-BWETP = WA_TAB7-BWETP.
+    WA_TAB8-DMBTR = WA_TAB7-DMBTR.
+    WA_TAB8-GJAHR = WA_TAB7-GJAHR.
+    WA_TAB8-BELNR = WA_TAB7-BELNR.
+    WA_TAB8-RMWWR = WA_TAB7-RMWWR.
+    WA_TAB8-TBTKZ = WA_TAB7-TBTKZ.
+    WA_TAB8-FIDOC = WA_TAB7-FIDOC.
+    WA_TAB8-FIDOCDT = WA_TAB7-FIDOCDT.
+    WA_TAB8-LIFNR = WA_TAB7-LIFNR.
+    WA_TAB8-NAME1 = WA_TAB7-NAME1.
+    WA_TAB8-ORT01 = WA_TAB7-ORT01.
+    WA_TAB8-DDAYS = SY-DATUM -  WA_TAB7-BUDAT.
+*    wa_tab8-xblnr = wa_tab7-xblnr.
+*    wa_tab8-bldat = wa_tab7-bldat.
+*    wa_tab8-duedt = wa_tab7-duedt.
+    READ TABLE IT_TAB6 INTO WA_TAB6 WITH KEY FIDOC = WA_TAB7-FIDOC GJAHR = WA_TAB7-GJAHR.
+    IF SY-SUBRC EQ 0.
+      WA_TAB8-XBLNR = WA_TAB6-XBLNR.
+      WA_TAB8-BLDAT = WA_TAB6-BLDAT.
+      WA_TAB8-DUEDT = WA_TAB6-DUEDT.
+    ENDIF.
+    COLLECT WA_TAB8 INTO IT_TAB8.
+    CLEAR WA_TAB8.
+  ENDLOOP.
+
+
+  WA_FIELDCAT-FIELDNAME = 'WERKS'.
+  WA_FIELDCAT-SELTEXT_L = 'PLANT'.
+*  WA_FIELDCAT-outputlen = '20'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'LIFNR'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR CODE'.
+*  WA_FIELDCAT-outputlen = '20'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'NAME1'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR NAME'.
+*  WA_FIELDCAT-outputlen = '20'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'ORT01'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR CITY'.
+*  WA_FIELDCAT-outputlen = '20'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'GRN'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BUDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN POSTING DATE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BWART'.
+  WA_FIELDCAT-SELTEXT_L = 'MOV'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+*  WA_FIELDCAT-fieldname = 'BWETP'.
+*  WA_FIELDCAT-SELTEXT_L = 'CN/DN'.
+**  WA_FIELDCAT-outputlen = '80'.
+*  append WA_FIELDCAT to FIELDCAT.
+*  clear WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'DMBTR'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN VALUE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'GJAHR'.
+  WA_FIELDCAT-SELTEXT_L = 'FI YEAR'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+*  loop at it_tab3 into wa_tab3 where belnr_clr eq space.
+*    write : / '3', wa_tab3-matnr,wa_tab3-txz01,wa_tab3-ebeln,wa_tab3-ebelp,wa_tab3-poqty, wa_tab3-grn,wa_tab3-budat,wa_tab3-bwart,wa_tab3-bwetp,
+*    wa_tab3-menge,wa_tab3-dmbtr,wa_tab3-gjahr, wa_tab3-belnr ,wa_tab3-menge1,wa_tab3-wrbtr , wa_tab3-tbtkz,
+*      wa_tab3-fidoc, wa_tab3-fidocdt.
+*  endloop.
+
+  WA_FIELDCAT-FIELDNAME = 'BELNR'.
+  WA_FIELDCAT-SELTEXT_L = 'MIRO DOC NO.'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'RMWWR'.
+  WA_FIELDCAT-SELTEXT_L = 'MIRO TOTAL VALUE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'XBLNR'.
+  WA_FIELDCAT-SELTEXT_L = 'BILL NO.'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BLDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'BILL DATE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'DUEDT'.
+  WA_FIELDCAT-SELTEXT_L = 'DUE DATE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'TBTKZ'.
+  WA_FIELDCAT-SELTEXT_L = 'CN/DN IND'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'FIDOC'.
+  WA_FIELDCAT-SELTEXT_L = 'FI DOC NO.'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'FIDOCDT'.
+  WA_FIELDCAT-SELTEXT_L = 'FI DOC POSTING DATE'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'DDAYS'.
+  WA_FIELDCAT-SELTEXT_L = 'DAYS FROM GRN'.
+*  WA_FIELDCAT-outputlen = '80'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+
+*  wa_fieldcat-fieldname = 'KUNAG'.
+*  wa_fieldcat-seltext_s = 'RECEIPIENT PLANT'.
+*  append wa_fieldcat to fieldcat.
+*
+*  wa_fieldcat-fieldname = 'RSTCD3'.
+*  wa_fieldcat-seltext_s = 'RECEIPIENT''S GST NO'.
+*  append wa_fieldcat to fieldcat.
+*
+*  wa_fieldcat-fieldname = 'RST'.
+*  wa_fieldcat-seltext_s = 'RECEPIENT''S STATE CODE'.
+*  append wa_fieldcat to fieldcat.
+
+
+
+  LAYOUT-ZEBRA = 'X'.
+  LAYOUT-COLWIDTH_OPTIMIZE = 'X'.
+  LAYOUT-WINDOW_TITLEBAR  = 'MSME VENDOR STATUS'.
+
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+*     I_INTERFACE_CHECK       = ' '
+*     I_BYPASSING_BUFFER      = ' '
+*     I_BUFFER_ACTIVE         = ' '
+      I_CALLBACK_PROGRAM      = G_REPID
+*     I_CALLBACK_PF_STATUS_SET          = ' '
+      I_CALLBACK_USER_COMMAND = 'USER_COMM'
+      I_CALLBACK_TOP_OF_PAGE  = 'TOP'
+*     I_CALLBACK_HTML_TOP_OF_PAGE       = ' '
+*     I_CALLBACK_HTML_END_OF_LIST       = ' '
+*     I_STRUCTURE_NAME        =
+*     I_BACKGROUND_ID         = ' '
+*     I_GRID_TITLE            =
+*     I_GRID_SETTINGS         =
+      IS_LAYOUT               = LAYOUT
+      IT_FIELDCAT             = FIELDCAT
+*     IT_EXCLUDING            =
+*     IT_SPECIAL_GROUPS       =
+*     IT_SORT                 =
+*     IT_FILTER               =
+*     IS_SEL_HIDE             =
+*     I_DEFAULT               = 'X'
+      I_SAVE                  = 'A'
+*     IS_VARIANT              =
+*     IT_EVENTS               =
+*     IT_EVENT_EXIT           =
+*     IS_PRINT                =
+*     IS_REPREP_ID            =
+*     I_SCREEN_START_COLUMN   = 0
+*     I_SCREEN_START_LINE     = 0
+*     I_SCREEN_END_COLUMN     = 0
+*     I_SCREEN_END_LINE       = 0
+*     I_HTML_HEIGHT_TOP       = 0
+*     I_HTML_HEIGHT_END       = 0
+*     IT_ALV_GRAPHICS         =
+*     IT_HYPERLINK            =
+*     IT_ADD_FIELDCAT         =
+*     IT_EXCEPT_QINFO         =
+*     IR_SALV_FULLSCREEN_ADAPTER        =
+* IMPORTING
+*     E_EXIT_CAUSED_BY_CALLER =
+*     ES_EXIT_CAUSED_BY_USER  =
+    TABLES
+      T_OUTTAB                = IT_TAB8
+    EXCEPTIONS
+      PROGRAM_ERROR           = 1
+      OTHERS                  = 2.
+  IF SY-SUBRC <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  QCEMAIL
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM QCEMAIL .
+  LOOP AT IT_TAB6 INTO WA_TAB6 WHERE MATNR GT 0 AND BWART EQ '101' AND VDATUM LE 0 AND PRUEFLOS GT 0.
+    CLEAR : DAYS.
+    DAYS = SY-DATUM - WA_TAB6-BUDAT.
+*    if days ge 35.
+    IF DAYS GE 30.
+      IF WA_TAB6-WERKS EQ '1000'.
+        WA_NSK1-WERKS = WA_TAB6-WERKS.
+        WA_NSK1-PRUEFLOS = WA_TAB6-PRUEFLOS.
+        WA_NSK1-STATUS = WA_TAB6-STATUS.
+        WA_NSK1-VDATUM = WA_TAB6-VDATUM.
+        WA_NSK1-MATNR = WA_TAB6-MATNR.
+        WA_NSK1-CHARG = WA_TAB6-CHARG.
+        WA_NSK1-TXZ01 = WA_TAB6-TXZ01.
+*        wa_nsk1-lifnr = wa_tab6-lifnr.
+        WA_NSK1-NAME1 = WA_TAB6-NAME1.
+        WA_NSK1-EBELN = WA_TAB6-EBELN.
+*        wa_nsk1-poqty = wa_tab6-poqty.
+        WA_NSK1-GRN = WA_TAB6-GRN.
+        WA_NSK1-BUDAT = WA_TAB6-BUDAT.
+*        wa_nsk1-bwart = wa_tab6-bwart.
+        WA_NSK1-MENGE = WA_TAB6-MENGE.
+*        wa_nsk1-gjahr = wa_tab6-gjahr.
+*        wa_nsk1-duedt = wa_tab6-duedt.
+        COLLECT WA_NSK1 INTO IT_NSK1.
+        CLEAR WA_NSK1.
+      ELSEIF WA_TAB6-WERKS EQ '1001'.
+
+        WA_GOA1-WERKS = WA_TAB6-WERKS.
+        WA_GOA1-PRUEFLOS = WA_TAB6-PRUEFLOS.
+        WA_GOA1-STATUS = WA_TAB6-STATUS.
+        WA_GOA1-VDATUM = WA_TAB6-VDATUM.
+        WA_GOA1-MATNR = WA_TAB6-MATNR.
+        WA_GOA1-CHARG = WA_TAB6-CHARG.
+        WA_GOA1-TXZ01 = WA_TAB6-TXZ01.
+        WA_GOA1-NAME1 = WA_TAB6-NAME1.
+        WA_GOA1-EBELN = WA_TAB6-EBELN.
+        WA_GOA1-GRN = WA_TAB6-GRN.
+        WA_GOA1-BUDAT = WA_TAB6-BUDAT.
+        WA_GOA1-MENGE = WA_TAB6-MENGE.
+        COLLECT WA_GOA1 INTO IT_GOA1.
+        CLEAR WA_GOA1.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+
+
+  SORT IT_NSK1 BY GRN BUDAT.
+  SORT IT_GOA1 BY GRN BUDAT.
+
+  IF IT_NSK1 IS NOT INITIAL.
+    PERFORM NSKEMAIL.
+  ENDIF.
+
+  IF IT_GOA1 IS NOT INITIAL.
+    PERFORM GOAEMAIL.
+  ENDIF.
+
+
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  NSKEMAIL
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM NSKEMAIL .
+  CONCATENATE 'INSP_LOT' 'GRN_NO' 'GRN_DATE' 'MATERIAL' 'MATERIAL_DESCRIPTION' 'BATCH/I.D. No.' 'QUANTITY' 'VENDOR_NAME'
+    INTO  W_ATTACHMENT SEPARATED BY  CON_TAB.
+  APPEND W_ATTACHMENT TO I_ATTACHMENT.
+  CLEAR  W_ATTACHMENT.
+
+  LOOP AT IT_NSK1 INTO WA_NSK1.
+    CLEAR : WA_DAT,QTY1.
+    WRITE WA_NSK1-BUDAT TO WA_DAT DD/MM/YYYY.
+    QTY1 = WA_NSK1-MENGE.
+    CONDENSE QTY1.
+    REPLACE '0' IN WA_NSK1-CHARG WITH 'O' .
+    CONCATENATE WA_NSK1-PRUEFLOS WA_NSK1-GRN WA_DAT WA_NSK1-MATNR WA_NSK1-TXZ01 WA_NSK1-CHARG QTY1 WA_NSK1-NAME1
+    INTO W_ATTACHMENT SEPARATED BY CON_TAB.
+    CONCATENATE CON_CRET W_ATTACHMENT INTO W_ATTACHMENT.
+    APPEND W_ATTACHMENT TO I_ATTACHMENT.
+    CLEAR  W_ATTACHMENT.
+  ENDLOOP.
+
+*  write from_dt to wa_d1 dd/mm/yyyy.
+*  write to_dt to wa_d2 dd/mm/yyyy.
+  W_DOCUMENT_DATA-OBJ_NAME  = 'PENDING FOR UD FOR MSME PARTIES'.
+  W_DOCUMENT_DATA-OBJ_DESCR = 'PENDING FOR UD FOR MSME PARTIES'.
+  W_BODY_MSG = 'Dear Sir / Madam'.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = 'Plz. find attached DETAILS: PENDING FOR USAGE DECISION'.
+*  w_body_msg+52(10) = wa_d1.
+*  w_body_msg+64(3) = 'To'.
+*  w_body_msg+69(10) = wa_d2.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = '   '.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = '   '.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = 'This eMail is meant for information only. Please DO NOT REPLY.'.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  DESCRIBE TABLE I_BODY_MSG LINES G_TAB_LINES.
+  W_PACKING_LIST-HEAD_START = 1.
+  W_PACKING_LIST-HEAD_NUM   = 1.
+  W_PACKING_LIST-BODY_START = 1.
+  W_PACKING_LIST-BODY_NUM   = G_TAB_LINES.
+  W_PACKING_LIST-DOC_TYPE   = 'RAW'.
+  APPEND W_PACKING_LIST TO I_PACKING_LIST.
+  CLEAR  W_PACKING_LIST.
+  APPEND LINES OF I_ATTACHMENT TO I_BODY_MSG.
+  W_PACKING_LIST-HEAD_START = 2.
+  W_PACKING_LIST-HEAD_NUM   = 1.
+  W_PACKING_LIST-BODY_START = G_TAB_LINES + 1.
+  DATA LINES TYPE I.
+
+  DESCRIBE TABLE I_ATTACHMENT LINES LINES.
+  W_PACKING_LIST-BODY_NUM = LINES.
+  W_PACKING_LIST-DOC_TYPE   = 'XLS'.
+  W_PACKING_LIST-OBJ_DESCR  = 'BLUECROSS'.
+  W_PACKING_LIST-OBJ_NAME   = 'TXT_ATTACHMENT'.
+  W_PACKING_LIST-DOC_SIZE   = W_PACKING_LIST-BODY_NUM * 255.
+  APPEND W_PACKING_LIST TO I_PACKING_LIST.
+  CLEAR  W_PACKING_LIST.
+
+  "Fill the document data and get size of attachment
+  W_DOCUMENT_DATA-OBJ_LANGU  = SY-LANGU.
+  READ TABLE I_BODY_MSG INTO W_BODY_MSG INDEX G_ATTACHMENT_LINES.
+  W_DOCUMENT_DATA-DOC_SIZE = ( G_ATTACHMENT_LINES - 1 ) * 255 + STRLEN( W_BODY_MSG ).
+  "Receivers List.
+  W_RECEIVERS-REC_TYPE   = 'U'.  "Internet address
+*  w_receivers-receiver   = wa_email1-zmemail.
+*  w_receivers-receiver   = 'd.chanshetti@bluecrosslabs.com'.
+  W_RECEIVERS-RECEIVER   = 'qcnsk@bluecrosslabs.com'.
+  W_RECEIVERS-COM_TYPE   = 'INT'.
+  W_RECEIVERS-NOTIF_DEL  = 'X'.
+  W_RECEIVERS-NOTIF_NDEL = 'X'.
+  APPEND W_RECEIVERS TO I_RECEIVERS .
+  CLEAR:W_RECEIVERS.
+
+  "Function module to send MAI to Recipients
+  CALL FUNCTION 'SO_NEW_DOCUMENT_ATT_SEND_API1'
+    EXPORTING
+      DOCUMENT_DATA              = W_DOCUMENT_DATA
+      PUT_IN_OUTBOX              = 'X'
+      COMMIT_WORK                = 'X'
+    IMPORTING
+      SENT_TO_ALL                = G_SENT_TO_ALL
+    TABLES
+      PACKING_LIST               = I_PACKING_LIST
+      CONTENTS_TXT               = I_BODY_MSG
+      RECEIVERS                  = I_RECEIVERS
+    EXCEPTIONS
+      TOO_MANY_RECEIVERS         = 1
+      DOCUMENT_NOT_SENT          = 2
+      DOCUMENT_TYPE_NOT_EXIST    = 3
+      OPERATION_NO_AUTHORIZATION = 4
+      PARAMETER_ERROR            = 5
+      X_ERROR                    = 6
+      ENQUEUE_ERROR              = 7
+      OTHERS                     = 8.
+
+  IF SY-SUBRC = 0 .
+    WRITE : / 'Mail has been Successfully Sent on:'.
+*    wa_email1-zmemail.
+  ELSE.
+    WAIT UP TO 2 SECONDS.
+    "This program starts the SAPconnect send process.
+    SUBMIT RSCONN01 WITH MODE = 'INT' WITH OUTPUT = 'X' AND RETURN.
+  ENDIF.
+  CLEAR : I_ATTACHMENT,I_BODY_MSG,I_PACKING_LIST,I_RECEIVERS .
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GOAEMAIL
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM GOAEMAIL .
+  CONCATENATE 'INSP_LOT' 'GRN_NO' 'GRN_DATE' 'MATERIAL' 'MATERIAL_DESCRIPTION' 'BATCH/I.D. No.' 'QUANTITY' 'VENDOR_NAME'
+    INTO  W_ATTACHMENT SEPARATED BY  CON_TAB.
+  APPEND W_ATTACHMENT TO I_ATTACHMENT.
+  CLEAR  W_ATTACHMENT.
+
+  LOOP AT IT_GOA1 INTO WA_GOA1.
+    CLEAR : WA_DAT,QTY1.
+    WRITE WA_GOA1-BUDAT TO WA_DAT DD/MM/YYYY.
+    QTY1 = WA_GOA1-MENGE.
+    CONDENSE QTY1.
+    CONCATENATE WA_GOA1-PRUEFLOS WA_GOA1-GRN WA_DAT WA_GOA1-MATNR WA_GOA1-TXZ01 WA_GOA1-CHARG QTY1 WA_GOA1-NAME1
+    INTO W_ATTACHMENT SEPARATED BY CON_TAB.
+    CONCATENATE CON_CRET W_ATTACHMENT INTO W_ATTACHMENT.
+    APPEND W_ATTACHMENT TO I_ATTACHMENT.
+    CLEAR  W_ATTACHMENT.
+  ENDLOOP.
+
+*  write from_dt to wa_d1 dd/mm/yyyy.
+*  write to_dt to wa_d2 dd/mm/yyyy.
+  W_DOCUMENT_DATA-OBJ_NAME  = 'PENDING FOR UD FOR MSME PARTIES'.
+  W_DOCUMENT_DATA-OBJ_DESCR = 'PENDING FOR UD FOR MSME PARTIES'.
+  W_BODY_MSG = 'Dear Sir / Madam'.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = 'Plz. find attached DETAILS: PENDING FOR USAGE DECISION'.
+*  w_body_msg+52(10) = wa_d1.
+*  w_body_msg+64(3) = 'To'.
+*  w_body_msg+69(10) = wa_d2.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = '   '.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = '   '.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = 'This eMail is meant for information only. Please DO NOT REPLY.'.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  DESCRIBE TABLE I_BODY_MSG LINES G_TAB_LINES.
+  W_PACKING_LIST-HEAD_START = 1.
+  W_PACKING_LIST-HEAD_NUM   = 1.
+  W_PACKING_LIST-BODY_START = 1.
+  W_PACKING_LIST-BODY_NUM   = G_TAB_LINES.
+  W_PACKING_LIST-DOC_TYPE   = 'RAW'.
+  APPEND W_PACKING_LIST TO I_PACKING_LIST.
+  CLEAR  W_PACKING_LIST.
+  APPEND LINES OF I_ATTACHMENT TO I_BODY_MSG.
+  W_PACKING_LIST-HEAD_START = 2.
+  W_PACKING_LIST-HEAD_NUM   = 1.
+  W_PACKING_LIST-BODY_START = G_TAB_LINES + 1.
+  DATA LINES TYPE I.
+
+  DESCRIBE TABLE I_ATTACHMENT LINES LINES.
+  W_PACKING_LIST-BODY_NUM = LINES.
+  W_PACKING_LIST-DOC_TYPE   = 'XLS'.
+  W_PACKING_LIST-OBJ_DESCR  = 'BLUECROSS'.
+  W_PACKING_LIST-OBJ_NAME   = 'TXT_ATTACHMENT'.
+  W_PACKING_LIST-DOC_SIZE   = W_PACKING_LIST-BODY_NUM * 255.
+  APPEND W_PACKING_LIST TO I_PACKING_LIST.
+  CLEAR  W_PACKING_LIST.
+
+  "Fill the document data and get size of attachment
+  W_DOCUMENT_DATA-OBJ_LANGU  = SY-LANGU.
+  READ TABLE I_BODY_MSG INTO W_BODY_MSG INDEX G_ATTACHMENT_LINES.
+  W_DOCUMENT_DATA-DOC_SIZE = ( G_ATTACHMENT_LINES - 1 ) * 255 + STRLEN( W_BODY_MSG ).
+  "Receivers List.
+  W_RECEIVERS-REC_TYPE   = 'U'.  "Internet address
+*  w_receivers-receiver   = wa_email1-zmemail.
+  W_RECEIVERS-RECEIVER   = 'sawant@bluecrosslabs.com'.
+  W_RECEIVERS-COM_TYPE   = 'INT'.
+  W_RECEIVERS-NOTIF_DEL  = 'X'.
+  W_RECEIVERS-NOTIF_NDEL = 'X'.
+  APPEND W_RECEIVERS TO I_RECEIVERS .
+  CLEAR:W_RECEIVERS.
+
+  "Function module to send MAI to Recipients
+  CALL FUNCTION 'SO_NEW_DOCUMENT_ATT_SEND_API1'
+    EXPORTING
+      DOCUMENT_DATA              = W_DOCUMENT_DATA
+      PUT_IN_OUTBOX              = 'X'
+      COMMIT_WORK                = 'X'
+    IMPORTING
+      SENT_TO_ALL                = G_SENT_TO_ALL
+    TABLES
+      PACKING_LIST               = I_PACKING_LIST
+      CONTENTS_TXT               = I_BODY_MSG
+      RECEIVERS                  = I_RECEIVERS
+    EXCEPTIONS
+      TOO_MANY_RECEIVERS         = 1
+      DOCUMENT_NOT_SENT          = 2
+      DOCUMENT_TYPE_NOT_EXIST    = 3
+      OPERATION_NO_AUTHORIZATION = 4
+      PARAMETER_ERROR            = 5
+      X_ERROR                    = 6
+      ENQUEUE_ERROR              = 7
+      OTHERS                     = 8.
+
+  IF SY-SUBRC = 0 .
+    WRITE : / 'Mail has been Successfully Sent on:'.
+*    wa_email1-zmemail.
+  ELSE.
+    WAIT UP TO 2 SECONDS.
+    "This program starts the SAPconnect send process.
+    SUBMIT RSCONN01 WITH MODE = 'INT' WITH OUTPUT = 'X' AND RETURN.
+  ENDIF.
+  CLEAR : I_ATTACHMENT,I_BODY_MSG,I_PACKING_LIST,I_RECEIVERS .
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  NSKEMAI2
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  ACCEMAIL
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM ACCEMAIL .
+  CLEAR : DUEDATE.
+  DUEDATE = SY-DATUM - 7.
+
+  CLEAR : IT_NSK2,WA_NSK2.
+  LOOP AT IT_TAB6 INTO WA_TAB6 WHERE DUEDT le DUEDATE AND duedt ne '00000000' AND WERKS NE '1001'.
+*    WRITE : /'1', WA_TAB6-PRUEFLOS,WA_TAB6-STATUS,WA_TAB6-VDATUM,WA_TAB6-WERKS,WA_TAB6-MATNR,WA_TAB6-TXZ01,WA_TAB6-LIFNR,WA_TAB6-NAME1,
+*    WA_TAB6-ORT01,WA_TAB6-EBELN,WA_TAB6-EBELP,WA_TAB6-POQTY,WA_TAB6-GRN,WA_TAB6-BUDAT,WA_TAB6-BWART,WA_TAB6-MENGE,WA_TAB6-DMBTR,WA_TAB6-GJAHR,
+*    WA_TAB6-BELNR,WA_TAB6-MENGE1,WA_TAB6-WRBTR,WA_TAB6-RMWWR,WA_TAB6-XBLNR,WA_TAB6-BLDAT,WA_TAB6-DUEDT,WA_TAB6-TBTKZ,WA_TAB6-FIDOC,WA_TAB6-FIDOCDT,
+*    WA_TAB6-DDAYS.
+    WA_NSK2-PRUEFLOS = WA_TAB6-PRUEFLOS.
+    WA_NSK2-STATUS = WA_TAB6-STATUS.
+    WA_NSK2-VDATUM = WA_TAB6-VDATUM.
+    WA_NSK2-WERKS = WA_TAB6-WERKS.
+    WA_NSK2-MATNR = WA_TAB6-MATNR.
+    WA_NSK2-TXZ01 = WA_TAB6-TXZ01.
+    WA_NSK2-LIFNR = WA_TAB6-LIFNR.
+    WA_NSK2-NAME1 = WA_TAB6-NAME1.
+    WA_NSK2-ORT01 = WA_TAB6-ORT01.
+    WA_NSK2-EBELN = WA_TAB6-EBELN.
+    WA_NSK2-EBELP = WA_TAB6-EBELP.
+    WA_NSK2-POQTY = WA_TAB6-POQTY.
+    WA_NSK2-GRN = WA_TAB6-GRN.
+    WA_NSK2-BUDAT = WA_TAB6-BUDAT.
+    WA_NSK2-BWART = WA_TAB6-BWART.
+    WA_NSK2-MENGE = WA_TAB6-MENGE.
+    WA_NSK2-DMBTR = WA_TAB6-DMBTR.
+    WA_NSK2-GJAHR = WA_TAB6-GJAHR.
+    WA_NSK2-BELNR = WA_TAB6-BELNR.
+    WA_NSK2-MENGE1 = WA_TAB6-MENGE1.
+    WA_NSK2-WRBTR = WA_TAB6-WRBTR.
+    WA_NSK2-RMWWR = WA_TAB6-RMWWR.
+    WA_NSK2-XBLNR = WA_TAB6-XBLNR.
+    WA_NSK2-BLDAT = WA_TAB6-BLDAT.
+    WA_NSK2-DUEDT = WA_TAB6-DUEDT.
+    WA_NSK2-TBTKZ = WA_TAB6-TBTKZ.
+    WA_NSK2-FIDOC = WA_TAB6-FIDOC.
+    WA_NSK2-FIDOCDT = WA_TAB6-FIDOCDT.
+    WA_NSK2-DDAYS = WA_TAB6-DDAYS.
+    CONDENSE WA_NSK2-MENGE1.
+    CONDENSE WA_NSK2-DMBTR.
+    CONDENSE WA_NSK2-MENGE.
+    CONDENSE  WA_NSK2-POQTY.
+    CONDENSE WA_NSK2-WRBTR.
+    CONDENSE WA_NSK2-RMWWR.
+    CONDENSE WA_NSK2-DDAYS.
+    COLLECT WA_NSK2 INTO IT_NSK2.
+    CLEAR WA_NSK2.
+  ENDLOOP.
+
+
+  CLEAR : IT_GOA2,WA_GOA2.
+  LOOP AT IT_TAB6 INTO WA_TAB6 WHERE DUEDT le DUEDATE AND duedt ne '00000000' AND WERKS EQ '1001'.
+*    WRITE : /'1', WA_TAB6-PRUEFLOS,WA_TAB6-STATUS,WA_TAB6-VDATUM,WA_TAB6-WERKS,WA_TAB6-MATNR,WA_TAB6-TXZ01,WA_TAB6-LIFNR,WA_TAB6-NAME1,
+*    WA_TAB6-ORT01,WA_TAB6-EBELN,WA_TAB6-EBELP,WA_TAB6-POQTY,WA_TAB6-GRN,WA_TAB6-BUDAT,WA_TAB6-BWART,WA_TAB6-MENGE,WA_TAB6-DMBTR,WA_TAB6-GJAHR,
+*    WA_TAB6-BELNR,WA_TAB6-MENGE1,WA_TAB6-WRBTR,WA_TAB6-RMWWR,WA_TAB6-XBLNR,WA_TAB6-BLDAT,WA_TAB6-DUEDT,WA_TAB6-TBTKZ,WA_TAB6-FIDOC,WA_TAB6-FIDOCDT,
+*    WA_TAB6-DDAYS.
+    WA_GOA2-PRUEFLOS = WA_TAB6-PRUEFLOS.
+    WA_GOA2-STATUS = WA_TAB6-STATUS.
+    WA_GOA2-VDATUM = WA_TAB6-VDATUM.
+    WA_GOA2-WERKS = WA_TAB6-WERKS.
+    WA_GOA2-MATNR = WA_TAB6-MATNR.
+    WA_GOA2-TXZ01 = WA_TAB6-TXZ01.
+    WA_GOA2-LIFNR = WA_TAB6-LIFNR.
+    WA_GOA2-NAME1 = WA_TAB6-NAME1.
+    WA_GOA2-ORT01 = WA_TAB6-ORT01.
+    WA_GOA2-EBELN = WA_TAB6-EBELN.
+    WA_GOA2-EBELP = WA_TAB6-EBELP.
+    WA_GOA2-POQTY = WA_TAB6-POQTY.
+    WA_GOA2-GRN = WA_TAB6-GRN.
+    WA_GOA2-BUDAT = WA_TAB6-BUDAT.
+    WA_GOA2-BWART = WA_TAB6-BWART.
+    WA_GOA2-MENGE = WA_TAB6-MENGE.
+    WA_GOA2-DMBTR = WA_TAB6-DMBTR.
+    WA_GOA2-GJAHR = WA_TAB6-GJAHR.
+    WA_GOA2-BELNR = WA_TAB6-BELNR.
+    WA_GOA2-MENGE1 = WA_TAB6-MENGE1.
+    WA_GOA2-WRBTR = WA_TAB6-WRBTR.
+    WA_GOA2-RMWWR = WA_TAB6-RMWWR.
+    WA_GOA2-XBLNR = WA_TAB6-XBLNR.
+    WA_GOA2-BLDAT = WA_TAB6-BLDAT.
+    WA_GOA2-DUEDT = WA_TAB6-DUEDT.
+    WA_GOA2-TBTKZ = WA_TAB6-TBTKZ.
+    WA_GOA2-FIDOC = WA_TAB6-FIDOC.
+    WA_GOA2-FIDOCDT = WA_TAB6-FIDOCDT.
+    WA_GOA2-DDAYS = WA_TAB6-DDAYS.
+    CONDENSE WA_GOA2-MENGE1.
+    CONDENSE WA_GOA2-DMBTR.
+    CONDENSE WA_GOA2-MENGE.
+    CONDENSE  WA_GOA2-POQTY.
+    CONDENSE WA_GOA2-WRBTR.
+    CONDENSE WA_GOA2-RMWWR.
+    CONDENSE WA_GOA2-DDAYS.
+    COLLECT WA_GOA2 INTO IT_GOA2.
+    CLEAR WA_GOA2.
+  ENDLOOP.
+
+
+  IF IT_NSK2 IS NOT INITIAL.
+*    PERFORM NSKEMAIL.
+    PERFORM ACCNSKEMAI.
+  ENDIF.
+
+  IF IT_GOA2 IS NOT INITIAL.
+*    PERFORM NSKEMAIL.
+    PERFORM ACCGOAEMAI.
+  ENDIF.
+
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ACCNSKEMAI
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM ACCNSKEMAI .
+
+*  WRITE : /'1', WA_TAB6-PRUEFLOS,WA_TAB6-STATUS,WA_TAB6-VDATUM,WA_TAB6-WERKS,WA_TAB6-MATNR,WA_TAB6-TXZ01,WA_TAB6-LIFNR,WA_TAB6-NAME1,
+**    WA_TAB6-ORT01,WA_TAB6-EBELN,WA_TAB6-EBELP,WA_TAB6-POQTY,WA_TAB6-GRN,WA_TAB6-BUDAT,WA_TAB6-BWART,WA_TAB6-MENGE,WA_TAB6-DMBTR,WA_TAB6-GJAHR,
+**    WA_TAB6-BELNR,WA_TAB6-MENGE1,WA_TAB6-WRBTR,WA_TAB6-RMWWR,WA_TAB6-XBLNR,WA_TAB6-BLDAT,WA_TAB6-DUEDT,WA_TAB6-TBTKZ,WA_TAB6-FIDOC,WA_TAB6-FIDOCDT,
+**    WA_TAB6-DDAYS.
+  CLEAR : I_ATTACHMENT,W_ATTACHMENT.
+
+*  CONCATENATE 'INSP_LOT' 'STATUS' 'UD_DATE' 'PLANT' 'MATERIAL' 'MATERIAL_DESCRIPTION' 'VENDOR' 'VENDOR_NAME'
+*  'CITY' 'PO' 'PO_ITEM' 'PO_QTY' 'GRN' 'GRN_POSTING_DATE' 'MOV' 'GRN_QTY' 'GRN_VALUE' 'FI_YEAR'
+*  'MIRO_DOC' 'MIRO_QTY' 'MIRO_BASE_VAL' 'MIRO_TOTAL_VAL' 'BILL_NO' 'BILL_DATE' 'DUE_DATE' 'CN/DM_IND' 'FI_DOC_NO' 'FI_DOC_DT'
+*  'DAYS_FROM_GRN'  INTO  W_ATTACHMENT SEPARATED BY  CON_TAB.
+*  APPEND W_ATTACHMENT TO I_ATTACHMENT.
+*  CLEAR  W_ATTACHMENT.
+ CONCATENATE 'INSP_LOT' 'STATUS' 'UD_DATE' 'MATERIAL' 'MATERIAL_DESCRIPTION' 'PO' 'PO_ITEM' 'GRN' 'GRN_POSTING_DATE' 'MOV' 'GRN_QTY' 'GRN_VALUE'
+  'FI_YEAR' 'MIRO_DOC' 'MIRO_QTY' 'BILL_NO' 'BILL_DATE' 'DUE_DATE' 'FI_DOC_NO' 'FI_DOC_DT'
+  'DAYS_FROM_GRN'  INTO  W_ATTACHMENT SEPARATED BY  CON_TAB.
+  APPEND W_ATTACHMENT TO I_ATTACHMENT.
+  CLEAR  W_ATTACHMENT.
+
+  LOOP AT IT_NSK2 INTO WA_NSK2.
+    CLEAR : WA_DAT,WA_DAT1,WA_DAT2,WA_DAT3,WA_DAT4.
+    WRITE WA_NSK2-VDATUM TO WA_DAT DD/MM/YYYY.
+    WRITE WA_NSK2-BUDAT TO WA_DAT1 DD/MM/YYYY.
+    WRITE WA_NSK2-BLDAT TO WA_DAT2 DD/MM/YYYY.
+    WRITE WA_NSK2-DUEDT TO WA_DAT3 DD/MM/YYYY.
+    WRITE WA_NSK2-FIDOCDT TO WA_DAT4 DD/MM/YYYY.
+*    CONCATENATE WA_NSK2-PRUEFLOS  WA_NSK2-STATUS WA_DAT WA_NSK2-WERKS WA_NSK2-MATNR WA_NSK2-TXZ01 WA_NSK2-LIFNR WA_NSK2-NAME1
+*     WA_NSK2-ORT01 WA_NSK2-EBELN WA_NSK2-EBELP WA_NSK2-POQTY WA_NSK2-GRN WA_DAT1 WA_NSK2-BWART WA_NSK2-MENGE WA_NSK2-DMBTR WA_NSK2-GJAHR
+*     WA_NSK2-BELNR WA_NSK2-MENGE1 WA_NSK2-WRBTR WA_NSK2-RMWWR WA_NSK2-XBLNR WA_DAT2 WA_DAT3 WA_NSK2-TBTKZ WA_NSK2-FIDOC WA_DAT4
+*     WA_NSK2-DDAYS
+      CONCATENATE WA_NSK2-PRUEFLOS  WA_NSK2-STATUS WA_DAT WA_NSK2-MATNR WA_NSK2-TXZ01 WA_NSK2-EBELN WA_NSK2-EBELP WA_NSK2-GRN WA_DAT1 WA_NSK2-BWART
+      WA_NSK2-MENGE WA_NSK2-DMBTR WA_NSK2-GJAHR WA_NSK2-BELNR WA_NSK2-MENGE1 WA_NSK2-XBLNR WA_DAT2 WA_DAT3 WA_NSK2-FIDOC WA_DAT4
+     WA_NSK2-DDAYS
+
+*     WA_nsk2-GRN WA_DAT WA_nsk2-MATNR WA_nsk2-TXZ01 WA_nsk2-CHARG QTY1 WA_nsk2-NAME1
+    INTO W_ATTACHMENT SEPARATED BY CON_TAB.
+    CONCATENATE CON_CRET W_ATTACHMENT INTO W_ATTACHMENT.
+    APPEND W_ATTACHMENT TO I_ATTACHMENT.
+    CLEAR  W_ATTACHMENT.
+  ENDLOOP.
+
+*  write from_dt to wa_d1 dd/mm/yyyy.
+*  write to_dt to wa_d2 dd/mm/yyyy.
+  W_DOCUMENT_DATA-OBJ_NAME  = 'PENDING FOR PAYMENT FOR MSME PARTIES'.
+  W_DOCUMENT_DATA-OBJ_DESCR = 'PENDING FOR PAYMENT FOR MSME PARTIES'.
+  W_BODY_MSG = 'Dear Sir / Madam'.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = 'Plz. find attached DETAILS: PENDING FOR PAYMENT'.
+*  w_body_msg+52(10) = wa_d1.
+*  w_body_msg+64(3) = 'To'.
+*  w_body_msg+69(10) = wa_d2.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = '   '.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = '   '.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = 'This eMail is meant for information only. Please DO NOT REPLY.'.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  DESCRIBE TABLE I_BODY_MSG LINES G_TAB_LINES.
+  W_PACKING_LIST-HEAD_START = 1.
+  W_PACKING_LIST-HEAD_NUM   = 1.
+  W_PACKING_LIST-BODY_START = 1.
+  W_PACKING_LIST-BODY_NUM   = G_TAB_LINES.
+  W_PACKING_LIST-DOC_TYPE   = 'RAW'.
+  APPEND W_PACKING_LIST TO I_PACKING_LIST.
+  CLEAR  W_PACKING_LIST.
+  APPEND LINES OF I_ATTACHMENT TO I_BODY_MSG.
+  W_PACKING_LIST-HEAD_START = 2.
+  W_PACKING_LIST-HEAD_NUM   = 1.
+  W_PACKING_LIST-BODY_START = G_TAB_LINES + 1.
+  DATA LINES TYPE I.
+
+  DESCRIBE TABLE I_ATTACHMENT LINES LINES.
+  W_PACKING_LIST-BODY_NUM = LINES.
+  W_PACKING_LIST-DOC_TYPE   = 'XLS'.
+  W_PACKING_LIST-OBJ_DESCR  = 'BLUECROSS'.
+  W_PACKING_LIST-OBJ_NAME   = 'TXT_ATTACHMENT'.
+  W_PACKING_LIST-DOC_SIZE   = W_PACKING_LIST-BODY_NUM * 255.
+  APPEND W_PACKING_LIST TO I_PACKING_LIST.
+  CLEAR  W_PACKING_LIST.
+
+  "Fill the document data and get size of attachment
+  W_DOCUMENT_DATA-OBJ_LANGU  = SY-LANGU.
+  READ TABLE I_BODY_MSG INTO W_BODY_MSG INDEX G_ATTACHMENT_LINES.
+  W_DOCUMENT_DATA-DOC_SIZE = ( G_ATTACHMENT_LINES - 1 ) * 255 + STRLEN( W_BODY_MSG ).
+  "Receivers List.
+  W_RECEIVERS-REC_TYPE   = 'U'.  "Internet address
+*  w_receivers-receiver   = wa_email1-zmemail.
+*  w_receivers-receiver   = 'd.chanshetti@bluecrosslabs.com'.
+  W_RECEIVERS-RECEIVER   = 'umesh.j@bluecrosslabs.com'.
+  W_RECEIVERS-COM_TYPE   = 'INT'.
+  W_RECEIVERS-NOTIF_DEL  = 'X'.
+  W_RECEIVERS-NOTIF_NDEL = 'X'.
+  APPEND W_RECEIVERS TO I_RECEIVERS .
+  CLEAR:W_RECEIVERS.
+
+  "Function module to send MAI to Recipients
+  CALL FUNCTION 'SO_NEW_DOCUMENT_ATT_SEND_API1'
+    EXPORTING
+      DOCUMENT_DATA              = W_DOCUMENT_DATA
+      PUT_IN_OUTBOX              = 'X'
+      COMMIT_WORK                = 'X'
+    IMPORTING
+      SENT_TO_ALL                = G_SENT_TO_ALL
+    TABLES
+      PACKING_LIST               = I_PACKING_LIST
+      CONTENTS_TXT               = I_BODY_MSG
+      RECEIVERS                  = I_RECEIVERS
+    EXCEPTIONS
+      TOO_MANY_RECEIVERS         = 1
+      DOCUMENT_NOT_SENT          = 2
+      DOCUMENT_TYPE_NOT_EXIST    = 3
+      OPERATION_NO_AUTHORIZATION = 4
+      PARAMETER_ERROR            = 5
+      X_ERROR                    = 6
+      ENQUEUE_ERROR              = 7
+      OTHERS                     = 8.
+
+  IF SY-SUBRC = 0 .
+    WRITE : / 'Mail has been Successfully Sent on:'.
+*    wa_email1-zmemail.
+  ELSE.
+    WAIT UP TO 2 SECONDS.
+    "This program starts the SAPconnect send process.
+    SUBMIT RSCONN01 WITH MODE = 'INT' WITH OUTPUT = 'X' AND RETURN.
+  ENDIF.
+  CLEAR : I_ATTACHMENT,I_BODY_MSG,I_PACKING_LIST,I_RECEIVERS .
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ACCGOAEMAI
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM ACCGOAEMAI .
+
+
+*  WRITE : /'1', WA_TAB6-PRUEFLOS,WA_TAB6-STATUS,WA_TAB6-VDATUM,WA_TAB6-WERKS,WA_TAB6-MATNR,WA_TAB6-TXZ01,WA_TAB6-LIFNR,WA_TAB6-NAME1,
+**    WA_TAB6-ORT01,WA_TAB6-EBELN,WA_TAB6-EBELP,WA_TAB6-POQTY,WA_TAB6-GRN,WA_TAB6-BUDAT,WA_TAB6-BWART,WA_TAB6-MENGE,WA_TAB6-DMBTR,WA_TAB6-GJAHR,
+**    WA_TAB6-BELNR,WA_TAB6-MENGE1,WA_TAB6-WRBTR,WA_TAB6-RMWWR,WA_TAB6-XBLNR,WA_TAB6-BLDAT,WA_TAB6-DUEDT,WA_TAB6-TBTKZ,WA_TAB6-FIDOC,WA_TAB6-FIDOCDT,
+**    WA_TAB6-DDAYS.
+  CLEAR : I_ATTACHMENT,W_ATTACHMENT.
+
+*  CONCATENATE 'INSP_LOT' 'STATUS' 'UD_DATE' 'PLANT' 'MATERIAL' 'MATERIAL_DESCRIPTION' 'VENDOR' 'VENDOR_NAME'
+*  'CITY' 'PO' 'PO_ITEM' 'PO_QTY' 'GRN' 'GRN_POSTING_DATE' 'MOV' 'GRN_QTY' 'GRN_VALUE' 'FI_YEAR'
+*  'MIRO_DOC' 'MIRO_QTY' 'MIRO_BASE_VAL' 'MIRO_TOTAL_VAL' 'BILL_NO' 'BILL_DATE' 'DUE_DATE' 'CN/DM_IND' 'FI_DOC_NO' 'FI_DOC_DT'
+*  'DAYS_FROM_GRN'  INTO  W_ATTACHMENT SEPARATED BY  CON_TAB.
+*  APPEND W_ATTACHMENT TO I_ATTACHMENT.
+*  CLEAR  W_ATTACHMENT.
+ CONCATENATE 'INSP_LOT' 'STATUS' 'UD_DATE' 'MATERIAL' 'MATERIAL_DESCRIPTION' 'PO' 'PO_ITEM' 'GRN' 'GRN_POSTING_DATE' 'MOV' 'GRN_QTY' 'GRN_VALUE'
+  'FI_YEAR' 'MIRO_DOC' 'MIRO_QTY' 'BILL_NO' 'BILL_DATE' 'DUE_DATE' 'FI_DOC_NO' 'FI_DOC_DT'
+  'DAYS_FROM_GRN'  INTO  W_ATTACHMENT SEPARATED BY  CON_TAB.
+  APPEND W_ATTACHMENT TO I_ATTACHMENT.
+  CLEAR  W_ATTACHMENT.
+
+  LOOP AT IT_goa2 INTO WA_goa2.
+    CLEAR : WA_DAT,WA_DAT1,WA_DAT2,WA_DAT3,WA_DAT4.
+    WRITE WA_goa2-VDATUM TO WA_DAT DD/MM/YYYY.
+    WRITE WA_goa2-BUDAT TO WA_DAT1 DD/MM/YYYY.
+    WRITE WA_goa2-BLDAT TO WA_DAT2 DD/MM/YYYY.
+    WRITE WA_goa2-DUEDT TO WA_DAT3 DD/MM/YYYY.
+    WRITE WA_goa2-FIDOCDT TO WA_DAT4 DD/MM/YYYY.
+*    CONCATENATE WA_goa2-PRUEFLOS  WA_goa2-STATUS WA_DAT WA_goa2-WERKS WA_goa2-MATNR WA_goa2-TXZ01 WA_goa2-LIFNR WA_goa2-NAME1
+*     WA_goa2-ORT01 WA_goa2-EBELN WA_goa2-EBELP WA_goa2-POQTY WA_goa2-GRN WA_DAT1 WA_goa2-BWART WA_goa2-MENGE WA_goa2-DMBTR WA_goa2-GJAHR
+*     WA_goa2-BELNR WA_goa2-MENGE1 WA_goa2-WRBTR WA_goa2-RMWWR WA_goa2-XBLNR WA_DAT2 WA_DAT3 WA_goa2-TBTKZ WA_goa2-FIDOC WA_DAT4
+*     WA_goa2-DDAYS
+      CONCATENATE WA_goa2-PRUEFLOS  WA_goa2-STATUS WA_DAT WA_goa2-MATNR WA_goa2-TXZ01 WA_goa2-EBELN WA_goa2-EBELP WA_goa2-GRN WA_DAT1 WA_goa2-BWART
+      WA_goa2-MENGE WA_goa2-DMBTR WA_goa2-GJAHR WA_goa2-BELNR WA_goa2-MENGE1 WA_goa2-XBLNR WA_DAT2 WA_DAT3 WA_goa2-FIDOC WA_DAT4
+     WA_goa2-DDAYS
+
+*     WA_goa2-GRN WA_DAT WA_goa2-MATNR WA_goa2-TXZ01 WA_goa2-CHARG QTY1 WA_goa2-NAME1
+    INTO W_ATTACHMENT SEPARATED BY CON_TAB.
+    CONCATENATE CON_CRET W_ATTACHMENT INTO W_ATTACHMENT.
+    APPEND W_ATTACHMENT TO I_ATTACHMENT.
+    CLEAR  W_ATTACHMENT.
+  ENDLOOP.
+
+
+**  WRITE : /'1', WA_TAB6-PRUEFLOS,WA_TAB6-STATUS,WA_TAB6-VDATUM,WA_TAB6-WERKS,WA_TAB6-MATNR,WA_TAB6-TXZ01,WA_TAB6-LIFNR,WA_TAB6-NAME1,
+***    WA_TAB6-ORT01,WA_TAB6-EBELN,WA_TAB6-EBELP,WA_TAB6-POQTY,WA_TAB6-GRN,WA_TAB6-BUDAT,WA_TAB6-BWART,WA_TAB6-MENGE,WA_TAB6-DMBTR,WA_TAB6-GJAHR,
+***    WA_TAB6-BELNR,WA_TAB6-MENGE1,WA_TAB6-WRBTR,WA_TAB6-RMWWR,WA_TAB6-XBLNR,WA_TAB6-BLDAT,WA_TAB6-DUEDT,WA_TAB6-TBTKZ,WA_TAB6-FIDOC,WA_TAB6-FIDOCDT,
+***    WA_TAB6-DDAYS.
+*
+*  CONCATENATE 'INSP_LOT' 'STATUS' 'UD_DATE' 'PLANT' 'MATERIAL' 'MATERIAL_DESCRIPTION' 'VENDOR' 'VENDOR_NAME'
+*  'CITY' 'PO' 'PO_ITEM' 'PO_QTY' 'GRN' 'GRN_POSTING_DATE' 'MOV' 'GRN_QTY' 'GRN_VALUE' 'FI_YEAR'
+*  'MIRO_DOC' 'MIRO_QTY' 'MIRO_BASE_VAL' 'MIRO_TOTAL_VAL' 'BILL_NO' 'BILL_DATE' 'DUE_DATE' 'CN/DM_IND' 'FI_DOC_NO' 'FI_DOC_DT'
+*  'DAYS_FROM_GRN'  INTO  W_ATTACHMENT SEPARATED BY  CON_TAB.
+*  APPEND W_ATTACHMENT TO I_ATTACHMENT.
+*  CLEAR  W_ATTACHMENT.
+*
+*  LOOP AT IT_GOA2 INTO WA_GOA2.
+*    CLEAR : WA_DAT,WA_DAT1,WA_DAT2,WA_DAT3,WA_DAT4.
+*    WRITE WA_GOA2-VDATUM TO WA_DAT DD/MM/YYYY.
+*    WRITE WA_GOA2-BUDAT TO WA_DAT1 DD/MM/YYYY.
+*    WRITE WA_GOA2-BLDAT TO WA_DAT2 DD/MM/YYYY.
+*    WRITE WA_GOA2-DUEDT TO WA_DAT3 DD/MM/YYYY.
+*    WRITE WA_GOA2-FIDOCDT TO WA_DAT4 DD/MM/YYYY.
+**    QTY1 = WA_goa2-MENGE.
+**    CONDENSE QTY1.
+**    REPLACE '0' IN WA_goa2-CHARG WITH 'O' .
+*
+***     WA_TAB6-PRUEFLOS,WA_TAB6-STATUS,WA_TAB6-VDATUM,WA_TAB6-WERKS,WA_TAB6-MATNR,WA_TAB6-TXZ01,WA_TAB6-LIFNR,WA_TAB6-NAME1,
+***    WA_TAB6-ORT01,WA_TAB6-EBELN,WA_TAB6-EBELP,WA_TAB6-POQTY,WA_TAB6-GRN,WA_TAB6-BUDAT,WA_TAB6-BWART,WA_TAB6-MENGE,WA_TAB6-DMBTR,WA_TAB6-GJAHR,
+***    WA_TAB6-BELNR,WA_TAB6-MENGE1,WA_TAB6-WRBTR,WA_TAB6-RMWWR,WA_TAB6-XBLNR,WA_TAB6-BLDAT,WA_TAB6-DUEDT,WA_TAB6-TBTKZ,WA_TAB6-FIDOC,WA_TAB6-FIDOCDT,
+***    WA_TAB6-DDAYS.
+*
+*    CONCATENATE WA_GOA2-PRUEFLOS  WA_GOA2-STATUS WA_DAT WA_GOA2-WERKS WA_GOA2-MATNR WA_GOA2-TXZ01 WA_GOA2-LIFNR WA_GOA2-NAME1
+*     WA_GOA2-ORT01 WA_GOA2-EBELN WA_GOA2-EBELP WA_GOA2-POQTY WA_GOA2-GRN WA_DAT1 WA_GOA2-BWART WA_GOA2-MENGE WA_GOA2-DMBTR WA_GOA2-GJAHR
+*     WA_GOA2-BELNR WA_GOA2-MENGE1 WA_GOA2-WRBTR WA_GOA2-RMWWR WA_GOA2-XBLNR WA_DAT2 WA_DAT3 WA_GOA2-TBTKZ WA_GOA2-FIDOC WA_DAT4
+*     WA_GOA2-DDAYS
+*
+**     WA_goa2-GRN WA_DAT WA_goa2-MATNR WA_goa2-TXZ01 WA_goa2-CHARG QTY1 WA_goa2-NAME1
+*    INTO W_ATTACHMENT SEPARATED BY CON_TAB.
+*    CONCATENATE CON_CRET W_ATTACHMENT INTO W_ATTACHMENT.
+*    APPEND W_ATTACHMENT TO I_ATTACHMENT.
+*    CLEAR  W_ATTACHMENT.
+*  ENDLOOP.
+
+*  write from_dt to wa_d1 dd/mm/yyyy.
+*  write to_dt to wa_d2 dd/mm/yyyy.
+  W_DOCUMENT_DATA-OBJ_NAME  = 'PENDING FOR PAYMENT FOR MSME PARTIES'.
+  W_DOCUMENT_DATA-OBJ_DESCR = 'PENDING FOR PAYMENT FOR MSME PARTIES'.
+  W_BODY_MSG = 'Dear Sir / Madam'.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = 'Plz. find attached DETAILS: PENDING FOR PAYMENT'.
+*  w_body_msg+52(10) = wa_d1.
+*  w_body_msg+64(3) = 'To'.
+*  w_body_msg+69(10) = wa_d2.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = '   '.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = '   '.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  W_BODY_MSG = 'This eMail is meant for information only. Please DO NOT REPLY.'.
+  APPEND W_BODY_MSG TO I_BODY_MSG.
+  CLEAR  W_BODY_MSG.
+  DESCRIBE TABLE I_BODY_MSG LINES G_TAB_LINES.
+  W_PACKING_LIST-HEAD_START = 1.
+  W_PACKING_LIST-HEAD_NUM   = 1.
+  W_PACKING_LIST-BODY_START = 1.
+  W_PACKING_LIST-BODY_NUM   = G_TAB_LINES.
+  W_PACKING_LIST-DOC_TYPE   = 'RAW'.
+  APPEND W_PACKING_LIST TO I_PACKING_LIST.
+  CLEAR  W_PACKING_LIST.
+  APPEND LINES OF I_ATTACHMENT TO I_BODY_MSG.
+  W_PACKING_LIST-HEAD_START = 2.
+  W_PACKING_LIST-HEAD_NUM   = 1.
+  W_PACKING_LIST-BODY_START = G_TAB_LINES + 1.
+  DATA LINES TYPE I.
+
+  DESCRIBE TABLE I_ATTACHMENT LINES LINES.
+  W_PACKING_LIST-BODY_NUM = LINES.
+  W_PACKING_LIST-DOC_TYPE   = 'XLS'.
+  W_PACKING_LIST-OBJ_DESCR  = 'BLUECROSS'.
+  W_PACKING_LIST-OBJ_NAME   = 'TXT_ATTACHMENT'.
+  W_PACKING_LIST-DOC_SIZE   = W_PACKING_LIST-BODY_NUM * 255.
+  APPEND W_PACKING_LIST TO I_PACKING_LIST.
+  CLEAR  W_PACKING_LIST.
+
+  "Fill the document data and get size of attachment
+  W_DOCUMENT_DATA-OBJ_LANGU  = SY-LANGU.
+  READ TABLE I_BODY_MSG INTO W_BODY_MSG INDEX G_ATTACHMENT_LINES.
+  W_DOCUMENT_DATA-DOC_SIZE = ( G_ATTACHMENT_LINES - 1 ) * 255 + STRLEN( W_BODY_MSG ).
+  "Receivers List.
+  W_RECEIVERS-REC_TYPE   = 'U'.  "Internet address
+*  w_receivers-receiver   = wa_email1-zmemail.
+*  w_receivers-receiver   = 'd.chanshetti@bluecrosslabs.com'.
+  W_RECEIVERS-RECEIVER   = 'viplav.h@bluecrosslabs.com'.
+  W_RECEIVERS-COM_TYPE   = 'INT'.
+  W_RECEIVERS-NOTIF_DEL  = 'X'.
+  W_RECEIVERS-NOTIF_NDEL = 'X'.
+  APPEND W_RECEIVERS TO I_RECEIVERS .
+  CLEAR:W_RECEIVERS.
+
+  "Function module to send MAI to Recipients
+  CALL FUNCTION 'SO_NEW_DOCUMENT_ATT_SEND_API1'
+    EXPORTING
+      DOCUMENT_DATA              = W_DOCUMENT_DATA
+      PUT_IN_OUTBOX              = 'X'
+      COMMIT_WORK                = 'X'
+    IMPORTING
+      SENT_TO_ALL                = G_SENT_TO_ALL
+    TABLES
+      PACKING_LIST               = I_PACKING_LIST
+      CONTENTS_TXT               = I_BODY_MSG
+      RECEIVERS                  = I_RECEIVERS
+    EXCEPTIONS
+      TOO_MANY_RECEIVERS         = 1
+      DOCUMENT_NOT_SENT          = 2
+      DOCUMENT_TYPE_NOT_EXIST    = 3
+      OPERATION_NO_AUTHORIZATION = 4
+      PARAMETER_ERROR            = 5
+      X_ERROR                    = 6
+      ENQUEUE_ERROR              = 7
+      OTHERS                     = 8.
+
+  IF SY-SUBRC = 0 .
+    WRITE : / 'Mail has been Successfully Sent on:'.
+*    wa_email1-zmemail.
+  ELSE.
+    WAIT UP TO 2 SECONDS.
+    "This program starts the SAPconnect send process.
+    SUBMIT RSCONN01 WITH MODE = 'INT' WITH OUTPUT = 'X' AND RETURN.
+  ENDIF.
+  CLEAR : I_ATTACHMENT,I_BODY_MSG,I_PACKING_LIST,I_RECEIVERS .
+ENDFORM.

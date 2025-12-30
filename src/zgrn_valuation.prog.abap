@@ -1,0 +1,885 @@
+*&---------------------------------------------------------------------*
+*& Report  ZGRN_PROG1
+*& Developed by Jyotsna
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+REPORT  ZGRN_PROG3 NO STANDARD PAGE HEADING LINE-SIZE 300.
+TABLES : MSEG,
+         MKPF,
+         EKPO,
+         J_1IGRXREF,
+         A053,
+         KONP,
+         MAKT,
+         LFA1,
+         EKKO,
+         T161T,
+         MCHA,
+         QAVE,
+         MARA,
+         JEST,
+         ZMIGO,
+         EKKN,
+         MCH1.
+
+TYPE-POOLS:  SLIS.
+
+DATA: G_REPID     LIKE SY-REPID,
+      FIELDCAT    TYPE SLIS_T_FIELDCAT_ALV,
+      WA_FIELDCAT LIKE LINE OF FIELDCAT,
+      SORT        TYPE SLIS_T_SORTINFO_ALV,
+      WA_SORT     LIKE LINE OF SORT,
+      LAYOUT      TYPE SLIS_LAYOUT_ALV.
+
+DATA : IT_MSEG TYPE TABLE OF MSEG,
+       WA_MSEG TYPE MSEG,
+       IT_MKPF TYPE TABLE OF MKPF,
+       WA_MKPF TYPE MKPF,
+       IT_QALS TYPE TABLE OF QALS,
+       WA_QALS TYPE QALS.
+
+TYPES : BEGIN OF ITAB1,
+          MBLNR        TYPE MSEG-MBLNR,
+          MJAHR        TYPE MSEG-MJAHR,
+          MATNR        TYPE MSEG-MATNR,
+          BWART        TYPE MSEG-BWART,
+          CHARG        TYPE MSEG-CHARG,
+          MENGE        TYPE MSEG-MENGE,
+          MEINS        TYPE MSEG-MEINS,
+          DMBTR        TYPE MSEG-DMBTR,
+          LIFNR        TYPE MSEG-LIFNR,
+          EBELP        TYPE MSEG-EBELP,
+          EBELN        TYPE MSEG-EBELN,
+          NETPR        TYPE EKPO-NETPR,
+          PEINH        TYPE EKPO-PEINH,
+          BUDAT        TYPE MKPF-BUDAT,
+          BLDAT        TYPE MKPF-BLDAT,
+          TAX          TYPE P DECIMALS 2,
+          EXBED        TYPE J_1IGRXREF-EXBED,
+          ACT_VAL      TYPE P DECIMALS 2,
+          DIFF         TYPE P DECIMALS 2,
+*          MAKTX        TYPE MAKT-MAKTX,
+          MAKTX(81)    TYPE C,
+          NAME1        TYPE LFA1-NAME1,
+          ORT01        TYPE LFA1-ORT01,
+          BATXT        TYPE T161T-BATXT,
+          KNTTP        TYPE EKPO-KNTTP,
+          SGTXT        TYPE MSEG-SGTXT,
+          WERKS        TYPE MSEG-WERKS,
+          HSDAT        TYPE MCHA-HSDAT,
+          VFDAT        TYPE MCHA-VFDAT,
+          DDAYS        TYPE I,
+          PRUEFLOS     TYPE QALS-PRUEFLOS,
+*          LICHN        TYPE QALS-LICHN,
+          LICHN        TYPE ATWTB,
+          INSPSTAT(20) TYPE C,
+          ABLAD        TYPE MSEG-ABLAD,
+          BSART        TYPE EKKO-BSART,
+          TCODE2       TYPE MKPF-TCODE2,
+          PASTRTERM    TYPE QALS-PASTRTERM,
+          VDATUM       TYPE QAVE-VDATUM,
+          AEDAT        TYPE EKPO-AEDAT,
+          PODT         TYPE EKKO-AEDAT,
+          NORMT        TYPE MARA-NORMT,
+          MFGR         TYPE LFA1-NAME1,
+          XBLNR        TYPE MKPF-XBLNR,
+          KOSTL        TYPE EKKN-KOSTL,
+          MFRNR        TYPE EKPO-MFRNR,
+        END OF ITAB1.
+
+TYPES : BEGIN OF ITAB3,
+          MATNR TYPE MSEG-MATNR,
+          MAKTX TYPE MAKT-MAKTX,
+          MENGE TYPE MSEG-MENGE,
+          LIFNR TYPE MSEG-LIFNR,
+          NAME1 TYPE LFA1-NAME1,
+          SGTXT TYPE MSEG-SGTXT,
+        END OF ITAB3.
+
+DATA : IT_TAB1 TYPE TABLE OF ITAB1,
+       WA_TAB1 TYPE ITAB1,
+       IT_TAB2 TYPE TABLE OF ITAB1,
+       WA_TAB2 TYPE ITAB1,
+       IT_TAB3 TYPE TABLE OF ITAB3,
+       WA_TAB3 TYPE ITAB3.
+DATA : BATCH_DETAILS    TYPE TABLE OF CLBATCH,
+       WA_BATCH_DETAILS TYPE CLBATCH.
+DATA: RTDNAME1 LIKE STXH-TDNAME.
+DATA : BEGIN OF RITEXT1 OCCURS 0.
+         INCLUDE STRUCTURE TLINE.
+DATA : END OF RITEXT1.
+DATA : LN TYPE I.
+DATA : LN1 TYPE I.
+DATA : NOLINES TYPE I.
+DATA: W_ITEXT3(135) TYPE C,
+      R11(1200)     TYPE C,
+      R12(1200)     TYPE C.
+DATA: MAKTX1(40) TYPE C,
+      MAKTX2(40) TYPE C,
+      MAKTX(81)  TYPE C,
+      NORMT      TYPE MARA-NORMT.
+
+DATA : STAY  TYPE I,
+       STAY1 TYPE I,
+       STAY2 TYPE I,
+       STAY3 TYPE I.
+
+DATA : TAX   TYPE P DECIMALS 2,
+       VAL1  TYPE P DECIMALS 2,
+       VAL2  TYPE P DECIMALS 2,
+       VAL3  TYPE P DECIMALS 2,
+       VAL4  TYPE P DECIMALS 2,
+       VAL5  TYPE P DECIMALS 2,
+       ABLAD TYPE MSEG-ABLAD.
+
+SELECTION-SCREEN BEGIN OF BLOCK MERKMALE1 WITH FRAME TITLE TEXT-001.
+  SELECT-OPTIONS : S_DATE FOR MKPF-BUDAT OBLIGATORY,
+                   MATERIAL FOR MSEG-MATNR,
+                   MOV FOR MSEG-BWART.
+  SELECT-OPTIONS : VENDOR FOR MSEG-LIFNR,
+                   BSART FOR EKKO-BSART.
+
+  PARAMETERS : PLANT LIKE MSEG-WERKS OBLIGATORY,
+               YEAR  LIKE MKPF-MJAHR OBLIGATORY.
+SELECTION-SCREEN END OF BLOCK MERKMALE1 .
+
+SELECTION-SCREEN BEGIN OF BLOCK MERKMALE2 WITH FRAME TITLE TEXT-001.
+  PARAMETERS : A1 RADIOBUTTON GROUP R1,
+               A2 RADIOBUTTON GROUP R1.
+SELECTION-SCREEN END OF BLOCK MERKMALE2 .
+
+INITIALIZATION.
+  G_REPID = SY-REPID.
+
+START-OF-SELECTION.
+
+
+  SELECT * FROM MKPF INTO TABLE IT_MKPF WHERE MJAHR EQ YEAR AND BUDAT IN S_DATE.
+  IF SY-SUBRC EQ 0.
+    SELECT * FROM MSEG INTO TABLE IT_MSEG FOR ALL ENTRIES IN IT_MKPF WHERE MBLNR EQ IT_MKPF-MBLNR AND MJAHR EQ IT_MKPF-MJAHR AND MATNR IN MATERIAL
+      AND BWART IN MOV AND WERKS EQ PLANT AND LIFNR IN VENDOR.
+    IF SY-SUBRC NE 0.
+      EXIT.
+    ENDIF.
+  ENDIF.
+
+  LOOP AT IT_MSEG INTO WA_MSEG.
+    CLEAR : TAX,ABLAD.
+    READ TABLE IT_MKPF INTO WA_MKPF WITH KEY MBLNR = WA_MSEG-MBLNR.
+    IF SY-SUBRC EQ 0.
+      SELECT SINGLE * FROM EKKO WHERE EBELN EQ WA_MSEG-EBELN AND BSART IN BSART.
+      IF SY-SUBRC EQ 0.
+        IF WA_MSEG-SHKZG EQ 'H'.
+          WA_MSEG-DMBTR = WA_MSEG-DMBTR * ( - 1 ).
+          WA_MSEG-ERFMG = WA_MSEG-ERFMG * ( - 1 ).
+        ENDIF.
+        WA_TAB1-MBLNR = WA_MSEG-MBLNR.
+        WA_TAB1-MJAHR = WA_MSEG-MJAHR.
+        WA_TAB1-MATNR = WA_MSEG-MATNR.
+        WA_TAB1-BWART = WA_MSEG-BWART.
+        WA_TAB1-CHARG = WA_MSEG-CHARG.
+        WA_TAB1-WERKS = WA_MSEG-WERKS.
+        WA_TAB1-MENGE = WA_MSEG-ERFMG.
+        WA_TAB1-MEINS = WA_MSEG-MEINS.
+        WA_TAB1-DMBTR = WA_MSEG-DMBTR.
+        WA_TAB1-LIFNR = WA_MSEG-LIFNR.
+        WA_TAB1-EBELP = WA_MSEG-EBELP.
+        WA_TAB1-EBELN = WA_MSEG-EBELN.
+*        WA_TAB1-SGTXT = WA_MSEG-SGTXT.
+        ABLAD = WA_MSEG-ABLAD.
+        CONDENSE ABLAD.
+        WA_TAB1-ABLAD = ABLAD.
+        WA_TAB1-BSART = EKKO-BSART.
+        WA_TAB1-PODT = EKKO-AEDAT.
+        WA_TAB1-BUDAT = WA_MKPF-BUDAT.
+        WA_TAB1-BLDAT = WA_MKPF-BLDAT.
+        WA_TAB1-TCODE2 = WA_MKPF-TCODE2.
+        SELECT SINGLE * FROM EKPO WHERE EBELN EQ WA_MSEG-EBELN AND EBELP EQ WA_MSEG-EBELP .
+        IF SY-SUBRC EQ 0.
+          WA_TAB1-NETPR = EKPO-NETPR.
+          WA_TAB1-PEINH = EKPO-PEINH.
+          WA_TAB1-KNTTP = EKPO-KNTTP.
+          WA_TAB1-AEDAT = EKPO-AEDAT.
+          WA_TAB1-MFRNR = EKPO-MFRNR.
+        ENDIF.
+
+        COLLECT WA_TAB1 INTO IT_TAB1.
+        CLEAR WA_TAB1.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+
+  IF IT_TAB1 IS NOT INITIAL.
+    SELECT * FROM QALS INTO TABLE IT_QALS FOR ALL ENTRIES IN IT_TAB1 WHERE WERK EQ IT_TAB1-WERKS AND MATNR EQ IT_TAB1-MATNR AND CHARG EQ IT_TAB1-CHARG
+      AND MBLNR EQ IT_TAB1-MBLNR.
+  ENDIF.
+
+  LOOP AT IT_QALS INTO WA_QALS.
+    SELECT SINGLE * FROM JEST WHERE OBJNR EQ WA_QALS-OBJNR AND STAT EQ 'I0224'.
+    IF SY-SUBRC NE 4.
+      DELETE IT_QALS WHERE PRUEFLOS EQ WA_QALS-PRUEFLOS.
+    ENDIF.
+  ENDLOOP.
+  SORT IT_QALS DESCENDING BY ENSTEHDAT.
+
+  LOOP AT IT_TAB1 INTO WA_TAB1.
+    CLEAR : VAL1,VAL2,VAL3,VAL4,VAL5,STAY,STAY3.
+    WA_TAB2-MBLNR = WA_TAB1-MBLNR.
+    WA_TAB2-MJAHR = WA_TAB1-MJAHR.
+    SELECT SINGLE * FROM MKPF WHERE MBLNR EQ WA_TAB1-MBLNR AND MJAHR EQ WA_TAB1-MJAHR.
+    IF SY-SUBRC EQ 0.
+      WA_TAB2-XBLNR = MKPF-XBLNR.
+    ENDIF.
+    WA_TAB2-BLDAT = WA_TAB1-BLDAT.
+    WA_TAB2-BUDAT = WA_TAB1-BUDAT.
+    WA_TAB2-MATNR = WA_TAB1-MATNR.
+*    WA_TAB2-SGTXT = WA_TAB1-SGTXT.
+    WA_TAB2-ABLAD = WA_TAB1-ABLAD.
+    WA_TAB2-BSART = WA_TAB1-BSART.
+    WA_TAB2-TCODE2 = WA_TAB1-TCODE2.
+    WA_TAB2-PODT = WA_TAB1-PODT.
+    WA_TAB2-AEDAT = WA_TAB1-AEDAT.
+
+    CLEAR : MAKTX1,MAKTX2,MAKTX,NORMT.
+    SELECT SINGLE * FROM MAKT WHERE SPRAS EQ 'EN' AND MATNR EQ WA_TAB1-MATNR.
+    IF SY-SUBRC EQ 0.
+      MAKTX1 = MAKT-MAKTX.
+    ENDIF.
+    SELECT SINGLE * FROM MAKT WHERE SPRAS EQ 'Z1' AND MATNR EQ WA_TAB1-MATNR.
+    IF SY-SUBRC EQ 0.
+      MAKTX2 = MAKT-MAKTX.
+    ENDIF.
+    SELECT SINGLE * FROM MARA WHERE MATNR EQ WA_TAB1-MATNR.
+    IF SY-SUBRC EQ 0.
+      NORMT = MARA-NORMT.
+    ENDIF.
+    CONCATENATE MAKTX1 MAKTX2 NORMT INTO MAKTX SEPARATED BY SPACE.
+    WA_TAB2-MAKTX = MAKTX.
+
+    WA_TAB2-BWART = WA_TAB1-BWART.
+    WA_TAB2-CHARG = WA_TAB1-CHARG.
+    SELECT SINGLE * FROM MCH1 WHERE MATNR EQ WA_TAB1-MATNR AND CHARG EQ WA_TAB1-CHARG.
+    IF SY-SUBRC EQ 0.
+      WA_TAB2-HSDAT = MCH1-HSDAT.
+      WA_TAB2-VFDAT = MCH1-VFDAT.
+    ENDIF.
+    WA_TAB2-MENGE = WA_TAB1-MENGE.
+    WA_TAB2-MEINS = WA_TAB1-MEINS.
+    WA_TAB2-DMBTR = WA_TAB1-DMBTR.
+    WA_TAB2-LIFNR = WA_TAB1-LIFNR.
+    SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ WA_TAB1-LIFNR.
+    IF SY-SUBRC EQ 0.
+      WA_TAB2-NAME1 = LFA1-NAME1.
+      WA_TAB2-ORT01 = LFA1-ORT01.
+    ENDIF.
+
+    WA_TAB2-EBELP = WA_TAB1-EBELP.
+    WA_TAB2-EBELN = WA_TAB1-EBELN.
+    WA_TAB2-KNTTP = WA_TAB1-KNTTP.
+    SELECT SINGLE * FROM T161T WHERE BSART EQ WA_TAB1-BSART AND SPRAS EQ 'EN' AND BSTYP = 'F'.
+    IF SY-SUBRC EQ 0.
+      WA_TAB2-BATXT = T161T-BATXT.
+    ENDIF.
+    READ TABLE IT_QALS INTO WA_QALS WITH KEY MATNR = WA_TAB1-MATNR CHARG = WA_TAB1-CHARG MBLNR = WA_TAB1-MBLNR.
+    IF SY-SUBRC EQ 0.
+      WA_TAB2-PRUEFLOS = WA_QALS-PRUEFLOS.
+*      WA_TAB2-LICHN = WA_QALS-LICHN.
+
+      CALL FUNCTION 'VB_BATCH_GET_DETAIL'
+        EXPORTING
+          MATNR              = WA_TAB1-MATNR
+          CHARG              = WA_TAB1-CHARG
+          WERKS              = WA_TAB1-WERKS
+          GET_CLASSIFICATION = 'X'
+*         EXISTENCE_CHECK    =
+*         READ_FROM_BUFFER   =
+*         NO_CLASS_INIT      = ' '
+*         LOCK_BATCH         = ' '
+*       IMPORTING
+*         YMCHA              =
+*         CLASSNAME          =
+*         BATCH_DEL_FLG      = BATCH_DETAILS
+        TABLES
+          CHAR_OF_BATCH      = BATCH_DETAILS
+        EXCEPTIONS
+          NO_MATERIAL        = 1
+          NO_BATCH           = 2
+          NO_PLANT           = 3
+          MATERIAL_NOT_FOUND = 4
+          PLANT_NOT_FOUND    = 5
+          NO_AUTHORITY       = 6
+          BATCH_NOT_EXIST    = 7
+          LOCK_ON_BATCH      = 8
+          OTHERS             = 9.
+      IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+      ENDIF.
+
+      READ TABLE BATCH_DETAILS INTO WA_BATCH_DETAILS WITH KEY ATNAM = 'ZVENDOR_BATCH'.
+      IF SY-SUBRC = 0 .
+        WA_TAB2-LICHN  = WA_BATCH_DETAILS-ATWTB.
+      ENDIF.
+
+
+*      select single * from mcha where matnr eq wa_qals-matnr and charg eq wa_qals-charg and werks eq wa_qals-werk. "commented by varsha
+*      if sy-subrc eq 0.
+*        wa_tab2-lichn = mcha-licha.
+*      endif.
+************vendor batch************
+*************************** VENDOR BATCH*********************************************************************************************************
+      CLEAR : RTDNAME1.
+      CONCATENATE WA_QALS-MATNR WA_QALS-WERK WA_QALS-CHARG INTO RTDNAME1.
+*            RTDNAME1 = '00000000000010010010000000108421'.
+      CLEAR : RITEXT1.
+      CALL FUNCTION 'READ_TEXT'
+        EXPORTING
+          CLIENT                  = SY-MANDT
+          ID                      = 'VERM'
+          LANGUAGE                = 'E'
+          NAME                    = RTDNAME1
+          OBJECT                  = 'CHARGE'
+*         ARCHIVE_HANDLE          = 0
+*            IMPORTING
+*         HEADER                  = THEAD
+        TABLES
+          LINES                   = RITEXT1
+        EXCEPTIONS
+          ID                      = 1
+          LANGUAGE                = 2
+          NAME                    = 3
+          NOT_FOUND               = 4
+          OBJECT                  = 5
+          REFERENCE_CHECK         = 6
+          WRONG_ACCESS_TO_ARCHIVE = 7
+          OTHERS                  = 8.
+      IF SY-SUBRC <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+      ENDIF.
+*    ************
+
+      DESCRIBE TABLE RITEXT1 LINES LN1.
+      NOLINES = 0.
+      CLEAR : W_ITEXT3,R11,R12.
+      LOOP AT RITEXT1."WHERE tdline NE ' '.
+        CONDENSE RITEXT1-TDLINE.
+        NOLINES =  NOLINES  + 1.
+        IF RITEXT1-TDLINE IS NOT  INITIAL   .
+          IF RITEXT1-TDLINE NE '.'.
+
+            IF NOLINES LE  1.
+*                  MOVE ITEXT-TDLINE TO T1.
+              MOVE RITEXT1-TDLINE TO W_ITEXT3.
+              CONCATENATE R11 W_ITEXT3  INTO R11.
+*                  SEPARATED BY SPACE.
+            ENDIF.
+
+*              move ritext1-tdline to w_itext3.
+*              concatenate r3 w_itext3  into r3 separated by space.
+          ENDIF.
+        ENDIF.
+      ENDLOOP.
+*            WRITE : LICHA,R11.
+*      IF WA_TAB2-BUDAT GE '20200914'.
+      IF WA_TAB2-LICHN+0(15) = R11+0(15).  "11.9.20  "long vendor batch
+        WA_TAB2-LICHN = R11.
+      ENDIF.
+*      ENDIF.
+***********************************
+      WA_TAB2-PASTRTERM = WA_QALS-PASTRTERM.
+      SELECT SINGLE * FROM QAVE WHERE PRUEFLOS EQ WA_QALS-PRUEFLOS.
+      IF SY-SUBRC EQ 0.
+        WA_TAB2-VDATUM = QAVE-VDATUM.
+        IF QAVE-VCODE EQ 'A1'.
+          WA_TAB2-INSPSTAT = 'ACCEPTED'.
+        ELSEIF QAVE-VCODE EQ 'A2'.
+          WA_TAB2-INSPSTAT = 'PARTIALLY ACCEPTED'.
+        ELSEIF QAVE-VCODE EQ 'A3'.
+          WA_TAB2-INSPSTAT = 'REJECTED'.
+        ENDIF.
+      ENDIF.
+***************manufacturer      ****************
+      SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ WA_TAB1-MFRNR.
+      IF SY-SUBRC EQ 0.
+        WA_TAB2-MFGR = LFA1-NAME1.
+        WA_TAB2-sgtxt = LFA1-NAME1.          "vse
+      ENDIF.
+
+
+
+*      select single * from zmigo where mblnr eq wa_qals-mblnr and mjahr eq wa_qals-mjahr and zeile eq wa_qals-zeile.
+*      if sy-subrc eq 0.
+*        select single * from lfa1 where lifnr eq zmigo-mfgr.
+*        if sy-subrc eq 0.
+*          wa_tab2-mfgr = lfa1-name1.
+*        endif.
+*      endif.
+    ENDIF.
+    WA_TAB2-NETPR = WA_TAB1-NETPR.
+    WA_TAB2-PEINH = WA_TAB1-PEINH.
+    VAL1 = ( WA_TAB1-NETPR * WA_TAB1-MENGE ) / WA_TAB1-PEINH.
+    CALL FUNCTION 'HR_SGPBS_YRS_MTHS_DAYS'
+      EXPORTING
+        BEG_DA        = WA_TAB2-HSDAT
+        END_DA        = WA_TAB2-BUDAT
+      IMPORTING
+        NO_DAY        = STAY
+*       no_month      = stay1
+*       no_year       = stay2
+        NO_CAL_DAY    = STAY3
+      EXCEPTIONS
+        DATEINT_ERROR = 1
+        OTHERS        = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    WA_TAB2-DDAYS = STAY3.
+
+    SELECT SINGLE * FROM EKKN WHERE EBELN EQ WA_TAB1-EBELN AND EBELP EQ WA_TAB1-EBELP.
+    IF SY-SUBRC EQ 0.
+      WA_TAB2-KOSTL = EKKN-KOSTL.
+    ENDIF.
+    COLLECT WA_TAB2 INTO IT_TAB2.
+    CLEAR WA_TAB2.
+  ENDLOOP.
+
+  IF A1 EQ 'X'.
+    PERFORM ALL.
+  ELSEIF A2 EQ 'X'.
+    PERFORM MANUFACTURER.
+  ENDIF.
+
+FORM ALL.
+
+  LOOP AT IT_TAB2 INTO WA_TAB2.
+    PACK WA_TAB2-LIFNR TO WA_TAB2-LIFNR.
+    CONDENSE WA_TAB2-LIFNR.
+    MODIFY IT_TAB2 FROM WA_TAB2 TRANSPORTING LIFNR.
+*    IF wa_tab2-matnr CN 'H'.
+*      PACK wa_tab2-matnr TO wa_tab2-matnr.
+*      CONDENSE wa_tab2-matnr.
+*      MODIFY it_tab2 FROM wa_tab2 TRANSPORTING matnr.
+*    ENDIF.
+    IF  WA_TAB2-MATNR NA 'H'..
+      PACK WA_TAB2-MATNR TO WA_TAB2-MATNR.
+      CONDENSE WA_TAB2-MATNR.
+      MODIFY IT_TAB2 FROM WA_TAB2 TRANSPORTING MATNR.
+    ENDIF.
+
+*    WRITE : /'a', wa_tab2-MBLNR,wa_tab2-MJAHR,wa_tab2-BLDAT,wa_tab2-BUDAT,wa_tab2-MATNR,wa_tab2-BWART,wa_tab2-CHARG,
+*    wa_tab2-menge,wa_tab2-meins,wa_tab2-LIFNR,wa_tab2-EBELP, wa_tab2-EBELN,wa_tab2-NETPR,wa_tab2-PEINH,
+*    wa_tab2-TAX,wa_tab2-exbed,wa_tab2-dmbtr,wa_tab2-act_val,wa_tab2-diff.
+  ENDLOOP.
+
+
+
+  WA_FIELDCAT-FIELDNAME = 'KNTTP'.
+  WA_FIELDCAT-SELTEXT_L = 'PO TYP'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BATXT'.
+  WA_FIELDCAT-SELTEXT_L = 'PO. TYPE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'PODT'.
+  WA_FIELDCAT-SELTEXT_L = 'PO. DATE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'EBELN'.
+  WA_FIELDCAT-SELTEXT_L = 'PO.'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'EBELP'.
+  WA_FIELDCAT-SELTEXT_L = 'PO ITEM'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'KOSTL'.
+  WA_FIELDCAT-SELTEXT_L = 'COST CENTER'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'AEDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'PO ITEM CHANGE DATE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'TCODE2'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN TCODE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MBLNR'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MJAHR'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN YEAR'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'XBLNR'.
+  WA_FIELDCAT-SELTEXT_L = 'DELIVERY NOTE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BLDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN DOC DATE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BUDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN POSTING DATE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MATNR'.
+  WA_FIELDCAT-SELTEXT_L = 'MATERIAL NO.'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MAKTX'.
+  WA_FIELDCAT-SELTEXT_L = 'MATERIAL DESCRIPTION'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+*  wa_fieldcat-fieldname = 'NORMT'.
+*  wa_fieldcat-seltext_l = 'PHARMA. STAT'.
+*  append wa_fieldcat to fieldcat.
+
+  WA_FIELDCAT-FIELDNAME = 'BWART'.
+  WA_FIELDCAT-SELTEXT_L = 'MOVEMENT'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'CHARG'.
+  WA_FIELDCAT-SELTEXT_L = 'BATCH NO.'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MENGE'.
+  WA_FIELDCAT-SELTEXT_L = 'QUANTITY'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MEINS'.
+  WA_FIELDCAT-SELTEXT_L = 'UNIT'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'DMBTR'.
+  WA_FIELDCAT-SELTEXT_L = 'GRN VALUATION'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'NETPR'.
+  WA_FIELDCAT-SELTEXT_L = 'NET RATE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'PEINH'.
+  WA_FIELDCAT-SELTEXT_L = 'RATE PER'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'HSDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'BATCH MFG.DATE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'DDAYS'.
+  WA_FIELDCAT-SELTEXT_L = 'DAYS FROM MFG TO RECEIPT'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'VFDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'BATCH EXP.DATE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MFGR'.
+  WA_FIELDCAT-SELTEXT_L = 'MANUFACTURER NAME'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+
+  WA_FIELDCAT-FIELDNAME = 'LIFNR'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR CODE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'NAME1'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR NAME'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'ORT01'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR PLACE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+
+
+  WA_FIELDCAT-FIELDNAME = 'LICHN'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR BATCH'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'SGTXT'.
+  WA_FIELDCAT-SELTEXT_L = 'TEXT'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'PRUEFLOS'.
+  WA_FIELDCAT-SELTEXT_L = 'INSPECTION LOT NO.'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'PASTRTERM'.
+  WA_FIELDCAT-SELTEXT_L = 'INSPECTION LOT CREATION'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'INSPSTAT'.
+  WA_FIELDCAT-SELTEXT_L = 'INSPECTION STATUS'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'VDATUM'.
+  WA_FIELDCAT-SELTEXT_L = 'INSPECTION UD DATE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'ABLAD'.
+  WA_FIELDCAT-SELTEXT_L = 'PACK SIZE DETAIL'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+
+
+
+  LAYOUT-ZEBRA = 'X'.
+  LAYOUT-COLWIDTH_OPTIMIZE = 'X'.
+  LAYOUT-WINDOW_TITLEBAR  = 'GRN VALUATION'.
+
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+*     I_INTERFACE_CHECK       = ' '
+*     I_BYPASSING_BUFFER      = ' '
+*     I_BUFFER_ACTIVE         = ' '
+      I_CALLBACK_PROGRAM      = G_REPID
+*     I_CALLBACK_PF_STATUS_SET          = ' '
+      I_CALLBACK_USER_COMMAND = 'USER_COMM'
+      I_CALLBACK_TOP_OF_PAGE  = 'TOP'
+*     I_CALLBACK_HTML_TOP_OF_PAGE       = ' '
+*     I_CALLBACK_HTML_END_OF_LIST       = ' '
+*     I_STRUCTURE_NAME        =
+*     I_BACKGROUND_ID         = ' '
+*     I_GRID_TITLE            =
+*     I_GRID_SETTINGS         =
+      IS_LAYOUT               = LAYOUT
+      IT_FIELDCAT             = FIELDCAT
+*     IT_EXCLUDING            =
+*     IT_SPECIAL_GROUPS       =
+*     IT_SORT                 =
+*     IT_FILTER               =
+*     IS_SEL_HIDE             =
+*     I_DEFAULT               = 'X'
+      I_SAVE                  = 'A'
+*     IS_VARIANT              =
+*     IT_EVENTS               =
+*     IT_EVENT_EXIT           =
+*     IS_PRINT                =
+*     IS_REPREP_ID            =
+*     I_SCREEN_START_COLUMN   = 0
+*     I_SCREEN_START_LINE     = 0
+*     I_SCREEN_END_COLUMN     = 0
+*     I_SCREEN_END_LINE       = 0
+*     I_HTML_HEIGHT_TOP       = 0
+*     I_HTML_HEIGHT_END       = 0
+*     IT_ALV_GRAPHICS         =
+*     IT_HYPERLINK            =
+*     IT_ADD_FIELDCAT         =
+*     IT_EXCEPT_QINFO         =
+*     IR_SALV_FULLSCREEN_ADAPTER        =
+* IMPORTING
+*     E_EXIT_CAUSED_BY_CALLER =
+*     ES_EXIT_CAUSED_BY_USER  =
+    TABLES
+      T_OUTTAB                = IT_TAB2
+    EXCEPTIONS
+      PROGRAM_ERROR           = 1
+      OTHERS                  = 2.
+  IF SY-SUBRC <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  TOP
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM TOP.
+
+  DATA: COMMENT    TYPE SLIS_T_LISTHEADER,
+        WA_COMMENT LIKE LINE OF COMMENT.
+
+  WA_COMMENT-TYP = 'A'.
+  WA_COMMENT-INFO = 'GRN DETAILS FROM'.
+  WA_COMMENT-INFO+19(2) = S_DATE-LOW+6(2).
+  WA_COMMENT-INFO+21(1) = '.'.
+  WA_COMMENT-INFO+22(2) = S_DATE-LOW+4(2).
+  WA_COMMENT-INFO+24(1) = '.'.
+  WA_COMMENT-INFO+25(4) = S_DATE-LOW+0(4).
+  WA_COMMENT-INFO+30(2) = 'TO'.
+
+  WA_COMMENT-INFO+33(2) = S_DATE-HIGH+6(2).
+  WA_COMMENT-INFO+35(1) = '.'.
+  WA_COMMENT-INFO+36(2) = S_DATE-HIGH+4(2).
+  WA_COMMENT-INFO+38(1) = '.'.
+  WA_COMMENT-INFO+39(4) = S_DATE-HIGH+0(4).
+  APPEND WA_COMMENT TO COMMENT.
+
+  CALL FUNCTION 'REUSE_ALV_COMMENTARY_WRITE'
+    EXPORTING
+      IT_LIST_COMMENTARY = COMMENT
+*     I_LOGO             = 'ENJOYSAP_LOGO'
+*     I_END_OF_LIST_GRID =
+*     I_ALV_FORM         =
+    .
+
+  CLEAR COMMENT.
+
+ENDFORM.                    "TOP
+
+
+
+*&---------------------------------------------------------------------*
+*&      Form  USER_COMM
+*&---------------------------------------------------------------------*
+*       Program developed by Jyotsna for GRN system valuation Vs. actual valuation
+*----------------------------------------------------------------------*
+*      -->UCOMM      text
+*      -->SELFIELD   text
+*----------------------------------------------------------------------*
+FORM USER_COMM USING UCOMM LIKE SY-UCOMM
+                     SELFIELD TYPE SLIS_SELFIELD.
+
+
+
+  CASE SELFIELD-FIELDNAME.
+    WHEN 'MBLNR'.
+      SET PARAMETER ID 'MBN' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'MIGO' AND SKIP FIRST SCREEN.
+    WHEN 'LIFNR'.
+      SET PARAMETER ID 'LIF' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'MK03' AND SKIP FIRST SCREEN.
+    WHEN 'EBELN'.
+      SET PARAMETER ID 'BES' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'ME23N' AND SKIP FIRST SCREEN.
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.                    "USER_COMM
+*&---------------------------------------------------------------------*
+*&      Form  MANUFACTURER
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM MANUFACTURER .
+*  loop at it_tab2 into wa_tab2.
+*    wa_tab3-matnr = wa_tab2-matnr.
+*    wa_tab3-maktx = wa_tab2-maktx.
+*    wa_tab3-lifnr = wa_tab2-lifnr.
+*    wa_tab3-name1 = wa_tab2-name1.
+*    wa_tab3-sgtxt = wa_tab2-sgtxt.
+*    wa_tab3-menge = wa_tab2-menge.
+*    collect wa_tab3 into it_tab3.
+*    clear wa_tab3.
+*  endloop.
+*  SORT IT_TAB3 BY MATNR LIFNR SGTXT.
+*  LOOP AT IT_TAB3 INTO WA_TAB3.
+*    WRITE : / WA_TAB3-MATNR,WA_TAB3-MAKTX,WA_TAB3-LIFNR,WA_TAB3-NAME1,WA_TAB3-SGTXT,WA_TAB3-MENGE.
+*    ENDLOOP.
+
+  LOOP AT IT_TAB2 INTO WA_TAB2.
+    PACK WA_TAB2-LIFNR TO WA_TAB2-LIFNR.
+    CONDENSE WA_TAB2-LIFNR.
+    MODIFY IT_TAB2 FROM WA_TAB2 TRANSPORTING LIFNR.
+*    IF wa_tab2-matnr CN 'H'.
+*      PACK wa_tab2-matnr TO wa_tab2-matnr.
+*      CONDENSE wa_tab2-matnr.
+*      MODIFY it_tab2 FROM wa_tab2 TRANSPORTING matnr.
+*    ENDIF.
+    IF  WA_TAB2-MATNR NA 'H'..
+      PACK WA_TAB2-MATNR TO WA_TAB2-MATNR.
+      CONDENSE WA_TAB2-MATNR.
+      MODIFY IT_TAB2 FROM WA_TAB2 TRANSPORTING MATNR.
+    ENDIF.
+
+*    WRITE : /'a', wa_tab2-MBLNR,wa_tab2-MJAHR,wa_tab2-BLDAT,wa_tab2-BUDAT,wa_tab2-MATNR,wa_tab2-BWART,wa_tab2-CHARG,
+*    wa_tab2-menge,wa_tab2-meins,wa_tab2-LIFNR,wa_tab2-EBELP, wa_tab2-EBELN,wa_tab2-NETPR,wa_tab2-PEINH,
+*    wa_tab2-TAX,wa_tab2-exbed,wa_tab2-dmbtr,wa_tab2-act_val,wa_tab2-diff.
+  ENDLOOP.
+
+
+
+  WA_FIELDCAT-FIELDNAME = 'MATNR'.
+  WA_FIELDCAT-SELTEXT_L = 'MATERIAL NO.'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MAKTX'.
+  WA_FIELDCAT-SELTEXT_L = 'MATERIAL DESCRIPTION'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'LIFNR'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR CODE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'NAME1'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR NAME'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'SGTXT'.
+  WA_FIELDCAT-SELTEXT_L = 'MANUFACTURER'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MENGE'.
+  WA_FIELDCAT-SELTEXT_L = 'QUANTITY'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+
+  LAYOUT-ZEBRA = 'X'.
+  LAYOUT-COLWIDTH_OPTIMIZE = 'X'.
+  LAYOUT-WINDOW_TITLEBAR  = 'GRN VALUATION'.
+
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+*     I_INTERFACE_CHECK       = ' '
+*     I_BYPASSING_BUFFER      = ' '
+*     I_BUFFER_ACTIVE         = ' '
+      I_CALLBACK_PROGRAM      = G_REPID
+*     I_CALLBACK_PF_STATUS_SET          = ' '
+      I_CALLBACK_USER_COMMAND = 'USER_COMM'
+      I_CALLBACK_TOP_OF_PAGE  = 'TOP'
+*     I_CALLBACK_HTML_TOP_OF_PAGE       = ' '
+*     I_CALLBACK_HTML_END_OF_LIST       = ' '
+*     I_STRUCTURE_NAME        =
+*     I_BACKGROUND_ID         = ' '
+*     I_GRID_TITLE            =
+*     I_GRID_SETTINGS         =
+      IS_LAYOUT               = LAYOUT
+      IT_FIELDCAT             = FIELDCAT
+*     IT_EXCLUDING            =
+*     IT_SPECIAL_GROUPS       =
+*     IT_SORT                 =
+*     IT_FILTER               =
+*     IS_SEL_HIDE             =
+*     I_DEFAULT               = 'X'
+      I_SAVE                  = 'A'
+*     IS_VARIANT              =
+*     IT_EVENTS               =
+*     IT_EVENT_EXIT           =
+*     IS_PRINT                =
+*     IS_REPREP_ID            =
+*     I_SCREEN_START_COLUMN   = 0
+*     I_SCREEN_START_LINE     = 0
+*     I_SCREEN_END_COLUMN     = 0
+*     I_SCREEN_END_LINE       = 0
+*     I_HTML_HEIGHT_TOP       = 0
+*     I_HTML_HEIGHT_END       = 0
+*     IT_ALV_GRAPHICS         =
+*     IT_HYPERLINK            =
+*     IT_ADD_FIELDCAT         =
+*     IT_EXCEPT_QINFO         =
+*     IR_SALV_FULLSCREEN_ADAPTER        =
+* IMPORTING
+*     E_EXIT_CAUSED_BY_CALLER =
+*     ES_EXIT_CAUSED_BY_USER  =
+    TABLES
+      T_OUTTAB                = IT_TAB2
+    EXCEPTIONS
+      PROGRAM_ERROR           = 1
+      OTHERS                  = 2.
+  IF SY-SUBRC <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+ENDFORM.

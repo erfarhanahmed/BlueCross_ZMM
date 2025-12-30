@@ -1,0 +1,833 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xfa generator="AdobeLiveCycleDesigner_V11.0.9.20220218.1.20_SAP" APIVersion="3.6.22049.0"?><xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" timeStamp="2025-10-30T06:34:43Z" uuid="cb2f0f9c-439f-41e0-a5bd-c61aba0cf3c7">
+<template xmlns="http://www.xfa.org/schema/xfa-template/3.3/" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.1">
+   <?formServer defaultPDFRenderFormat acrobat10.0dynamic?>
+   <subform layout="tb" locale="en_US" name="data" restoreState="auto">
+      <pageSet>
+         <pageArea id="Page1" name="Page1">
+            <contentArea h="279.4mm" name="head1" w="139.7mm" x="19.05mm"/>
+            <medium long="11in" short="8.5in" stock="letter"/>
+            <field h="9.215mm" hAlign="center" name="MOV1" w="41.275mm" x="38.1mm" y="3.175mm">
+               <ui>
+                  <textEdit>
+                     <border>
+                        <edge stroke="lowered"/>
+                     </border>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <font typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <caption reserve="27.0127mm">
+                  <para vAlign="middle"/>
+                  <value>
+                     <text xliff:rid="BB84FECC-825E-4966-8377-AE226A226DCC">From Movement</text>
+                  </value>
+               </caption>
+               <value>
+                  <text maxChars="3"/>
+               </value>
+               <bind match="dataRef" ref="$.MOV1"/>
+               <desc>
+                  <text name="Schema Annotation">Movement Type (Inventory Management)</text>
+               </desc>
+               <border>
+                  <edge stroke="embossed"/>
+                  <fill>
+                     <color value="153,204,255"/>
+                  </fill>
+               </border>
+            </field>
+            <field h="9.215mm" hAlign="center" name="MOV2" w="38.1mm" x="79.375mm" y="3.175mm">
+               <ui>
+                  <textEdit>
+                     <border>
+                        <edge stroke="lowered"/>
+                     </border>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <font typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <caption reserve="22.62mm">
+                  <para vAlign="middle"/>
+                  <value>
+                     <text xliff:rid="7487EAE5-D969-4A3B-8232-56AFF043D085">To Movement</text>
+                  </value>
+               </caption>
+               <value>
+                  <text maxChars="3"/>
+               </value>
+               <bind match="dataRef" ref="$.MOV2"/>
+               <desc>
+                  <text name="Schema Annotation">Movement Type (Inventory Management)</text>
+               </desc>
+               <border>
+                  <edge stroke="embossed"/>
+                  <fill>
+                     <color value="153,204,255"/>
+                  </fill>
+               </border>
+            </field>
+            <field h="9.215mm" hAlign="center" name="BUDAT1" w="41.275mm" x="38.1mm" y="12.7mm">
+               <ui>
+                  <dateTimeEdit>
+                     <border>
+                        <edge stroke="lowered"/>
+                     </border>
+                     <margin/>
+                  </dateTimeEdit>
+               </ui>
+               <font typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <value>
+                  <date/>
+               </value>
+               <caption reserve="18.2195mm">
+                  <para vAlign="middle"/>
+                  <value>
+                     <text xliff:rid="2AA00268-B5A8-418B-A674-C2E5737B66E9">From Date</text>
+                  </value>
+               </caption>
+               <bind match="dataRef" ref="$.BUDAT1">
+                  <picture>date{YYYY-MM-DD}</picture>
+               </bind>
+               <desc>
+                  <text name="Schema Annotation">ABAP System Field: Current Date of Application Server</text>
+               </desc>
+               <validate nullTest="error"/>
+               <border>
+                  <edge stroke="embossed"/>
+                  <fill>
+                     <color value="153,204,255"/>
+                  </fill>
+               </border>
+            </field>
+            <field h="9.215mm" hAlign="center" name="BUDAT2" w="38.1mm" x="79.375mm" y="12.7mm">
+               <ui>
+                  <dateTimeEdit>
+                     <border>
+                        <edge stroke="lowered"/>
+                     </border>
+                     <margin/>
+                  </dateTimeEdit>
+               </ui>
+               <font typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <value>
+                  <date/>
+               </value>
+               <caption reserve="12.98mm">
+                  <para vAlign="middle"/>
+                  <value>
+                     <text xliff:rid="9DFBBBF7-DCAC-4417-B053-5FA5F9A03DBF">To Date</text>
+                  </value>
+               </caption>
+               <bind match="dataRef" ref="$.BUDAT2">
+                  <picture>date{YYYY-MM-DD}</picture>
+               </bind>
+               <desc>
+                  <text name="Schema Annotation">ABAP System Field: Current Date of Application Server</text>
+               </desc>
+               <validate nullTest="error"/>
+               <border>
+                  <edge stroke="embossed"/>
+                  <fill>
+                     <color value="153,204,255"/>
+                  </fill>
+               </border>
+            </field>
+            <draw h="9.525mm" name="Image1" w="9.525mm" x="25.4mm" y="3.175mm">
+               <value>
+                  <image contentType="image/jpeg">/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcG
+BwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwM
+DAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCABaAFMDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9+2ba
+Kinv4bWIvLIkaDqznAFZvj/xjZfD3wZqeualMLfT9JtpLu4kP8KIpY/oK+Kvht8DvGP/AAUzWXxx
+4+8Q6z4b+Ht3Kw0Lw3p0xgNzACQJZmHXd+P4V7mU5NHE054rFVPZUYWTla7be0YxW70b3SS3Z4Ob
+51PC1YYTC0va1p3ajeySW8pSey6bNt7I+3B4u0o/8xKw/wDAhf8AGj/hL9K/6Cdh/wCBC/41+bf7
+Y/7Mv7Nf7GHiXRNM13wl471afXLd7iE2Gq52hWCkHcwOcntWR8HPhP8Asn/GrwL4x1XT/Dnj6zvv
+BOmvqt9pd5qBSeWBOrREMVPOAckEFhxzmvsafA2CqYOOYU6ld0pbSVCNt+X/AJ/d9D4+rx1jKWLl
+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</image>
+               </value>
+               <ui>
+                  <imageEdit/>
+               </ui>
+               <desc>
+                  <text name="embeddedHref">D:\Desktop\Blue Logo.jpg</text>
+               </desc>
+               <border>
+                  <edge presence="hidden"/>
+                  <fill/>
+               </border>
+            </draw>
+            <field h="9mm" name="KUNNR" w="25.4mm" x="117.475mm" y="3.175mm">
+               <ui>
+                  <textEdit>
+                     <border>
+                        <edge stroke="lowered"/>
+                     </border>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <font typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <caption reserve="9.6321mm">
+                  <para vAlign="middle"/>
+                  <value>
+                     <text xliff:rid="DD400782-5A13-49FA-B1F5-B4D989B288D3">Plant</text>
+                  </value>
+               </caption>
+               <value>
+                  <text maxChars="10"/>
+               </value>
+               <desc>
+                  <text name="Schema Annotation">Customer number of plant</text>
+               </desc>
+               <border>
+                  <edge stroke="embossed"/>
+                  <fill>
+                     <color value="153,204,255"/>
+                  </fill>
+               </border>
+               <bind match="dataRef" ref="$.KUNNR"/>
+            </field>
+            <field access="readOnly" h="7.5mm" id="floatingField000041" name="CurrentPage" presence="hidden" w="55mm" x="65.755mm" y="32.252mm">
+               <ui>
+                  <numericEdit>
+                     <border>
+                        <edge stroke="lowered"/>
+                     </border>
+                     <margin/>
+                  </numericEdit>
+               </ui>
+               <font typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <caption reserve="20mm">
+                  <para vAlign="middle"/>
+                  <value>
+                     <text xliff:rid="F3BC52A5-105F-4D3D-8E42-1BDCF0F4FB36">Text Field</text>
+                  </value>
+               </caption>
+               <calculate override="error"/>
+               <event activity="ready" name="event__layout_ready" ref="$layout">
+                  <script contentType="application/x-javascript">this.rawValue = xfa.layout.page(this);
+</script>
+               </event>
+               <?templateDesigner floatingFieldPlaceholder #?>
+               <bind match="none"/>
+            </field>
+            <field access="readOnly" h="7.5mm" id="floatingField018467" name="PageCount" presence="hidden" w="55mm" x="65.755mm" y="32.252mm">
+               <ui>
+                  <numericEdit>
+                     <border>
+                        <edge stroke="lowered"/>
+                     </border>
+                     <margin/>
+                  </numericEdit>
+               </ui>
+               <font typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <caption reserve="20mm">
+                  <para vAlign="middle"/>
+                  <value>
+                     <text xliff:rid="813B3AC2-03F1-41C3-BF1C-6D75FE146FAF">Text Field</text>
+                  </value>
+               </caption>
+               <calculate override="error"/>
+               <event activity="ready" name="event__layout_ready" ref="$layout">
+                  <script contentType="application/x-javascript">this.rawValue = xfa.layout.pageCount();
+</script>
+               </event>
+               <?templateDesigner floatingFieldPlaceholder ##?>
+               <bind match="none"/>
+            </field>
+            <draw hAlign="right" name="Pages" x="136.525mm" y="22.225mm">
+               <ui>
+                  <textEdit>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <value>
+                  <exData contentType="text/html" maxLength="0" xliff:rid="F6611664-0E42-42C2-9E57-915056D4A9DA">
+                     <body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"><p style="text-decoration:none;letter-spacing:0in">Page<span style="xfa-spacerun:yes"> </span><span xfa:embed="#floatingField000041" xfa:embedMode="raw" xfa:embedType="uri"/> of<span style="xfa-spacerun:yes"> </span><span xfa:embed="#floatingField018467" xfa:embedMode="raw" xfa:embedType="uri"/></p></body>
+                  </exData>
+               </value>
+               <font baselineShift="0pt" size="8pt" typeface="Arial"/>
+               <margin bottomInset="0mm" leftInset="0mm" rightInset="0mm" topInset="0mm"/>
+               <para marginLeft="0pt" marginRight="0pt" spaceAbove="0pt" spaceBelow="0pt" textIndent="0pt" vAlign="middle"/>
+            </draw>
+            <field h="9mm" name="UDATE" w="33.425mm" x="92.075mm" y="269.875mm">
+               <ui>
+                  <dateTimeEdit>
+                     <border>
+                        <edge stroke="lowered"/>
+                     </border>
+                     <margin/>
+                  </dateTimeEdit>
+               </ui>
+               <font size="8pt" typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <value>
+                  <date/>
+               </value>
+               <caption reserve="10.471mm">
+                  <para vAlign="middle"/>
+                  <value>
+                     <text xliff:rid="A1BFF01D-8E8A-4B75-B838-C1AC568021C3">Date</text>
+                  </value>
+               </caption>
+               <bind match="dataRef" ref="$.UDATE">
+                  <picture>date{YYYY-MM-DD}</picture>
+               </bind>
+               <desc>
+                  <text name="Schema Annotation">ABAP System Field: Current Date of Application Server</text>
+               </desc>
+               <validate nullTest="error"/>
+            </field>
+            <field h="9mm" name="UTIME" w="31.75mm" x="127mm" y="269.875mm">
+               <ui>
+                  <dateTimeEdit>
+                     <border>
+                        <edge stroke="lowered"/>
+                     </border>
+                     <margin/>
+                  </dateTimeEdit>
+               </ui>
+               <font size="8pt" typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <value>
+                  <time/>
+               </value>
+               <caption reserve="8.5874mm">
+                  <para vAlign="middle"/>
+                  <value>
+                     <text xliff:rid="ED221134-31D8-4B5C-BFCD-9D9162ED48FD">Time</text>
+                  </value>
+               </caption>
+               <bind match="dataRef" ref="$.UTIME">
+                  <picture>time{KK:MM:SS}</picture>
+               </bind>
+               <desc>
+                  <text name="Schema Annotation">ABAP System Field: Current Time of Application Server</text>
+               </desc>
+               <validate nullTest="error"/>
+            </field>
+            <?templateDesigner expand 1?></pageArea>
+         <?templateDesigner expand 1?></pageSet>
+      <subform columnWidths="19.478mm 88.367mm 21.362mm 11.096mm" layout="table" name="IT_TAB1">
+         <subform id="overflowLeader_ID" layout="row" name="overflowLeader">
+            <draw>
+               <ui>
+                  <textEdit>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <value>
+                  <text xliff:rid="05C67920-1868-4CE3-AB15-EE5506B7A86E">Material Code</text>
+               </value>
+               <font typeface="Arial"/>
+               <para vAlign="middle"/>
+               <margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"/>
+               <border>
+                  <edge/>
+               </border>
+            </draw>
+            <draw>
+               <ui>
+                  <textEdit>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <value>
+                  <text xliff:rid="E48EDA88-7392-4CA7-AF64-894052B80149">Material Description</text>
+               </value>
+               <font typeface="Arial"/>
+               <para vAlign="middle"/>
+               <margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"/>
+               <border>
+                  <edge/>
+               </border>
+            </draw>
+            <draw>
+               <ui>
+                  <textEdit>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <value>
+                  <text xliff:rid="E173B1F5-6114-4AD8-97CE-977650E0D945">Quantity</text>
+               </value>
+               <font typeface="Arial"/>
+               <para vAlign="middle"/>
+               <margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"/>
+               <border>
+                  <edge/>
+               </border>
+            </draw>
+            <draw>
+               <ui>
+                  <textEdit>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <value>
+                  <text xliff:rid="BBA1C33F-4DC2-4332-8816-907906D2A960">UOM</text>
+               </value>
+               <font typeface="Arial"/>
+               <para vAlign="middle"/>
+               <margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"/>
+               <border>
+                  <edge/>
+               </border>
+            </draw>
+            <assist role="TH"/>
+            <occur max="-1"/>
+            <bind match="none"/>
+            <?templateDesigner expand 1?></subform>
+         <subform layout="row" name="DATA">
+            <field h="9mm" name="MATNR" w="62mm">
+               <ui>
+                  <textEdit>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <font size="8pt" typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <value>
+                  <text maxChars="18"/>
+               </value>
+               <desc>
+                  <text name="Schema Annotation">Material Number</text>
+               </desc>
+               <border>
+                  <edge/>
+               </border>
+            </field>
+            <field h="7.62mm" name="MAKTX" w="62mm" x="2.440944in">
+               <ui>
+                  <textEdit>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <font size="8pt" typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <value>
+                  <text maxChars="100"/>
+               </value>
+               <desc>
+                  <text name="Schema Annotation">Character 100</text>
+               </desc>
+               <border>
+                  <edge/>
+               </border>
+            </field>
+            <field h="9mm" name="MENGE" w="62mm" x="4.881889in">
+               <ui>
+                  <textEdit>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <font size="8pt" typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <value>
+                  <text maxChars="15"/>
+               </value>
+               <desc>
+                  <text name="Schema Annotation">Char 15</text>
+               </desc>
+               <border>
+                  <edge/>
+               </border>
+            </field>
+            <field h="9mm" name="MEINS" w="62mm" y="0.354333in">
+               <ui>
+                  <textEdit>
+                     <margin/>
+                  </textEdit>
+               </ui>
+               <font size="8pt" typeface="Arial"/>
+               <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+               <para vAlign="middle"/>
+               <value>
+                  <text maxChars="3"/>
+               </value>
+               <desc>
+                  <text name="Schema Annotation">Base Unit of Measure</text>
+               </desc>
+               <border>
+                  <edge/>
+               </border>
+            </field>
+            <assist role="TR"/>
+            <occur max="-1"/>
+            <bind match="dataRef" ref="$record.IT_TAB1.DATA[*]"/>
+            <?templateDesigner expand 1?></subform>
+         <occur min="0"/>
+         <desc>
+            <text name="Schema Annotation">test</text>
+         </desc>
+         <overflow leader="overflowLeader"/>
+         <margin bottomInset="12.7mm" topInset="25.4mm"/>
+         <?templateDesigner expand 1?></subform>
+      <field access="readOnly" h="7.5mm" id="floatingField006334" name="CurrentPage" presence="hidden" w="55mm">
+         <ui>
+            <numericEdit>
+               <border>
+                  <edge stroke="lowered"/>
+               </border>
+               <margin/>
+            </numericEdit>
+         </ui>
+         <font typeface="Arial"/>
+         <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+         <para vAlign="middle"/>
+         <caption reserve="20mm">
+            <para vAlign="middle"/>
+            <value>
+               <text xliff:rid="03EB7B0B-CB79-42E4-A090-C6C197749733">Text Field</text>
+            </value>
+         </caption>
+         <calculate override="error"/>
+         <event activity="ready" name="event__layout_ready" ref="$layout">
+            <script contentType="application/x-javascript">this.rawValue = xfa.layout.page(this);
+</script>
+         </event>
+         <?templateDesigner floatingFieldPlaceholder #?>
+         <bind match="none"/>
+      </field>
+      <field access="readOnly" h="7.5mm" id="floatingField026500" name="PageCount" presence="hidden" w="55mm">
+         <ui>
+            <numericEdit>
+               <border>
+                  <edge stroke="lowered"/>
+               </border>
+               <margin/>
+            </numericEdit>
+         </ui>
+         <font typeface="Arial"/>
+         <margin bottomInset="1mm" leftInset="1mm" rightInset="1mm" topInset="1mm"/>
+         <para vAlign="middle"/>
+         <caption reserve="20mm">
+            <para vAlign="middle"/>
+            <value>
+               <text xliff:rid="0FA07543-F1B5-48FC-B206-D6750B7B3DB3">Text Field</text>
+            </value>
+         </caption>
+         <calculate override="error"/>
+         <event activity="ready" name="event__layout_ready" ref="$layout">
+            <script contentType="application/x-javascript">this.rawValue = xfa.layout.pageCount();
+</script>
+         </event>
+         <?templateDesigner floatingFieldPlaceholder ##?>
+         <bind match="none"/>
+      </field>
+      <proto/>
+      <subform layout="tb" name="HEAD1" w="139.7mm">
+         <bind match="none"/>
+         <?templateDesigner expand 1?></subform>
+      <desc>
+         <text name="version">11.0.9.20220218.1.20.2</text>
+      </desc>
+      <subform layout="tb" name="BODY" w="139.7mm">
+         <bind match="none"/>
+         <?templateDesigner expand 1?></subform>
+      <draw h="0in" hAlign="right" w="0in">
+         <ui>
+            <textEdit>
+               <margin/>
+            </textEdit>
+         </ui>
+         <value>
+            <text xliff:rid="B8A34DA5-0823-4656-8C92-13CC8C0F0B3F">#</text>
+         </value>
+         <font typeface="Arial"/>
+         <para vAlign="middle"/>
+         <margin bottomInset="0.5mm" leftInset="0.5mm" rightInset="0.5mm" topInset="0.5mm"/>
+         <border>
+            <edge/>
+         </border>
+         <?renderCache.bounds 2834 2834 0 0 -1417 -1417 0 0?></draw>
+      <?templateDesigner expand 1?>
+      <?renderCache.subset "Arial" 0 0 ISO-8859-1 4 120 30 0003000600260027002900300032003300340037003800440046004700480049004A004C004F005000510052005300550056005700580059005B005C #CDFMOPQTUacdefgilmnoprstuvxy?></subform>
+   <?templateDesigner DefaultPreviewDynamic 1?>
+   <?templateDesigner DefaultRunAt client?>
+   <?templateDesigner Grid show:1, snap:1, units:0, color:ff8080, origin:(0,0), interval:(125000,125000)?>
+   <?templateDesigner WidowOrphanControl 0?>
+   <?templateDesigner DefaultCaptionFontSettings face:Arial;size:10;weight:normal;style:normal?>
+   <?templateDesigner DefaultValueFontSettings face:Arial;size:10;weight:normal;style:normal?>
+   <?templateDesigner DefaultLanguage FormCalc?>
+   <?acrobat JavaScript strictScoping?>
+   <?templateDesigner FormTargetVersion 33?>
+   <?templateDesigner Rulers horizontal:1, vertical:1, guidelines:1, crosshairs:0?>
+   <?templateDesigner Zoom 126?></template>
+<config xmlns="http://www.xfa.org/schema/xci/3.0/">
+   <agent name="designer">
+      <!--  [0..n]  -->
+      <destination>pdf</destination>
+      <pdf>
+         <!--  [0..n]  -->
+         <fontInfo/>
+      </pdf>
+      <common>
+         <template>
+            <base>http://sapqlt.bclads.com:50200/sap/bc/fp/form/layout/</base>
+         </template>
+      </common>
+   </agent>
+   <present>
+      <!--  [0..n]  -->
+      <pdf>
+         <!--  [0..n]  -->
+         <version>1.7</version>
+         <adobeExtensionLevel>8</adobeExtensionLevel>
+      </pdf>
+      <common>
+         <data>
+            <xsl>
+               <uri/>
+            </xsl>
+            <outputXSL>
+               <uri/>
+            </outputXSL>
+         </data>
+      </common>
+      <xdp>
+         <packets>*</packets>
+      </xdp>
+   </present>
+</config>
+<connectionSet xmlns="http://www.xfa.org/schema/xfa-connection-set/2.8/">
+   <xsdConnection dataDescription="data" name="ZTEST13">
+      <uri/>
+      <rootElement>data</rootElement>
+   </xsdConnection>
+</connectionSet>
+<xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/">
+   <xfa:data xfa:dataNode="dataGroup"/>
+   <dd:dataDescription xmlns:dd="http://ns.adobe.com/data-description/" dd:name="data">
+      <data>
+         <KUNNR/>
+         <MOV1/>
+         <UDATE/>
+         <BUDAT2/>
+         <UTIME/>
+         <BUDAT1/>
+         <MOV2/>
+         <IT_TAB1 dd:minOccur="0">
+            <DATA dd:maxOccur="-1">
+               <MATNR/>
+               <MAKTX/>
+               <MENGE/>
+               <MEINS/>
+            </DATA>
+         </IT_TAB1>
+      </data>
+   </dd:dataDescription>
+</xfa:datasets>
+<localeSet xmlns="http://www.xfa.org/schema/xfa-locale-set/2.7/">
+   <locale desc="English (United States)" name="en_US">
+      <calendarSymbols name="gregorian">
+         <monthNames>
+            <month>January</month>
+            <month>February</month>
+            <month>March</month>
+            <month>April</month>
+            <month>May</month>
+            <month>June</month>
+            <month>July</month>
+            <month>August</month>
+            <month>September</month>
+            <month>October</month>
+            <month>November</month>
+            <month>December</month>
+         </monthNames>
+         <monthNames abbr="1">
+            <month>Jan</month>
+            <month>Feb</month>
+            <month>Mar</month>
+            <month>Apr</month>
+            <month>May</month>
+            <month>Jun</month>
+            <month>Jul</month>
+            <month>Aug</month>
+            <month>Sep</month>
+            <month>Oct</month>
+            <month>Nov</month>
+            <month>Dec</month>
+         </monthNames>
+         <dayNames>
+            <day>Sunday</day>
+            <day>Monday</day>
+            <day>Tuesday</day>
+            <day>Wednesday</day>
+            <day>Thursday</day>
+            <day>Friday</day>
+            <day>Saturday</day>
+         </dayNames>
+         <dayNames abbr="1">
+            <day>Sun</day>
+            <day>Mon</day>
+            <day>Tue</day>
+            <day>Wed</day>
+            <day>Thu</day>
+            <day>Fri</day>
+            <day>Sat</day>
+         </dayNames>
+         <meridiemNames>
+            <meridiem>AM</meridiem>
+            <meridiem>PM</meridiem>
+         </meridiemNames>
+         <eraNames>
+            <era>BC</era>
+            <era>AD</era>
+         </eraNames>
+      </calendarSymbols>
+      <datePatterns>
+         <datePattern name="full">EEEE, MMMM D, YYYY</datePattern>
+         <datePattern name="long">MMMM D, YYYY</datePattern>
+         <datePattern name="med">MMM D, YYYY</datePattern>
+         <datePattern name="short">M/D/YY</datePattern>
+      </datePatterns>
+      <timePatterns>
+         <timePattern name="full">h:MM:SS A Z</timePattern>
+         <timePattern name="long">h:MM:SS A Z</timePattern>
+         <timePattern name="med">h:MM:SS A</timePattern>
+         <timePattern name="short">h:MM A</timePattern>
+      </timePatterns>
+      <dateTimeSymbols>GyMdkHmsSEDFwWahKzZ</dateTimeSymbols>
+      <numberPatterns>
+         <numberPattern name="numeric">z,zz9.zzz</numberPattern>
+         <numberPattern name="currency">$z,zz9.99|($z,zz9.99)</numberPattern>
+         <numberPattern name="percent">z,zz9%</numberPattern>
+      </numberPatterns>
+      <numberSymbols>
+         <numberSymbol name="decimal">.</numberSymbol>
+         <numberSymbol name="grouping">,</numberSymbol>
+         <numberSymbol name="percent">%</numberSymbol>
+         <numberSymbol name="minus">-</numberSymbol>
+         <numberSymbol name="zero">0</numberSymbol>
+      </numberSymbols>
+      <currencySymbols>
+         <currencySymbol name="symbol">$</currencySymbol>
+         <currencySymbol name="isoname">USD</currencySymbol>
+         <currencySymbol name="decimal">.</currencySymbol>
+      </currencySymbols>
+      <typefaces>
+         <typeface name="Myriad Pro"/>
+         <typeface name="Minion Pro"/>
+         <typeface name="Courier Std"/>
+         <typeface name="Adobe Pi Std"/>
+         <typeface name="Adobe Hebrew"/>
+         <typeface name="Adobe Arabic"/>
+         <typeface name="Adobe Thai"/>
+         <typeface name="Kozuka Gothic Pro-VI M"/>
+         <typeface name="Kozuka Mincho Pro-VI R"/>
+         <typeface name="Adobe Ming Std L"/>
+         <typeface name="Adobe Song Std L"/>
+         <typeface name="Adobe Myungjo Std M"/>
+         <typeface name="Adobe Devanagari"/>
+      </typefaces>
+   </locale>
+</localeSet>
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.6-c015 81.161580, 2017/12/01-01:38:21        ">
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <rdf:Description xmlns:desc="http://ns.adobe.com/xfa/promoted-desc/" xmlns:pdf="http://ns.adobe.com/pdf/1.3/" xmlns:xmp="http://ns.adobe.com/xap/1.0/" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/" rdf:about="">
+         <xmp:MetadataDate>2023-10-21T04:37:38Z</xmp:MetadataDate>
+         <xmp:CreatorTool>Adobe LiveCycle Designer 11.0</xmp:CreatorTool>
+         <pdf:Producer>Adobe LiveCycle Designer 11.0</pdf:Producer>
+         <xmpMM:DocumentID>uuid:a843f728-27c4-42d2-8778-3d67fc54fab8</xmpMM:DocumentID>
+         <desc:version rdf:parseType="Resource">
+            <rdf:value>11.0.9.20220218.1.20.2</rdf:value>
+            <desc:ref>/template/subform[1]</desc:ref>
+         </desc:version>
+      </rdf:Description>
+   </rdf:RDF>
+</x:xmpmeta></xdp:xdp>

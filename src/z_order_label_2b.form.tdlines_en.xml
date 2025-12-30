@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-16"?>
+<abapGit version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <TDLINES>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>MAIN</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>LABEL</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>PROTECT</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P4</TDFORMAT>
+     <TDLINE>&amp;COMPNM&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P4</TDFORMAT>
+     <TDLINE>&amp;rettxt&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;C2&gt;Product:&amp;t_header-MAKTXM(25)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;C2&gt;B.No:&amp;t_header-chargm&amp;&lt;/&gt;&lt;C1&gt; Insp Lot:&amp;t_header-prueflos&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Item Code:&amp;t_header-matnr(CIZ)&amp;, I.D.No.:&amp;T_HEADER-CHARG&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;&amp;w_name(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;t_header-maktx(40)&amp; &amp;t_header-normt(18)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Quantity:&amp;t_header-erfmg(CIZ)&amp; &amp;t_header-erfme&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Tare Wt :&amp;SPACE(20)&amp; &amp;t_header-erfme&amp; &lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Gross Wt:&amp;SPACE(20)&amp; &amp;t_header-erfme&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;No. Of CONT. : ---, Verified By IPQA:&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;No. Of CONT. : ---, Iss. On:&amp;t_header-budat&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;&amp;text1&amp;:&amp;t_header-budat&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Checked By: &amp;rptxt1&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;&amp;rptxt1&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;c3&gt;&amp;format1&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>ENDPROTECT</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>LABEL1</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>PROTECT</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P4</TDFORMAT>
+     <TDLINE>&amp;COMPNM&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P4</TDFORMAT>
+     <TDLINE>&amp;rettxt&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;C2&gt;Product:&amp;t_header-MAKTXM(25)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;C2&gt;B.No:&amp;t_header-chargm&amp;&lt;/&gt;&lt;C1&gt; Insp Lot:&amp;t_header-prueflos&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Item Code:&amp;t_header-matnr(CIZ)&amp;, I.D.No.:&amp;T_HEADER-CHARG&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;C1&gt;&amp;w_name(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;t_header-maktx(40)&amp; &amp;t_header-normt(18)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Quantity:&amp;t_header-erfmg(CIZ)&amp; &amp;t_header-erfme&amp; &lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Tare Wt :&amp;space(20)&amp; &amp;t_header-erfme&amp; &lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Gross Wt:&amp;space(20)&amp; &amp;t_header-erfme&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;No. Of CONT. : ---, Verified By IPQA:&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;No. Of CONT. : ---, Iss. On:&amp;t_header-budat&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;C1&gt;&amp;text1&amp;:&amp;t_header-budat&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;C1&gt;Checked By: &amp;rptxt1&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;C1&gt;&amp;rptxt1&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;c3&gt;&amp;format1&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>ENDPROTECT</TDLINE>
+    </TLINE>
+   </TDLINES>
+  </asx:values>
+ </asx:abap>
+</abapGit>

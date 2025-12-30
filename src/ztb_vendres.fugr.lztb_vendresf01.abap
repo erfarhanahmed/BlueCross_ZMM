@@ -1,0 +1,38 @@
+*----------------------------------------------------------------------*
+***INCLUDE LZTB_VENDRESF01.
+*----------------------------------------------------------------------*
+FORM NEW_RECORD.
+* Create
+  ZTB_VENDRES-CRDAT = SY-DATUM.
+  ZTB_VENDRES-CRNAM = SY-UNAME.
+* Changed by fields
+  ZTB_VENDRES-AEDAT = SY-DATUM.
+  ZTB_VENDRES-AENAM = SY-UNAME.
+
+ENDFORM.
+FORM CHANGE_RECORD.
+
+  FIELD-SYMBOLS: <FS_FIELD> TYPE ANY .
+  LOOP AT TOTAL.
+    CHECK <ACTION> EQ AENDERN.
+** -- Updated By
+    ASSIGN COMPONENT 'AENAM' OF STRUCTURE <VIM_TOTAL_STRUC> TO <FS_FIELD>.
+    IF SY-SUBRC EQ 0.
+      <FS_FIELD> = SY-UNAME.
+    ENDIF.
+** -- Updated On
+    ASSIGN COMPONENT 'AEDAT' OF STRUCTURE <VIM_TOTAL_STRUC> TO <FS_FIELD>.
+    IF SY-SUBRC EQ 0.
+
+      <FS_FIELD> = SY-DATUM.
+    ENDIF.
+    READ TABLE EXTRACT WITH KEY <VIM_XTOTAL_KEY>.
+    IF SY-SUBRC EQ 0.
+      EXTRACT = TOTAL.
+      MODIFY EXTRACT INDEX SY-TABIX.
+    ENDIF.
+    IF TOTAL IS NOT INITIAL.
+      MODIFY TOTAL.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.

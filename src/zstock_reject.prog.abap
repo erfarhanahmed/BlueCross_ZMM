@@ -1,0 +1,650 @@
+*&---------------------------------------------------------------------*
+*& Report  ZSTOCK_REJECT1
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+REPORT ZSTOCK_REJECT1 NO STANDARD PAGE HEADING LINE-SIZE 400.
+
+TABLES : QALS,
+         MARA,
+         MKPF,
+         LFA1,
+         MAKT,
+         JEST,
+         EKKO.
+
+
+DATA: IT_QALS  TYPE TABLE OF QALS,
+      WA_QALS  TYPE QALS,
+      IT_QAVE  TYPE TABLE OF QAVE,
+      WA_QAVE  TYPE QAVE,
+      IT_MARA  TYPE TABLE OF MARA,
+      WA_MARA  TYPE MARA,
+      IT_MSEG  TYPE TABLE OF MSEG,
+      WA_MSEG  TYPE MSEG,
+      IT_MKPF  TYPE TABLE OF MKPF,
+      WA_MKPF  TYPE MKPF,
+      IT_QALS1 TYPE TABLE OF QALS,
+      WA_QALS1 TYPE QALS.
+
+TYPES : BEGIN OF ONL1,
+*          MATNR TYPE QALS-MATNR,
+          CHARG TYPE QALS-CHARG,
+        END OF ONL1.
+DATA: IT_ONL1 TYPE TABLE OF ONL1,
+      WA_ONL1 TYPE ONL1.
+
+TYPES : BEGIN OF ITAB1,
+          LIFNR      TYPE QALS-LIFNR,
+          LICHN      TYPE QALS-LICHN,
+          PRUEFLOS   TYPE QALS-PRUEFLOS,
+          MATNR      TYPE QALS-MATNR,
+          CHARG      TYPE QALS-CHARG,
+          LMENGE04   TYPE QALS-LMENGE04,
+          LMENGE03   TYPE QALS-LMENGE03,
+          LOSMENGE   TYPE QALS-LOSMENGE,
+          XBLNR      TYPE MKPF-XBLNR,
+          BLDAT      TYPE MKPF-BLDAT,
+          NAME1      TYPE LFA1-NAME1,
+          MAKTX(100) TYPE C,
+          MBLNR      TYPE QALS-MBLNR,
+          STATUS(25) TYPE C,
+          EBELN      TYPE QALS-EBELN,
+          MENGE      TYPE MSEG-MENGE,
+          BUDAT      TYPE SY-DATUM,
+          AEDAT      TYPE EKKO-AEDAT,
+  sgtxt TYPE mseg-sgtxt,
+        END OF ITAB1.
+
+DATA: IT_TAB1 TYPE TABLE OF ITAB1,
+      WA_TAB1 TYPE ITAB1,
+      IT_TAB2 TYPE TABLE OF ITAB1,
+      WA_TAB2 TYPE ITAB1.
+
+DATA: MAKTX1(40) TYPE C,
+      MAKTX2(40) TYPE C,
+      NORMT      TYPE MARA-NORMT,
+      MAKTX(100) TYPE C.
+DATA: YEAR1(4) TYPE C,
+      YEAR2(4) TYPE C.
+
+TYPE-POOLS:  SLIS.
+
+DATA: G_REPID     LIKE SY-REPID,
+      FIELDCAT    TYPE SLIS_T_FIELDCAT_ALV,
+      WA_FIELDCAT LIKE LINE OF FIELDCAT,
+      SORT        TYPE SLIS_T_SORTINFO_ALV,
+      WA_SORT     LIKE LINE OF SORT,
+      LAYOUT      TYPE SLIS_LAYOUT_ALV.
+DATA : MSG TYPE STRING.
+
+DATA : BATCH_DETAILS    TYPE TABLE OF CLBATCH,
+       WA_BATCH_DETAILS TYPE CLBATCH.
+
+SELECTION-SCREEN BEGIN OF BLOCK MERKMALE1 WITH FRAME TITLE TEXT-001.
+SELECT-OPTIONS : MATNR FOR QALS-MATNR,
+                 RDATE FOR QALS-BUDAT OBLIGATORY,
+                 MTYPE FOR MARA-MTART,
+                 VENDOR FOR LFA1-LIFNR.
+PARAMETERS : PLANT LIKE QALS-WERK OBLIGATORY.
+SELECTION-SCREEN END OF BLOCK MERKMALE1 .
+
+INITIALIZATION.
+  G_REPID = SY-REPID.
+
+AT SELECTION-SCREEN.
+  PERFORM AUTHORIZATION.
+
+START-OF-SELECTION.
+  SELECT * FROM MARA INTO TABLE IT_MARA WHERE MATNR IN MATNR AND MTART IN MTYPE.
+  PERFORM QCREJECTION.
+  PERFORM ONLINEREJ.
+  PERFORM PRINT.
+
+*&---------------------------------------------------------------------*
+*&      Form  QCREJECTION
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM QCREJECTION .
+  SELECT * FROM QALS INTO TABLE IT_QALS WHERE MATNR IN MATNR AND BUDAT IN RDATE AND WERK EQ PLANT.
+  IF SY-SUBRC EQ 0.
+    SELECT * FROM QAVE INTO TABLE IT_QAVE FOR ALL ENTRIES IN IT_QALS WHERE PRUEFLOS EQ IT_QALS-PRUEFLOS AND VCODE IN ( 'A3','A2' ).
+  ENDIF.
+
+
+  LOOP AT IT_QAVE INTO WA_QAVE.
+    READ TABLE IT_QALS INTO WA_QALS WITH KEY PRUEFLOS = WA_QAVE-PRUEFLOS.
+    IF SY-SUBRC EQ 0.
+      READ TABLE IT_MARA INTO WA_MARA WITH KEY MATNR = WA_QALS-MATNR.
+      IF SY-SUBRC EQ 0.
+        WA_TAB1-LIFNR = WA_QALS-LIFNR.
+        SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ WA_QALS-LIFNR.
+        IF SY-SUBRC EQ 0.
+          WA_TAB1-NAME1 = LFA1-NAME1.
+        ENDIF.
+        "WA_TAB1-LICHN = WA_QALS-LICHN.
+        WA_TAB1-PRUEFLOS = WA_QALS-PRUEFLOS.
+        WA_TAB1-MATNR = WA_QALS-MATNR.
+        WA_TAB1-CHARG = WA_QALS-CHARG.
+        WA_TAB1-EBELN = WA_QALS-EBELN.
+        wa_tab1-sgtxt = space.
+
+        CALL FUNCTION 'VB_BATCH_GET_DETAIL'
+          EXPORTING
+            MATNR                    = WA_TAB1-MATNR
+            CHARG                     = WA_TAB1-CHARG
+            WERKS                     = WA_QALS-WERK
+           GET_CLASSIFICATION         = 'X'
+*           EXISTENCE_CHECK          =
+*           READ_FROM_BUFFER         =
+*           NO_CLASS_INIT            = ' '
+*           LOCK_BATCH               = ' '
+*         IMPORTING
+*           YMCHA                    =
+*           CLASSNAME                  =
+*           BATCH_DEL_FLG            =
+         TABLES
+           CHAR_OF_BATCH            = BATCH_DETAILS
+         EXCEPTIONS
+           NO_MATERIAL              = 1
+           NO_BATCH                 = 2
+           NO_PLANT                 = 3
+           MATERIAL_NOT_FOUND       = 4
+           PLANT_NOT_FOUND          = 5
+           NO_AUTHORITY             = 6
+           BATCH_NOT_EXIST          = 7
+           LOCK_ON_BATCH            = 8
+           OTHERS                   = 9
+                  .
+        IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+        ENDIF.
+
+
+      READ TABLE BATCH_DETAILS INTO WA_BATCH_DETAILS WITH KEY ATNAM = 'ZVENDOR_BATCH'.
+      IF SY-SUBRC = 0 .
+        WA_TAB1-LICHN  = WA_BATCH_DETAILS-ATWTB.
+      ENDIF.
+
+        SELECT SINGLE * FROM EKKO WHERE EBELN EQ WA_QALS-EBELN.
+        IF SY-SUBRC EQ 0.
+          WA_TAB1-AEDAT = EKKO-AEDAT.
+        ENDIF.
+        WA_TAB1-BUDAT = WA_QALS-BUDAT.
+
+        CLEAR : MAKTX1,MAKTX2,MAKTX,NORMT.
+        NORMT = WA_MARA-NORMT.
+        SELECT SINGLE * FROM MAKT WHERE MATNR EQ WA_QALS-MATNR AND SPRAS EQ 'EN'.
+        IF SY-SUBRC EQ 0.
+          MAKTX1 = MAKT-MAKTX.
+        ENDIF.
+        SELECT SINGLE * FROM MAKT WHERE MATNR EQ WA_QALS-MATNR AND SPRAS EQ 'Z1'.
+        IF SY-SUBRC EQ 0.
+          MAKTX2 = MAKT-MAKTX.
+        ENDIF.
+        CONCATENATE MAKTX1 MAKTX2 NORMT INTO MAKTX.
+        WA_TAB1-MAKTX = MAKTX.
+
+
+        WA_TAB1-LMENGE04 = WA_QALS-LMENGE04.
+        WA_TAB1-LMENGE03 = WA_QALS-LMENGE03.
+        WA_TAB1-LOSMENGE = WA_QALS-LOSMENGE.
+        WA_TAB1-MENGE = 0.
+        SELECT SINGLE * FROM MKPF WHERE MBLNR EQ WA_QALS-MBLNR.
+        IF SY-SUBRC EQ 0.
+          WA_TAB1-XBLNR = MKPF-XBLNR.
+          WA_TAB1-BLDAT = MKPF-BLDAT.
+        ENDIF.
+        WA_TAB1-MBLNR = WA_QALS-MBLNR.
+        WA_TAB1-STATUS = 'QC REJECTION'.
+
+        COLLECT WA_TAB1 INTO IT_TAB1.
+        CLEAR WA_TAB1.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+
+*  LOOP AT IT_TAB1 INTO WA_TAB1.
+*    WRITE : /'QC REJ', WA_TAB1-LIFNR,WA_TAB1-NAME1,WA_TAB1-LICHN,WA_TAB1-PRUEFLOS,WA_TAB1-MBLNR,WA_TAB1-XBLNR,WA_TAB1-BLDAT,WA_TAB1-MATNR,WA_TAB1-MAKTX,
+*    WA_TAB1-LMENGE04,WA_TAB1-LMENGE03,WA_TAB1-LOSMENGE.
+*  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ONLINEREJ
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM ONLINEREJ .
+*   SELECT SINGLE * FROM MSEG WHERE BWART EQ '344' AND WERKS EQ WA_TAB1-WERK AND MATNR EQ WA_TAB1-MATNR AND CHARG EQ WA_TAB1-CHARG AND GRUND EQ '0001'.
+*    IF SY-SUBRC EQ 0.
+*      WA_TAB2-ONREJQTY = MSEG-MENGE.
+*    ENDIF.
+*    SELECT SINGLE * FROM MSEG WHERE BWART EQ '344' AND WERKS EQ WA_TAB1-WERK AND MATNR EQ WA_TAB1-MATNR AND CHARG EQ WA_TAB1-CHARG AND GRUND NE '0001'.
+*    IF SY-SUBRC EQ 0.
+*      WA_TAB2-OTHREJQTY = MSEG-MENGE.
+*    ENDIF.
+  YEAR1 = RDATE-LOW+0(4).
+  YEAR2 = RDATE-HIGH+0(4).
+  SELECT * FROM MKPF INTO TABLE IT_MKPF WHERE MJAHR GE YEAR1 AND MJAHR LE YEAR2 AND VGART EQ 'WA' AND BUDAT IN RDATE.
+  IF SY-SUBRC EQ 0.
+    SELECT * FROM MSEG INTO TABLE IT_MSEG  FOR ALL ENTRIES IN IT_MKPF  WHERE MBLNR EQ IT_MKPF-MBLNR AND MJAHR EQ IT_MKPF-MJAHR AND
+    BWART EQ '344' AND XAUTO EQ SPACE AND WERKS EQ PLANT AND MATNR IN MATNR.
+  ENDIF.
+
+  IF IT_MSEG IS NOT   INITIAL.
+    LOOP AT IT_MSEG INTO WA_MSEG .
+      READ TABLE IT_MARA INTO WA_MARA WITH KEY MATNR = WA_MSEG-MATNR.
+      IF SY-SUBRC EQ 0.
+*        WRITE : / 'ONL REJ',WA_MSEG-MBLNR,WA_MSEG-MATNR,WA_MSEG-CHARG,WA_MSEG-MENGE.
+        READ TABLE IT_MKPF INTO WA_MKPF WITH KEY MBLNR = WA_MSEG-MBLNR.
+        IF SY-SUBRC EQ 0.
+*      WA_ONL1-MATNR = WA_MSEG-MATNR.
+          WA_ONL1-CHARG = WA_MSEG-CHARG.
+          COLLECT WA_ONL1 INTO IT_ONL1.
+          CLEAR WA_ONL1.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
+  SORT IT_ONL1 BY CHARG.
+  DELETE ADJACENT DUPLICATES FROM IT_ONL1 COMPARING CHARG.
+
+  IF IT_ONL1 IS NOT INITIAL.
+    SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_ONL1 WHERE ART EQ '01' AND CHARG EQ IT_ONL1-CHARG AND LIFNR NE SPACE.
+  ENDIF.
+
+  LOOP AT IT_QALS1 INTO WA_QALS1.
+    SELECT SINGLE * FROM JEST WHERE OBJNR EQ WA_QALS-OBJNR AND STAT EQ 'I0224'.
+    IF SY-SUBRC EQ 0.
+      DELETE IT_QALS1 WHERE PRUEFLOS EQ WA_QALS1-PRUEFLOS.
+    ENDIF.
+  ENDLOOP.
+  IF IT_MSEG IS NOT INITIAL.
+    LOOP AT IT_MSEG INTO WA_MSEG .
+      READ TABLE IT_MARA INTO WA_MARA WITH KEY MATNR = WA_MSEG-MATNR.
+      IF SY-SUBRC EQ 0.
+*        WRITE : / 'ONL REJ',WA_MSEG-MBLNR,WA_MSEG-MATNR,WA_MSEG-CHARG,WA_MSEG-MENGE.
+        READ TABLE IT_MKPF INTO WA_MKPF WITH KEY MBLNR = WA_MSEG-MBLNR.
+        IF SY-SUBRC EQ 0.
+          WA_TAB1-MATNR = WA_MSEG-MATNR.
+          WA_TAB1-CHARG = WA_MSEG-CHARG.
+          WA_TAB1-MENGE = WA_MSEG-MENGE.
+          WA_TAB1-BUDAT = WA_MKPF-BUDAT.
+          wa_tab1-sgtxt = wa_mseg-sgtxt.
+          WA_TAB1-LMENGE04 = 0.
+          WA_TAB1-LMENGE03 = 0.
+          WA_TAB1-LOSMENGE = 0.
+
+          WA_TAB1-MBLNR = WA_MSEG-MBLNR.
+          IF WA_MSEG-GRUND EQ '0001'.
+            WA_TAB1-STATUS = 'QC REJECTION'.
+          ELSE.
+            WA_TAB1-STATUS = 'OTHER REJECTION'.
+          ENDIF.
+
+          CLEAR : MAKTX1,MAKTX2,MAKTX,NORMT.
+          NORMT = WA_MARA-NORMT.
+          SELECT SINGLE * FROM MAKT WHERE MATNR EQ WA_MSEG-MATNR AND SPRAS EQ 'EN'.
+          IF SY-SUBRC EQ 0.
+            MAKTX1 = MAKT-MAKTX.
+          ENDIF.
+          SELECT SINGLE * FROM MAKT WHERE MATNR EQ WA_MSEG-MATNR AND SPRAS EQ 'Z1'.
+          IF SY-SUBRC EQ 0.
+            MAKTX2 = MAKT-MAKTX.
+          ENDIF.
+          CONCATENATE MAKTX1 MAKTX2 NORMT INTO MAKTX.
+          WA_TAB1-MAKTX = MAKTX.
+          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY CHARG = WA_MSEG-CHARG.
+          IF SY-SUBRC EQ 0.
+            WA_TAB1-LIFNR = WA_QALS1-LIFNR.
+            SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ WA_QALS1-LIFNR.
+            IF SY-SUBRC EQ 0.
+              WA_TAB1-NAME1 = LFA1-NAME1.
+            ENDIF.
+            "WA_TAB1-LICHN = WA_QALS1-LICHN.
+            WA_TAB1-PRUEFLOS = WA_QALS1-PRUEFLOS.
+            WA_TAB1-EBELN = WA_QALS1-EBELN.
+            SELECT SINGLE * FROM EKKO WHERE EBELN EQ WA_QALS1-EBELN.
+            IF SY-SUBRC EQ 0.
+              WA_TAB1-AEDAT = EKKO-AEDAT.
+            ENDIF.
+            SELECT SINGLE * FROM MKPF WHERE MBLNR EQ WA_QALS1-MBLNR.
+            IF SY-SUBRC EQ 0.
+              WA_TAB1-XBLNR = MKPF-XBLNR.
+              WA_TAB1-BLDAT = MKPF-BLDAT.
+            ENDIF.
+
+          CALL FUNCTION 'VB_BATCH_GET_DETAIL'
+          EXPORTING
+            MATNR                    = WA_TAB1-MATNR
+            CHARG                     = WA_TAB1-CHARG
+            WERKS                     = WA_QALS-WERK
+           GET_CLASSIFICATION         = 'X'
+*           EXISTENCE_CHECK          =
+*           READ_FROM_BUFFER         =
+*           NO_CLASS_INIT            = ' '
+*           LOCK_BATCH               = ' '
+*         IMPORTING
+*           YMCHA                    =
+*           CLASSNAME                  =
+*           BATCH_DEL_FLG            =
+         TABLES
+           CHAR_OF_BATCH            = BATCH_DETAILS
+         EXCEPTIONS
+           NO_MATERIAL              = 1
+           NO_BATCH                 = 2
+           NO_PLANT                 = 3
+           MATERIAL_NOT_FOUND       = 4
+           PLANT_NOT_FOUND          = 5
+           NO_AUTHORITY             = 6
+           BATCH_NOT_EXIST          = 7
+           LOCK_ON_BATCH            = 8
+           OTHERS                   = 9
+                  .
+        IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+        ENDIF.
+
+
+      READ TABLE BATCH_DETAILS INTO WA_BATCH_DETAILS WITH KEY ATNAM = 'ZVENDOR_BATCH'.
+      IF SY-SUBRC = 0 .
+        WA_TAB1-LICHN  = WA_BATCH_DETAILS-ATWTB.
+      ENDIF.
+          ENDIF.
+          COLLECT WA_TAB1 INTO IT_TAB1.
+          CLEAR WA_TAB1.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
+
+
+*
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  PRINT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM PRINT .
+
+  LOOP AT IT_TAB1 INTO WA_TAB1 WHERE LIFNR IN VENDOR.
+    MOVE-CORRESPONDING WA_TAB1 TO WA_TAB2.
+    COLLECT wa_tab2 INTO it_tab2.
+    CLEAR WA_TAB2.
+*    WRITE : /'1', WA_TAB1-STATUS,WA_TAB1-LIFNR,WA_TAB1-NAME1,WA_TAB1-LICHN,WA_TAB1-PRUEFLOS,WA_TAB1-MBLNR,WA_TAB1-XBLNR,WA_TAB1-BLDAT,WA_TAB1-MATNR,WA_TAB1-MAKTX,
+*    WA_TAB1-CHARG,WA_TAB1-LMENGE04,WA_TAB1-LMENGE03,WA_TAB1-LOSMENGE,WA_TAB1-MENGE.
+  ENDLOOP.
+
+
+  SORT IT_TAB2 BY MATNR CHARG BUDAT.
+
+  LOOP AT IT_TAB2 INTO WA_TAB2.
+    IF WA_TAB2-MATNR CS 'H'.
+    ELSE.
+      PACK WA_TAB2-MATNR TO WA_TAB2-MATNR.
+      CONDENSE WA_TAB2-MATNR.
+      MODIFY IT_TAB2 FROM WA_TAB2 TRANSPORTING MATNR.
+    ENDIF.
+*    WRITE : /'1', WA_TAB1-STATUS,WA_TAB1-LIFNR,WA_TAB1-NAME1,WA_TAB1-LICHN,WA_TAB1-PRUEFLOS,WA_TAB1-MBLNR,WA_TAB1-XBLNR,WA_TAB1-BLDAT,WA_TAB1-MATNR,WA_TAB1-MAKTX,
+*    WA_TAB1-CHARG,WA_TAB1-LMENGE04,WA_TAB1-LMENGE03,WA_TAB1-LOSMENGE,WA_TAB1-MENGE.
+  ENDLOOP.
+
+  WA_FIELDCAT-FIELDNAME = 'MBLNR'.
+  WA_FIELDCAT-SELTEXT_L = 'MATERIAL DOC'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BUDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'MATERIAL DOC POSTING DT'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MATNR'.
+  WA_FIELDCAT-SELTEXT_L = 'MATERIAL CODE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MAKTX'.
+  WA_FIELDCAT-SELTEXT_L = 'MATERIAL NAME'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'CHARG'.
+  WA_FIELDCAT-SELTEXT_L = 'BATCH'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+   WA_FIELDCAT-FIELDNAME = 'PRUEFLOS'.
+  WA_FIELDCAT-SELTEXT_L = 'INSPECTION LOT'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'LMENGE04'.
+  WA_FIELDCAT-SELTEXT_L = 'REJECTED QTY'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'LMENGE03'.
+  WA_FIELDCAT-SELTEXT_L = 'SAMPLING QTY'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'MENGE'.
+  WA_FIELDCAT-SELTEXT_L = 'ONLINE/OTHR REJECTED QTY'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+
+
+  WA_FIELDCAT-FIELDNAME = 'STATUS'.
+  WA_FIELDCAT-SELTEXT_L = 'TYPE OF REJECTION'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+ WA_FIELDCAT-FIELDNAME = 'SGTXT'.
+  WA_FIELDCAT-SELTEXT_L = 'ONLINE/OTHR REJECTION TEXT'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+
+  WA_FIELDCAT-FIELDNAME = 'LIFNR'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR CODE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'NAME1'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR NAME'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'EBELN'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR PO'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'AEDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR PODATE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'LICHN'.
+  WA_FIELDCAT-SELTEXT_L = 'VENDOR BATCH'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'XBLNR'.
+  WA_FIELDCAT-SELTEXT_L = 'BILL NO.'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+  WA_FIELDCAT-FIELDNAME = 'BLDAT'.
+  WA_FIELDCAT-SELTEXT_L = 'BILL DATE'.
+  APPEND WA_FIELDCAT TO FIELDCAT.
+  CLEAR WA_FIELDCAT.
+
+*  WA_FIELDCAT-FIELDNAME = 'PRUEFLOS'.
+*  WA_FIELDCAT-SELTEXT_L = 'INSPECTION LOT'.
+*  APPEND WA_FIELDCAT TO FIELDCAT.
+
+*  WA_FIELDCAT-FIELDNAME = 'MBLNR'.
+*  WA_FIELDCAT-SELTEXT_L = 'GRN NO.'.
+*  APPEND WA_FIELDCAT TO FIELDCAT.
+
+
+
+
+
+
+
+
+
+  LAYOUT-ZEBRA = 'X'.
+  LAYOUT-COLWIDTH_OPTIMIZE = 'X'.
+  LAYOUT-WINDOW_TITLEBAR  = 'REJECTION DETAILS'.
+
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+*     I_INTERFACE_CHECK       = ' '
+*     I_BYPASSING_BUFFER      = ' '
+*     I_BUFFER_ACTIVE         = ' '
+      I_CALLBACK_PROGRAM      = G_REPID
+*     I_CALLBACK_PF_STATUS_SET          = ' '
+      I_CALLBACK_USER_COMMAND = 'USER_COMM'
+      I_CALLBACK_TOP_OF_PAGE  = 'TOP'
+*     I_CALLBACK_HTML_TOP_OF_PAGE       = ' '
+*     I_CALLBACK_HTML_END_OF_LIST       = ' '
+*     I_STRUCTURE_NAME        =
+*     I_BACKGROUND_ID         = ' '
+*     I_GRID_TITLE            =
+*     I_GRID_SETTINGS         =
+      IS_LAYOUT               = LAYOUT
+      IT_FIELDCAT             = FIELDCAT
+*     IT_EXCLUDING            =
+*     IT_SPECIAL_GROUPS       =
+*     IT_SORT                 =
+*     IT_FILTER               =
+*     IS_SEL_HIDE             =
+*     I_DEFAULT               = 'X'
+      I_SAVE                  = 'A'
+*     IS_VARIANT              =
+*     IT_EVENTS               =
+*     IT_EVENT_EXIT           =
+*     IS_PRINT                =
+*     IS_REPREP_ID            =
+*     I_SCREEN_START_COLUMN   = 0
+*     I_SCREEN_START_LINE     = 0
+*     I_SCREEN_END_COLUMN     = 0
+*     I_SCREEN_END_LINE       = 0
+*     I_HTML_HEIGHT_TOP       = 0
+*     I_HTML_HEIGHT_END       = 0
+*     IT_ALV_GRAPHICS         =
+*     IT_HYPERLINK            =
+*     IT_ADD_FIELDCAT         =
+*     IT_EXCEPT_QINFO         =
+*     IR_SALV_FULLSCREEN_ADAPTER        =
+* IMPORTING
+*     E_EXIT_CAUSED_BY_CALLER =
+*     ES_EXIT_CAUSED_BY_USER  =
+    TABLES
+      T_OUTTAB                = IT_TAB2
+    EXCEPTIONS
+      PROGRAM_ERROR           = 1
+      OTHERS                  = 2.
+  IF SY-SUBRC <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+ENDFORM.                    "SUMMARY
+
+*&---------------------------------------------------------------------*
+*&      Form  TOP
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM TOP.
+
+  DATA: COMMENT    TYPE SLIS_T_LISTHEADER,
+        WA_COMMENT LIKE LINE OF COMMENT.
+
+  WA_COMMENT-TYP = 'A'.
+  WA_COMMENT-INFO = 'REJECTION DETAILS'.
+*  WA_COMMENT-INFO = P_FRMDT.
+  APPEND WA_COMMENT TO COMMENT.
+
+  CALL FUNCTION 'REUSE_ALV_COMMENTARY_WRITE'
+    EXPORTING
+      IT_LIST_COMMENTARY = COMMENT
+*     I_LOGO             = 'ENJOYSAP_LOGO'
+*     I_END_OF_LIST_GRID =
+*     I_ALV_FORM         =
+    .
+
+  CLEAR COMMENT.
+
+ENDFORM.                    "TOP
+
+
+
+*&---------------------------------------------------------------------*
+*&      Form  USER_COMM
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->UCOMM      text
+*      -->SELFIELD   text
+*----------------------------------------------------------------------*
+FORM USER_COMM USING UCOMM LIKE SY-UCOMM
+                     SELFIELD TYPE SLIS_SELFIELD.
+
+
+
+  CASE SELFIELD-FIELDNAME.
+    WHEN 'EBELN'.
+      SET PARAMETER ID 'BES' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'ME23N' AND SKIP FIRST SCREEN.
+    WHEN 'MBLNR'.
+      SET PARAMETER ID 'MBN' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'MIGO' AND SKIP FIRST SCREEN.
+       WHEN 'PRUEFLOS'.
+      SET PARAMETER ID 'QLS' FIELD SELFIELD-VALUE.
+      CALL TRANSACTION 'QA03' AND SKIP FIRST SCREEN.
+    WHEN OTHERS.
+  ENDCASE.
+ENDFORM.                    "USER_COMM
+
+
+
+*&---------------------------------------------------------------------*
+*&      Form  authorization
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM AUTHORIZATION .
+
+  AUTHORITY-CHECK OBJECT 'M_BCO_WERK'
+          ID 'WERKS' FIELD PLANT.
+  IF SY-SUBRC <> 0.
+    CONCATENATE 'No authorization for Plant' PLANT INTO MSG
+    SEPARATED BY SPACE.
+    MESSAGE MSG TYPE 'E'.
+  ENDIF.
+
+
+ENDFORM.                    "authorization
+*ENDFORM.

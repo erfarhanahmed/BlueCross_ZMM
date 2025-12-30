@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>IF_HTTP_SERVICE_EXTENSION</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Handles incoming requests for HTTP Services.</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+   <DESCRIPTIONS_SUB>
+    <SEOSUBCOTX>
+     <CMPNAME>EXECUTE</CMPNAME>
+     <SCONAME>API_CHECK</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Single-Character Flag</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>EXECUTE</CMPNAME>
+     <SCONAME>LV_ID</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Sales and Distribution Document Number</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>IF_HTTP_SERVICE_EXTENSION</CMPNAME>
+     <SCONAME>REQUEST</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>HTTP Request for Web Development</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>IF_HTTP_SERVICE_EXTENSION</CMPNAME>
+     <SCONAME>RESPONSE</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>HTTP Response for Web Development</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>RENDER_FORM_TO_PDF</CMPNAME>
+     <SCONAME>API_CHECK</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Single-Character Flag</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>RENDER_FORM_TO_PDF</CMPNAME>
+     <SCONAME>I_FORM_NAME</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Name of a Form Object</DESCRIPT>
+    </SEOSUBCOTX>
+   </DESCRIPTIONS_SUB>
+  </asx:values>
+ </asx:abap>
+</abapGit>

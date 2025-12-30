@@ -1,0 +1,2076 @@
+*&---------------------------------------------------------------------*
+*& Report  ZPMR1
+*& Developed by Jyotsna
+*&---------------------------------------------------------------------*
+*& TCODE - ZPMR
+*&
+*&---------------------------------------------------------------------*
+
+REPORT  ZPMR3 NO STANDARD PAGE HEADING LINE-SIZE 300.
+TABLES : AFPO,
+         "MCHA,
+         MCH1,
+         MARA,
+*         zpms_art_table,
+         MAKT,
+         CAUFV,
+         JEST,
+         LFA1,
+         PA0002,
+         QAVE,
+         ZQSPECIFICATION,
+         T001W,
+         MSEG,
+         ZMIGO,
+         ZPASSW.
+
+DATA : IT_RESB            TYPE TABLE OF RESB,
+       WA_RESB            TYPE RESB,
+*       IT_RESB TYPE TABLE OF RESB,
+*       WA_RESB TYPE RESB,
+       IT_QALS            TYPE TABLE OF QALS,
+       WA_QALS            TYPE QALS,
+       IT_QALS2           TYPE TABLE OF QALS,
+       WA_QALS2           TYPE QALS,
+       IT_ZQSPECIFICATION TYPE TABLE OF ZQSPECIFICATION,
+       WA_ZQSPECIFICATION TYPE ZQSPECIFICATION.
+DATA : IT_ZINSP TYPE TABLE OF ZINSP,
+       WA_ZINSP TYPE ZINSP.
+
+DATA : IT_MCHB1 TYPE TABLE OF MCHB,
+       WA_MCHB1 TYPE MCHB,
+       IT_QALS1 TYPE TABLE OF QALS,
+       WA_QALS1 TYPE QALS,
+       IT_QALS3 TYPE TABLE OF QALS,
+       WA_QALS3 TYPE QALS,
+       LV_QALS  TYPE QALS-HERSTELLER.
+TYPES: BEGIN OF MAT1,
+         MATNR TYPE MARA-MATNR,
+         CHARG TYPE MCHB-CHARG,
+         LGORT TYPE MCHB-LGORT,
+         MENGE TYPE MSEG-MENGE,
+       END OF MAT1.
+DATA: IT_MAT1 TYPE TABLE OF MAT1,
+      WA_MAT1 TYPE MAT1.
+
+DATA : W_AUFNR  TYPE AFPO-AUFNR,
+       W_PSMNG  TYPE AFPO-PSMNG,
+       W_MEINS  TYPE AFPO-MEINS,
+       W_MATNR  TYPE AFPO-MATNR,
+       W_DWERK  TYPE AFPO-DWERK,
+       W_CHARG  TYPE AFPO-CHARG,
+       W_VFDAT  TYPE MCH1-VFDAT,
+       W_VFDAT1 TYPE MCH1-VFDAT,
+       W_HSDAT  TYPE MCH1-HSDAT,
+       W_MAKTX  TYPE MAKT-MAKTX,
+       W_NAME1  TYPE T001W-NAME1,
+       W_NAME2  TYPE T001W-NAME2,
+       W_KUNNR  TYPE T001W-KUNNR.
+
+DATA : A     TYPE I,
+       IPRKZ TYPE MARA-IPRKZ,
+       MHDHB TYPE  MARA-MHDHB.
+DATA: RM(1) TYPE C.
+DATA: MFGRTYPE(15) TYPE C.
+TYPES : BEGIN OF ITAB1,
+          COUNT(4)           TYPE C,
+*          COUNT           TYPE int4,
+          RSPOS              TYPE RESB-RSPOS,
+          MATNR              TYPE MARA-MATNR,
+          CHARG              TYPE RESB-CHARG,
+          LGORT              TYPE RESB-LGORT,
+          MENGE(10)          TYPE C,
+          MEINS              TYPE RESB-MEINS,
+          PRUEFLOS           TYPE QALS-PRUEFLOS,
+          PMS_NO             TYPE ZPMS_ART_TABLE-PMS_NO,
+          ART_NO(40)         TYPE C,
+          MAKTX(65)          TYPE C,
+*          COUNT(4)           TYPE C,
+
+
+          NAME1              TYPE ADRC-NAME1,
+          HSDAT(10)          TYPE C,
+          VFDAT(10)          TYPE C,
+          DEC_VALUE_FROM(45) TYPE C,
+          SORTF              TYPE RESB-SORTF,
+        END OF ITAB1.
+
+TYPES : BEGIN OF MAT2,
+          COUNT(4)           TYPE C,
+          RSPOS              TYPE RESB-RSPOS,
+          MATNR              TYPE MARA-MATNR,
+          CHARG              TYPE RESB-CHARG,
+          LGORT              TYPE RESB-LGORT,
+          SQTY(10)           TYPE C,
+          MEINS              TYPE RESB-MEINS,
+          PRUEFLOS           TYPE QALS-PRUEFLOS,
+          PMS_NO             TYPE ZPMS_ART_TABLE-PMS_NO,
+          ART_NO(40)         TYPE C,
+          MAKTX(65)          TYPE C,
+*          count      type i,
+*          COUNT(4)           TYPE C,
+          NAME1              TYPE ADRC-NAME1,
+          HSDAT(10)          TYPE C,
+          VFDAT(10)          TYPE C,
+          DEC_VALUE_FROM(45) TYPE C,
+          SORTF              TYPE RESB-SORTF,
+        END OF MAT2.
+
+DATA : PLANT TYPE RESB-WERKS.
+DATA: UDDATE TYPE SY-DATUM.
+
+DATA : IT_TAB1 TYPE TABLE OF ITAB1,
+       WA_TAB1 TYPE ITAB1,
+       IT_MAT2 TYPE TABLE OF MAT2,
+       WA_MAT2 TYPE MAT2.
+DATA: IT_MCHA TYPE TABLE OF MCH1,
+      WA_MCHA TYPE MCH1.
+DATA : COUNT        TYPE BKPF-MONAT,
+       ARTPMSNO(40) TYPE C.
+
+DATA LV_AMOUNT TYPE P LENGTH 16 DECIMALS 2.
+
+DATA : SQTY1        TYPE MSEG-MENGE,
+       SQTY2        TYPE MSEG-MENGE,
+       MAKTX        TYPE MAKT-MAKTX,
+       W_ARTPMS(40) TYPE C,
+       COUN         TYPE BKPF-MONAT.
+DATA: PRUEFLOS TYPE QALS-PRUEFLOS,
+      NAME1    TYPE LFA1-NAME1.
+DATA: TEXT1(100) TYPE C.
+DATA:  MTART  TYPE MARA-MTART.
+DATA: MAKTX1 TYPE MAKT-MAKTX,
+      MAKTX2 TYPE MAKT-MAKTX,
+      MAKTX3 TYPE MAKT-MAKTX,
+      NORMT  TYPE MARA-NORMT.
+
+DATA: O_ENCRYPTOR        TYPE REF TO CL_HARD_WIRED_ENCRYPTOR,
+      O_CX_ENCRYPT_ERROR TYPE REF TO CX_ENCRYPT_ERROR.
+DATA:
+*      v_ac_xstring type xstring,
+  V_EN_STRING TYPE STRING,
+*      v_en_xstring type xstring,
+  V_DE_STRING TYPE STRING,
+*      v_de_xstring type string,
+  V_ERROR_MSG TYPE STRING.
+DATA: UNAME TYPE USR21-TECHDESC.
+
+DATA : V_FM TYPE RS38L_FNAM.
+DATA : CONTROL  TYPE SSFCTRLOP.
+DATA : W_SSFCOMPOP TYPE SSFCOMPOP.
+DATA: WERKS TYPE  AFPO-DWERK,
+      MSG   TYPE STRING,
+      KUNNR TYPE T001W-KUNNR.
+DATA: HTEXT1(100) TYPE C.
+DATA: FORMAT1(100) TYPE C.
+DATA: FTEXT1(100) TYPE C.
+DATA: MATTYP(10) TYPE C.
+
+
+TYPES : BEGIN OF TY_MCH1,
+          OBJEK TYPE CHAR90,
+          MATNR TYPE MATNR,
+          CHARG TYPE CHARG_D,
+        END OF TY_MCH1.
+
+DATA : IT_MCH1 TYPE TABLE OF TY_MCH1,
+       WA_MCH1 TYPE TY_MCH1.
+
+*SELECTION-SCREEN BEGIN OF BLOCK MERKMALE2 WITH FRAME TITLE TEXT-002.
+*PARAMETERS : PERNR    TYPE PA0001-PERNR,
+*             PASS(10) TYPE C.
+**PARAMETERS : phynr LIKE qprs-phynr.
+*SELECTION-SCREEN END OF BLOCK MERKMALE2 .
+
+SELECTION-SCREEN BEGIN OF BLOCK MERKMALE WITH FRAME TITLE TEXT-002.
+  PARAMETERS : ORD LIKE AFPO-AUFNR OBLIGATORY.
+  PARAMETERS : S_BUDAT LIKE  SY-DATUM OBLIGATORY.
+  PARAMETERS : R1 RADIOBUTTON GROUP R1,
+               R2 RADIOBUTTON GROUP R1.
+SELECTION-SCREEN END OF BLOCK MERKMALE.
+
+SELECTION-SCREEN BEGIN OF BLOCK MERKMALE1 WITH FRAME TITLE TEXT-016.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN COMMENT 1(10) TEXT-001.
+    PARAMETERS: MAT1    TYPE MAST-MATNR,CHARG1 TYPE MCHB-CHARG,LGORT1 TYPE MCHB-LGORT,QTY1(6).
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN COMMENT 1(10) TEXT-001.
+    PARAMETERS: MAT2    TYPE MAST-MATNR,CHARG2 TYPE MCHB-CHARG,LGORT2 TYPE MCHB-LGORT,QTY2(6).
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN COMMENT 1(10) TEXT-001.
+    PARAMETERS: MAT3    TYPE MAST-MATNR,CHARG3 TYPE MCHB-CHARG,LGORT3 TYPE MCHB-LGORT,QTY3(6).
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN COMMENT 1(10) TEXT-001.
+    PARAMETERS: MAT4    TYPE MAST-MATNR,CHARG4 TYPE MCHB-CHARG,LGORT4 TYPE MCHB-LGORT,QTY4(6).
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN COMMENT 1(10) TEXT-001.
+    PARAMETERS: MAT5    TYPE MAST-MATNR,CHARG5 TYPE MCHB-CHARG,LGORT5 TYPE MCHB-LGORT,QTY5(6).
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN COMMENT 1(10) TEXT-001.
+    PARAMETERS: MAT6    TYPE MAST-MATNR,CHARG6 TYPE MCHB-CHARG,LGORT6 TYPE MCHB-LGORT,QTY6(6).
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN COMMENT 1(10) TEXT-001.
+    PARAMETERS: MAT7    TYPE MAST-MATNR,CHARG7 TYPE MCHB-CHARG,LGORT7 TYPE MCHB-LGORT,QTY7(6).
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN COMMENT 1(10) TEXT-001.
+    PARAMETERS: MAT8    TYPE MAST-MATNR,CHARG8 TYPE MCHB-CHARG,LGORT8 TYPE MCHB-LGORT,QTY8(6).
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN COMMENT 1(10) TEXT-001.
+    PARAMETERS: MAT9    TYPE MAST-MATNR,CHARG9 TYPE MCHB-CHARG,LGORT9 TYPE MCHB-LGORT,QTY9(6).
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN COMMENT 1(10) TEXT-001.
+    PARAMETERS: MAT10    TYPE MAST-MATNR,CHARG10 TYPE MCHB-CHARG,LGORT10 TYPE MCHB-LGORT,QTY10(6).
+  SELECTION-SCREEN END OF LINE.
+
+SELECTION-SCREEN END OF BLOCK MERKMALE1.
+
+AT SELECTION-SCREEN OUTPUT.
+
+*  LOOP AT SCREEN.
+*    CHECK SCREEN-NAME EQ 'PASS'.
+*    SCREEN-INVISIBLE = 1.
+*    MODIFY SCREEN.
+*  ENDLOOP.
+
+
+START-OF-SELECTION.
+
+  CLEAR : FORMAT1,FTEXT1.
+  " PERFORM PASS.
+  SELECT SINGLE * FROM AFPO WHERE AUFNR EQ ORD.
+  IF SY-SUBRC EQ 0.
+    WERKS = AFPO-DWERK.
+    CLEAR : MATTYP.
+    SELECT SINGLE * FROM MARA WHERE MATNR EQ AFPO-MATNR AND MTART IN ('ZESC','ZESM').
+    IF SY-SUBRC EQ 0.
+      MATTYP = '(EXPORT)'.
+    ENDIF.
+    SELECT SINGLE * FROM T001W WHERE WERKS EQ WERKS.
+    IF SY-SUBRC EQ 0.
+      IF T001W-WERKS EQ '1000'.
+        KUNNR = 'Nashik'.
+        IF R2 EQ 'X'.
+          FORMAT1 = 'Format No.: SOP/PKG/157-10-F1 (Ref. SOP No. SOP/PKG/157)'.
+        ENDIF.
+        IF R1 EQ 'X'.
+          FTEXT1 = 'Requisition given By:'.
+        ENDIF.
+      ELSE.
+*        if r2 eq 'X'.
+        FTEXT1 = 'Requisition given By:'.
+*        endif.
+        KUNNR = T001W-KUNNR.
+        FORMAT1 = 'ST/GM/008-F5.'.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+  PERFORM AUTHORIZATION.
+  IF R1 EQ 'X'.
+    HTEXT1 = 'BILL OF MATERIAL (PICK LIST)'.
+  ELSEIF R2 EQ 'X'.
+    HTEXT1 = 'ADDITIONAL PACKING MATERIAL REQUISITION'.
+  ENDIF.
+*  BREAK-POINT .
+  CLEAR : UNAME.
+  " SELECT SINGLE * FROM PA0002 WHERE PERNR EQ PERNR AND ENDDA GE SY-DATUM.
+  " IF SY-SUBRC EQ 0.
+  "  CONCATENATE PA0002-VORNA PA0002-NACHN INTO UNAME SEPARATED BY SPACE.
+  "ENDIF.
+
+  SELECT TECHDESC FROM USR21 INTO UNAME WHERE BNAME = SY-UNAME.
+  ENDSELECT.
+  SELECT SINGLE AUFNR PSMNG MEINS MATNR DWERK CHARG FROM AFPO INTO (W_AUFNR, W_PSMNG, W_MEINS, W_MATNR, W_DWERK, W_CHARG) WHERE AUFNR EQ ORD.
+  SELECT * FROM RESB INTO TABLE IT_RESB WHERE WERKS EQ W_DWERK AND AUFNR EQ ORD.
+  IF SY-SUBRC NE 0.
+    MESSAGE 'NO DATA FOUND' TYPE 'E'.
+  ENDIF.
+
+  SELECT SINGLE * FROM AFPO WHERE AUFNR EQ ORD.
+  IF SY-SUBRC EQ 0.
+    SELECT SINGLE * FROM MARA WHERE MATNR EQ AFPO-MATNR.
+    IF SY-SUBRC EQ 0.
+      MTART  = MARA-MTART.
+    ENDIF.
+  ENDIF.
+  IF MTART EQ 'ZHLB'.
+    TEXT1 = 'RAW MATERIAL REQUISITION'.
+  ELSE.
+    IF R2 EQ 'X'.
+      TEXT1 = 'ADDITIONAL PACKING MATERIAL REQUISITION'.
+    ELSE.
+      TEXT1 = 'PACKING MATERIAL REQUISITION'.
+    ENDIF.
+  ENDIF.
+
+*************** EXTACEF ORAL EXPORT CODE- EXPIRY 30 MONTHS *******************
+*WRITE : / '1',W_MATNR, W_DWERK.
+  SELECT SINGLE * FROM CAUFV WHERE AUFNR EQ W_AUFNR AND ERDAT GE '20190501'.
+  IF SY-SUBRC EQ 0.
+    SELECT SINGLE * FROM MARA WHERE MATNR EQ W_MATNR AND MTART IN ('ZESC','ZESM').
+    IF SY-SUBRC EQ 0.
+      IPRKZ = MARA-IPRKZ.
+      MHDHB = MARA-MHDHB.
+      IF W_MATNR+13(5) EQ '15613' OR W_MATNR+13(5) EQ '15614'.
+        A = 1.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+  IF A EQ 1.
+    SELECT SINGLE HSDAT FROM MCH1 INTO W_HSDAT WHERE CHARG = W_CHARG AND VFDAT NE 0 AND HSDAT NE 0 AND MATNR = W_MATNR. "WERKS EQ W_DWERK
+    IF MHDHB NE 0 AND IPRKZ EQ '2'.
+      CALL FUNCTION 'RE_ADD_MONTH_TO_DATE'
+        EXPORTING
+          MONTHS  = MHDHB
+          OLDDATE = W_HSDAT
+        IMPORTING
+          NEWDATE = W_VFDAT1.
+
+      CALL FUNCTION 'HR_JP_MONTH_BEGIN_END_DATE'
+        EXPORTING
+          IV_DATE           = W_VFDAT1
+        IMPORTING
+*         EV_MONTH_BEGIN_DATE       =
+          EV_MONTH_END_DATE = W_VFDAT.
+
+      IF W_VFDAT1 NE W_VFDAT.
+        CALL FUNCTION 'RE_ADD_MONTH_TO_DATE'
+          EXPORTING
+            MONTHS  = -1
+            OLDDATE = W_VFDAT1
+          IMPORTING
+            NEWDATE = W_VFDAT1.
+
+        CALL FUNCTION 'HR_JP_MONTH_BEGIN_END_DATE'
+          EXPORTING
+            IV_DATE           = W_VFDAT1
+          IMPORTING
+*           EV_MONTH_BEGIN_DATE       =
+            EV_MONTH_END_DATE = W_VFDAT.
+      ENDIF.
+    ENDIF.
+
+    IF MHDHB EQ 0 .
+      MESSAGE ' MAINTAIN SHELF LIFE IN PLANT DATA IN MATERIAL MASTER' TYPE 'I'.
+      MESSAGE ' MAINTAIN SHELF LIFE IN PLANT DATA IN MATERIAL MASTER' TYPE 'E'.
+    ENDIF.
+    IF IPRKZ NE '2'.
+      MESSAGE ' MAINTAIN PERIOD INDICATOR IN PLANT DATA IN MATERIAL MASTER' TYPE 'I'.
+      MESSAGE ' MAINTAIN PERIOD INDICATOR IN PLANT DATA IN MATERIAL MASTER' TYPE 'E'.
+    ENDIF.
+  ELSE.
+    SELECT SINGLE VFDAT HSDAT FROM MCH1 INTO (W_VFDAT, W_HSDAT) WHERE CHARG = W_CHARG AND VFDAT NE 0 AND HSDAT NE 0 AND MATNR = W_MATNR . "WERKS EQ W_DWERK
+  ENDIF.
+
+
+  SELECT SINGLE MAKTX FROM MAKT INTO W_MAKTX WHERE MATNR EQ W_MATNR AND SPRAS EQ 'EN'.
+  SELECT SINGLE NAME1 NAME2 KUNNR FROM T001W INTO (W_NAME1,W_NAME2,W_KUNNR) WHERE WERKS EQ W_DWERK.
+  SELECT * FROM ZQSPECIFICATION INTO TABLE IT_ZQSPECIFICATION FOR ALL ENTRIES IN IT_RESB WHERE MATNR EQ IT_RESB-MATNR AND WERKS EQ
+    IT_RESB-WERKS.
+  SORT IT_ZQSPECIFICATION DESCENDING BY REVISION.
+
+  SELECT * FROM ZINSP INTO TABLE IT_ZINSP FOR ALL ENTRIES IN IT_RESB
+    WHERE WERKS EQ W_DWERK AND MATNR EQ IT_RESB-MATNR AND CHARG EQ IT_RESB-CHARG.
+  SELECT * FROM QALS INTO TABLE IT_QALS FOR ALL ENTRIES IN IT_RESB WHERE WERK EQ W_DWERK AND MATNR EQ IT_RESB-MATNR AND CHARG EQ IT_RESB-CHARG.
+  SORT IT_QALS DESCENDING BY PRUEFLOS.
+  LOOP AT IT_QALS INTO WA_QALS.
+    SELECT SINGLE * FROM JEST WHERE OBJNR EQ WA_QALS-OBJNR AND STAT EQ 'I0224'.
+    IF SY-SUBRC EQ 0.
+      DELETE IT_QALS WHERE PRUEFLOS EQ WA_QALS-PRUEFLOS.
+    ENDIF.
+  ENDLOOP.
+
+  SELECT * FROM QALS INTO TABLE IT_QALS2 FOR ALL ENTRIES IN IT_RESB WHERE ART EQ '01' AND CHARG EQ IT_RESB-CHARG AND LIFNR NE SPACE.
+  LOOP AT IT_QALS2 INTO WA_QALS2.
+    SELECT SINGLE * FROM JEST WHERE OBJNR EQ WA_QALS2-OBJNR AND STAT EQ 'I0224'.
+    IF SY-SUBRC EQ 0.
+      DELETE IT_QALS2 WHERE PRUEFLOS EQ WA_QALS2-PRUEFLOS.
+    ENDIF.
+  ENDLOOP.
+
+  SORT IT_RESB BY POSNR.
+  CLEAR : RM.
+  LOOP AT IT_RESB INTO WA_RESB WHERE BDMNG GT 0.
+    SELECT SINGLE * FROM MARA WHERE MATNR EQ WA_RESB-MATNR AND MTART NE 'ZHLB'.
+    IF SY-SUBRC EQ 0.
+
+      WA_TAB1-RSPOS = WA_RESB-RSPOS.
+*      WA_TAB1-COUNT = WA_RESB-POSNR.
+      WA_TAB1-MATNR = WA_RESB-MATNR.
+      WA_TAB1-CHARG = WA_RESB-CHARG.
+      WA_TAB1-SORTF = WA_RESB-SORTF.
+      SELECT SINGLE * FROM MCH1 WHERE MATNR EQ WA_RESB-MATNR AND CHARG EQ WA_RESB-CHARG. "AND WERKS EQ WA_RESB-WERKS.
+      IF SY-SUBRC EQ 0.
+        CONCATENATE MCH1-HSDAT+4(2) '/' MCH1-HSDAT+0(4) INTO WA_TAB1-HSDAT.
+        CONCATENATE MCH1-VFDAT+4(2) '/' MCH1-VFDAT+0(4) INTO WA_TAB1-VFDAT.
+      ENDIF.
+      CONDENSE : WA_TAB1-HSDAT,WA_TAB1-VFDAT.
+
+      WA_TAB1-LGORT = WA_RESB-LGORT.
+      WA_TAB1-MENGE = WA_RESB-BDMNG.
+      WA_TAB1-MEINS = WA_RESB-MEINS.
+      PLANT = WA_RESB-WERKS.
+      CLEAR : UDDATE.
+      READ TABLE IT_ZINSP INTO WA_ZINSP WITH  KEY WERKS = WA_RESB-WERKS MATNR = WA_RESB-MATNR CHARG = WA_RESB-CHARG.
+      IF SY-SUBRC = 0 .
+        WA_TAB1-PRUEFLOS = WA_ZINSP-PRUEFLOS.
+        SELECT SINGLE * FROM QAVE WHERE PRUEFLOS EQ WA_ZINSP-PRUEFLOS.
+        IF SY-SUBRC EQ 0.
+          UDDATE = QAVE-VDATUM.
+        ENDIF.
+      ELSE.
+        READ TABLE IT_QALS INTO WA_QALS WITH KEY WERK = WA_RESB-WERKS MATNR = WA_RESB-MATNR CHARG = WA_RESB-CHARG
+        LAGORTVORG = WA_RESB-LGORT.  "added on 15.9.23
+        IF SY-SUBRC EQ 0.
+*      WRITE : wa_qals-prueflos.
+          WA_TAB1-PRUEFLOS = WA_QALS-PRUEFLOS.
+          SELECT SINGLE * FROM QAVE WHERE PRUEFLOS EQ WA_QALS-PRUEFLOS.
+          IF SY-SUBRC EQ 0.
+            UDDATE = QAVE-VDATUM.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+      IF WA_TAB1-PRUEFLOS GT 0.
+      ELSE.
+        READ TABLE IT_QALS INTO WA_QALS WITH KEY WERK = WA_RESB-WERKS MATNR = WA_RESB-MATNR CHARG = WA_RESB-CHARG.
+*      lagortvorg = wa_resb-lgort.  "added on 15.9.23
+        IF SY-SUBRC EQ 0.
+*      WRITE : wa_qals-prueflos.
+          WA_TAB1-PRUEFLOS = WA_QALS-PRUEFLOS.
+          SELECT SINGLE * FROM QAVE WHERE PRUEFLOS EQ WA_QALS-PRUEFLOS.
+          IF SY-SUBRC EQ 0.
+            UDDATE = QAVE-VDATUM.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+
+      IF MTART EQ 'ZHLB'.
+        READ TABLE IT_QALS2 INTO WA_QALS2 WITH KEY WERK = WA_RESB-WERKS MATNR = WA_RESB-MATNR CHARG = WA_RESB-CHARG.
+        IF SY-SUBRC EQ 0.
+*      WRITE : wa_qals-prueflos.
+          SELECT HERSTELLER FROM QALS INTO LV_QALS WHERE MATNR = WA_RESB-MATNR  AND PRUEFLOS = WA_QALS-PRUEFLOS.
+            "SELECT SINGLE * FROM ZMIGO WHERE MBLNR EQ WA_QALS2-MBLNR AND MJAHR EQ WA_QALS2-MJAHR.
+          ENDSELECT.
+          IF SY-SUBRC EQ 0.
+            SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ LV_QALS.
+            IF SY-SUBRC EQ 0.
+              WA_TAB1-NAME1 = LFA1-NAME1.
+            ENDIF.
+          ELSE.
+            SELECT SINGLE LIFNR FROM ZINSP INTO @DATA(LV_LIF) WHERE MATNR = @WA_RESB-MATNR  AND PRUEFLOS = @WA_ZINSP-PRUEFLOS.
+            IF SY-SUBRC EQ 0.
+              SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ LV_LIF.
+              IF SY-SUBRC EQ 0.
+                WA_TAB1-NAME1 = LFA1-NAME1.
+              ENDIF.
+            ENDIF.
+          ENDIF.
+        ELSE.
+          SELECT SINGLE LIFNR FROM ZINSP INTO @LV_LIF WHERE MATNR = @WA_RESB-MATNR  AND PRUEFLOS = @WA_ZINSP-PRUEFLOS.
+          IF SY-SUBRC EQ 0.
+            SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ LV_LIF.
+            IF SY-SUBRC EQ 0.
+              WA_TAB1-NAME1 = LFA1-NAME1.
+            ENDIF.
+          ENDIF.
+        ENDIF.
+      ELSE.
+        READ TABLE IT_QALS2 INTO WA_QALS2 WITH KEY WERK = WA_RESB-WERKS MATNR = WA_RESB-MATNR CHARG = WA_RESB-CHARG.
+        IF SY-SUBRC EQ 0.
+*      WRITE : wa_qals-prueflos.
+          SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ WA_QALS2-LIFNR.
+          IF SY-SUBRC EQ 0.
+            WA_TAB1-NAME1 = LFA1-NAME1.
+          ENDIF.
+        ELSE.
+          SELECT SINGLE LIFNR FROM ZINSP INTO @LV_LIF WHERE MATNR = @WA_RESB-MATNR  AND PRUEFLOS = @WA_ZINSP-PRUEFLOS.
+          IF SY-SUBRC EQ 0.
+            SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ LV_LIF.
+            IF SY-SUBRC EQ 0.
+              WA_TAB1-NAME1 = LFA1-NAME1.
+            ENDIF.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+
+***************************************
+      CLEAR : IT_MCHA,WA_MCHA.
+      SELECT * FROM MCH1 INTO TABLE IT_MCHA WHERE CHARG EQ WA_RESB-CHARG AND LIFNR NE SPACE.
+      IF IT_MCHA IS INITIAL.
+        SELECT * FROM MCH1 INTO TABLE IT_MCHA WHERE CHARG EQ WA_RESB-CHARG.
+      ENDIF.
+      SORT IT_MCHA BY ERSDA.
+
+
+      IF WA_TAB1-NAME1 EQ SPACE.
+        READ TABLE IT_MCHA INTO WA_MCHA WITH KEY  CHARG = WA_RESB-CHARG.
+        IF SY-SUBRC EQ 0.
+          SELECT SINGLE * FROM MSEG WHERE MATNR EQ WA_MCHA-MATNR AND BWART EQ '101' AND CHARG EQ WA_RESB-CHARG AND LIFNR GT 0.
+          IF SY-SUBRC EQ 0.
+            SELECT HERSTELLER FROM QALS INTO LV_QALS WHERE MATNR = WA_RESB-MATNR  AND PRUEFLOS = WA_QALS-PRUEFLOS.
+
+            ENDSELECT.
+            "SELECT SINGLE * FROM ZMIGO WHERE MBLNR EQ MSEG-MBLNR AND MJAHR EQ MSEG-MJAHR.
+            IF SY-SUBRC EQ 0.
+              SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ LV_QALS.
+              IF SY-SUBRC EQ 0.
+                WA_TAB1-NAME1 = LFA1-NAME1.
+              ENDIF.
+            ELSE.
+              SELECT SINGLE LIFNR FROM ZINSP INTO @LV_LIF WHERE MATNR = @WA_RESB-MATNR  AND PRUEFLOS = @WA_QALS-PRUEFLOS.
+              IF SY-SUBRC EQ 0.
+                SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ LV_LIF.
+                IF SY-SUBRC EQ 0.
+                  WA_TAB1-NAME1 = LFA1-NAME1.
+                ENDIF.
+              ENDIF.
+            ENDIF.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+*******************************************
+
+*************************specification PMS & RMP ***********************
+      IF UDDATE EQ '00000000'.
+        READ TABLE IT_ZQSPECIFICATION INTO WA_ZQSPECIFICATION WITH KEY MATNR = WA_RESB-MATNR.
+        IF SY-SUBRC EQ 0.
+          WA_TAB1-PMS_NO = WA_ZQSPECIFICATION-SPECIFICATION.
+          WA_TAB1-ART_NO = WA_ZQSPECIFICATION-ARTWORK.
+          CONDENSE : WA_TAB1-PMS_NO,WA_TAB1-ART_NO.
+        ENDIF.
+      ELSE.
+        SELECT SINGLE * FROM ZQSPECIFICATION WHERE MATNR EQ WA_RESB-MATNR AND WERKS EQ WA_RESB-WERKS AND EFFECTDT LE UDDATE AND EFFECTENDDT GE UDDATE.
+        IF SY-SUBRC EQ 0.
+          WA_TAB1-PMS_NO = ZQSPECIFICATION-SPECIFICATION.
+          WA_TAB1-ART_NO = ZQSPECIFICATION-ARTWORK.
+          CONDENSE : WA_TAB1-PMS_NO,WA_TAB1-ART_NO.
+        ENDIF.
+      ENDIF.
+
+      SELECT SINGLE * FROM MARA WHERE MATNR EQ WA_RESB-MATNR AND MTART EQ 'ZROH'.
+      IF SY-SUBRC EQ 0.
+        RM = 'Y'.
+      ENDIF.
+
+*      select single * from zpms_art_table where matnr eq wa_resb-matnr and to_dt ge sy-datum.
+*      if sy-subrc eq 0.
+*        clear :artpmsno.
+*        concatenate zpms_art_table-art_no  zpms_art_table-pms_no into artpmsno separated by space.
+**      WA_TAB1-PMS_NO = ZPMS_ART_TABLE-PMS_NO.
+*        wa_tab1-art_no = artpmsno.
+*      endif.
+
+
+      CLEAR : MAKTX1,MAKTX2,MAKTX3,NORMT.
+      SELECT SINGLE * FROM MAKT WHERE MATNR EQ WA_RESB-MATNR AND SPRAS EQ 'EN'.
+      IF SY-SUBRC EQ 0.
+        MAKTX1 = MAKT-MAKTX.
+      ENDIF.
+      SELECT SINGLE * FROM MAKT WHERE MATNR EQ WA_RESB-MATNR AND SPRAS EQ 'Z1'.
+      IF SY-SUBRC EQ 0.
+        MAKTX2 = MAKT-MAKTX.
+      ENDIF.
+      SELECT SINGLE * FROM MARA  WHERE MATNR EQ WA_RESB-MATNR .
+      IF SY-SUBRC EQ 0.
+        NORMT = MARA-NORMT.
+      ENDIF.
+      CONCATENATE MAKTX1 MAKTX2 NORMT INTO MAKTX3.
+      CONDENSE MAKTX.
+      WA_TAB1-MAKTX = MAKTX3.
+
+      COLLECT WA_TAB1 INTO IT_TAB1.
+      CLEAR WA_TAB1.
+
+    ENDIF.
+  ENDLOOP.
+*  BREAK-POINT.
+*WRITE : / W_AUFNR, W_PSMNG, W_MATNR,W_MAKTX, W_CHARG,w_vfdat,w_hsdat.
+  LOOP AT IT_TAB1 INTO WA_TAB1.
+*    COUNT = COUNT + 1.
+*    WA_TAB1-COUNT = COUNT.
+
+    READ TABLE IT_RESB INTO WA_RESB WITH KEY MATNR = WA_TAB1-MATNR RSPOS = WA_TAB1-RSPOS .
+    WA_TAB1-COUNT = WA_RESB-POSNR .
+
+
+*    SHIFT  WA_TAB1-COUNT LEFT DELETING LEADING '0'.
+
+*    CONDENSE WA_TAB1-COUNT.
+    MODIFY IT_TAB1 FROM WA_TAB1 TRANSPORTING COUNT.
+*  WRITE : / '***',WA_TAB1-COUNT,WA_TAB1-MATNR,WA_TAB1-CHARG,WA_TAB1-MENGE,WA_TAB1-MEINS,WA_TAB1-PRUEFLOS,WA_TAB1-PMS_NO,WA_TAB1-ART_NO.
+
+  ENDLOOP.
+
+*  BREAK-POINT .
+
+*IF R2 EQ 'X'.
+*  PERFORM ADDITIONAL.
+*ENDIF.
+*exit.
+*  call function 'OPEN_FORM'
+*    exporting
+*      device                      = 'PRINTER'
+*      dialog                      = 'X'
+**     form                        = 'ZSR9_1'
+*      language                    = sy-langu
+**     options                     = options
+*    exceptions
+*      canceled                    = 1
+*      device                      = 2
+*      form                        = 3
+*      options                     = 4
+*      unclosed                    = 5
+*      mail_options                = 6
+*      archive_error               = 7
+*      invalid_fax_number          = 8
+*      more_params_needed_in_batch = 9
+*      spool_error                 = 10
+*      codepage                    = 11
+*      others                      = 12.
+*  if sy-subrc <> 0.
+** MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+**         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+*  endif.
+  IF PLANT EQ '1000'.
+*    call function 'START_FORM'
+*      exporting
+**       FORM        = 'ZPMR3'
+**       FORM        = 'ZPMR4'
+**       form        = 'ZPMR5'
+**       FORM        = 'ZPMR6'
+*        form        = 'ZPMR51'
+*        language    = sy-langu
+*      exceptions
+*        form        = 1
+*        format      = 2
+*        unended     = 3
+*        unopened    = 4
+*        unused      = 5
+*        spool_error = 6
+*        codepage    = 7
+*        others      = 8.
+*    if sy-subrc <> 0.
+*      message id sy-msgid type sy-msgty number sy-msgno
+*              with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+*    endif.
+
+  ELSE.
+*    call function 'START_FORM'
+*      exporting
+**       FORM        = 'ZPMR3'
+**       FORM        = 'ZPMR4'
+**       FORM        = 'ZPMR4'
+*        form        = 'ZPMR41'
+*        language    = sy-langu
+*      exceptions
+*        form        = 1
+*        format      = 2
+*        unended     = 3
+*        unopened    = 4
+*        unused      = 5
+*        spool_error = 6
+*        codepage    = 7
+*        others      = 8.
+*    if sy-subrc <> 0.
+*      message id sy-msgid type sy-msgty number sy-msgno
+*              with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+*    endif.
+  ENDIF.
+
+*call function 'WRITE_FORM'
+*  EXPORTING
+*    element = 'HEAD1'
+*    window  = 'MAIN'.
+
+*  call function 'WRITE_FORM'
+*    exporting
+*      element = 'T1'
+*      window  = 'WINDOW1'.
+  IF R1 EQ 'X'.
+
+*    loop at it_tab1 into wa_tab1.
+*      call function 'WRITE_FORM'
+*        exporting
+*          element = 'HEAD1'
+*          window  = 'MAIN'.
+*    endloop.
+
+  ELSE.
+    PERFORM ADDITIONAL.
+  ENDIF.
+  IF PLANT EQ '1000'.
+    IF R2 EQ 'X'.
+*      call function 'WRITE_FORM'
+*        exporting
+*          element = 'T2'
+*          window  = 'WINDOW3'.
+    ELSE.
+*      call function 'WRITE_FORM'
+*        exporting
+*          element = 'T2'
+*          window  = 'WINDOW2'.
+    ENDIF.
+  ELSE.
+*    call function 'WRITE_FORM'
+*      exporting
+*        element = 'T2'
+*        window  = 'WINDOW2'.
+  ENDIF.
+
+*  call function 'END_FORM'
+*    exceptions
+*      unopened                 = 1
+*      bad_pageformat_for_print = 2
+*      spool_error              = 3
+*      codepage                 = 4
+*      others                   = 5.
+*  if sy-subrc <> 0.
+*    message id sy-msgid type sy-msgty number sy-msgno
+*            with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+*  endif.
+
+*  call function 'CLOSE_FORM'
+** IMPORTING
+**   RESULT                         =
+**   RDI_RESULT                     =
+** TABLES
+**   OTFDATA                        =
+*    exceptions
+*      unopened                 = 1
+*      bad_pageformat_for_print = 2
+*      send_error               = 3
+*      spool_error              = 4
+*      codepage                 = 5
+*      others                   = 6.
+*  if sy-subrc <> 0.
+** MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+**         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+*  endif.
+*
+*
+
+  DATA : LV_FORM_NAME TYPE TDSFNAME .
+
+  SELECT SINGLE   AUFNR , DAUAT FROM AFPO INTO  @DATA(WA_AFPO)
+     WHERE AUFNR = @ORD .
+
+
+
+  IF WA_AFPO-DAUAT =  'ZNS1' OR
+      WA_AFPO-DAUAT =  'ZNS3' OR
+      WA_AFPO-DAUAT =  'ZNS4' OR
+      WA_AFPO-DAUAT =  'ZNS5' OR
+      WA_AFPO-DAUAT =  'ZGS1' OR
+      WA_AFPO-DAUAT =  'ZGS3' OR
+      WA_AFPO-DAUAT =  'ZGS4' .
+    LV_FORM_NAME  = 'ZPMR7_NR'.
+  ELSE.
+    LV_FORM_NAME  = 'ZPMR7'.
+
+
+  ENDIF.
+
+*  Then display Potency form and other than this old Form.
+
+
+
+
+
+  CALL FUNCTION 'SSF_FUNCTION_MODULE_NAME'
+    EXPORTING
+*     formname           = 'ZPMR3'  "12.4.21
+*     FORMNAME           = 'ZPMR7'  "
+      FORMNAME           = LV_FORM_NAME " 'ZPMR7_NR'  "
+*     FORMNAME           = 'ZPOTENCY4'  "12.4.21
+*     VARIANT            = ' '
+*     DIRECT_CALL        = ' '
+    IMPORTING
+      FM_NAME            = V_FM
+    EXCEPTIONS
+      NO_FORM            = 1
+      NO_FUNCTION_MODULE = 2
+      OTHERS             = 3.
+
+  CONTROL-NO_OPEN   = 'X'.
+  CONTROL-NO_CLOSE  = 'X'.
+
+  CALL FUNCTION 'SSF_OPEN'
+    EXPORTING
+      CONTROL_PARAMETERS = CONTROL.
+
+  IF RM EQ 'Y'.
+    MFGRTYPE = 'Manufacturer'.
+  ELSE.
+    MFGRTYPE = 'Supplier'.
+  ENDIF.
+  """"""""""""""""""""""" NEW Column """""""""""""""""""""""""""""""""""""""""""""
+
+  DATA: LV_ATINN TYPE ATINN.
+  RANGES : LR_ATINN  FOR AUSP-ATINN.
+
+  IF IT_TAB1 IS NOT INITIAL .
+
+    SELECT CUOBJ_BM, MATNR, CHARG
+      FROM MCH1 INTO TABLE @IT_MCH1
+       FOR ALL ENTRIES IN @IT_TAB1
+         WHERE MATNR = @IT_TAB1-MATNR
+           AND CHARG = @IT_TAB1-CHARG.
+    CALL FUNCTION 'CONVERSION_EXIT_ATINN_INPUT'
+      EXPORTING
+        INPUT  = 'ZPOTENCY'
+      IMPORTING
+        OUTPUT = LV_ATINN.
+
+    IF SY-SUBRC EQ 0.
+      CLEAR LR_ATINN.
+      LR_ATINN-SIGN = 'I'.        "Include
+      LR_ATINN-OPTION = 'EQ'.     "Equal to
+      LR_ATINN-LOW = LV_ATINN.    "Material number
+      APPEND LR_ATINN.
+    ENDIF.
+
+
+*      IF sy-subrc NE 0.
+    CALL FUNCTION 'CONVERSION_EXIT_ATINN_INPUT'
+      EXPORTING
+        INPUT  = 'ZPOTENCY1'
+      IMPORTING
+        OUTPUT = LV_ATINN.
+
+    IF SY-SUBRC EQ 0.
+      CLEAR LR_ATINN.
+      LR_ATINN-SIGN = 'I'.        "Include
+      LR_ATINN-OPTION = 'EQ'.     "Equal to
+      LR_ATINN-LOW = LV_ATINN.    "Material number
+      APPEND LR_ATINN.
+    ENDIF.
+
+*      IF sy-subrc NE 0.
+    CALL FUNCTION 'CONVERSION_EXIT_ATINN_INPUT'
+      EXPORTING
+        INPUT  = 'ZPOTENCY2'
+      IMPORTING
+        OUTPUT = LV_ATINN.
+    IF SY-SUBRC EQ 0.
+      CLEAR LR_ATINN.
+      LR_ATINN-SIGN = 'I'.        "Include
+      LR_ATINN-OPTION = 'EQ'.     "Equal to
+      LR_ATINN-LOW = LV_ATINN.    "Material number
+      APPEND LR_ATINN.
+    ENDIF.
+
+
+    CALL FUNCTION 'CONVERSION_EXIT_ATINN_INPUT'
+      EXPORTING
+        INPUT  = 'ZPOTENCY3'
+      IMPORTING
+        OUTPUT = LV_ATINN.
+    IF SY-SUBRC EQ 0.
+      CLEAR LR_ATINN.
+
+      LR_ATINN-SIGN = 'I'.        "Include
+      LR_ATINN-OPTION = 'EQ'.     "Equal to
+      LR_ATINN-LOW = LV_ATINN.    "Material number
+      APPEND LR_ATINN.
+    ENDIF.
+
+
+    CALL FUNCTION 'CONVERSION_EXIT_ATINN_INPUT'
+      EXPORTING
+        INPUT  = 'ZPOTENCY4'
+      IMPORTING
+        OUTPUT = LV_ATINN.
+    IF  SY-SUBRC EQ 0.
+      CLEAR LR_ATINN.
+      LR_ATINN-SIGN = 'I'.        "Include
+      LR_ATINN-OPTION = 'EQ'.     "Equal to
+      LR_ATINN-LOW = LV_ATINN.    "Material number
+      APPEND LR_ATINN.
+    ENDIF.
+
+    SELECT * FROM AUSP INTO TABLE @DATA(IT_AUSP) FOR ALL ENTRIES IN @IT_MCH1 WHERE OBJEK = @IT_MCH1-OBJEK
+                                                                               AND ATINN IN @LR_ATINN.
+  ENDIF.
+
+
+
+  LOOP AT IT_TAB1 INTO DATA(WA_TAB_NR).
+
+    READ TABLE IT_MCH1 INTO DATA(WA_MCH1_NR) WITH KEY MATNR = WA_TAB_NR-MATNR
+                                                   CHARG = WA_TAB_NR-CHARG.
+    IF SY-SUBRC EQ 0 .
+
+      READ TABLE IT_AUSP INTO DATA(WA_AUSP_NR) WITH KEY OBJEK = WA_MCH1_NR-OBJEK .
+      IF SY-SUBRC EQ 0 .
+
+
+        LV_AMOUNT =  WA_AUSP_NR-DEC_VALUE_FROM .
+
+
+        WA_TAB_NR-DEC_VALUE_FROM  = LV_AMOUNT .
+
+        CONDENSE  WA_TAB_NR-DEC_VALUE_FROM NO-GAPS.
+        MODIFY IT_TAB1 FROM WA_TAB_NR TRANSPORTING DEC_VALUE_FROM .
+
+      ENDIF.
+    ENDIF.
+    CLEAR: WA_TAB_NR , LV_AMOUNT .
+  ENDLOOP .
+
+  """"""""""""""""""""""""""""""""""" NC """""""""""""""""""""""""""""""""""""""""""""
+
+  IF IT_MAT2 IS NOT INITIAL .
+
+    SELECT CUOBJ_BM, MATNR, CHARG
+      FROM MCH1 INTO TABLE @IT_MCH1
+       FOR ALL ENTRIES IN @IT_MAT2
+         WHERE MATNR = @IT_MAT2-MATNR
+           AND CHARG = @IT_MAT2-CHARG.
+    CALL FUNCTION 'CONVERSION_EXIT_ATINN_INPUT'
+      EXPORTING
+        INPUT  = 'ZPOTENCY'
+      IMPORTING
+        OUTPUT = LV_ATINN.
+
+    IF SY-SUBRC EQ 0.
+      CLEAR LR_ATINN.
+      LR_ATINN-SIGN = 'I'.        "Include
+      LR_ATINN-OPTION = 'EQ'.     "Equal to
+      LR_ATINN-LOW = LV_ATINN.    "Material number
+      APPEND LR_ATINN.
+    ENDIF.
+
+
+*      IF sy-subrc NE 0.
+    CALL FUNCTION 'CONVERSION_EXIT_ATINN_INPUT'
+      EXPORTING
+        INPUT  = 'ZPOTENCY1'
+      IMPORTING
+        OUTPUT = LV_ATINN.
+
+    IF SY-SUBRC EQ 0.
+      CLEAR LR_ATINN.
+      LR_ATINN-SIGN = 'I'.        "Include
+      LR_ATINN-OPTION = 'EQ'.     "Equal to
+      LR_ATINN-LOW = LV_ATINN.    "Material number
+      APPEND LR_ATINN.
+    ENDIF.
+
+*      IF sy-subrc NE 0.
+    CALL FUNCTION 'CONVERSION_EXIT_ATINN_INPUT'
+      EXPORTING
+        INPUT  = 'ZPOTENCY2'
+      IMPORTING
+        OUTPUT = LV_ATINN.
+    IF SY-SUBRC EQ 0.
+      CLEAR LR_ATINN.
+      LR_ATINN-SIGN = 'I'.        "Include
+      LR_ATINN-OPTION = 'EQ'.     "Equal to
+      LR_ATINN-LOW = LV_ATINN.    "Material number
+      APPEND LR_ATINN.
+    ENDIF.
+
+
+    CALL FUNCTION 'CONVERSION_EXIT_ATINN_INPUT'
+      EXPORTING
+        INPUT  = 'ZPOTENCY3'
+      IMPORTING
+        OUTPUT = LV_ATINN.
+    IF SY-SUBRC EQ 0.
+      CLEAR LR_ATINN.
+
+      LR_ATINN-SIGN = 'I'.        "Include
+      LR_ATINN-OPTION = 'EQ'.     "Equal to
+      LR_ATINN-LOW = LV_ATINN.    "Material number
+      APPEND LR_ATINN.
+    ENDIF.
+
+
+    CALL FUNCTION 'CONVERSION_EXIT_ATINN_INPUT'
+      EXPORTING
+        INPUT  = 'ZPOTENCY4'
+      IMPORTING
+        OUTPUT = LV_ATINN.
+    IF  SY-SUBRC EQ 0.
+      CLEAR LR_ATINN.
+      LR_ATINN-SIGN = 'I'.        "Include
+      LR_ATINN-OPTION = 'EQ'.     "Equal to
+      LR_ATINN-LOW = LV_ATINN.    "Material number
+      APPEND LR_ATINN.
+    ENDIF.
+
+    SELECT * FROM AUSP INTO TABLE @IT_AUSP FOR ALL ENTRIES IN @IT_MCH1 WHERE OBJEK = @IT_MCH1-OBJEK
+                                                                               AND ATINN IN @LR_ATINN.
+  ENDIF.
+
+
+  CLEAR : WA_MCH1_NR,WA_AUSP_NR .
+  LOOP AT IT_MAT2 INTO DATA(WA_MAT2_NR).
+
+    READ TABLE IT_MCH1 INTO WA_MCH1_NR WITH KEY MATNR = WA_MAT2_NR-MATNR
+                                                      CHARG = WA_MAT2_NR-CHARG.
+    IF SY-SUBRC EQ 0 .
+
+      READ TABLE IT_AUSP INTO WA_AUSP_NR WITH KEY OBJEK = WA_MCH1_NR-OBJEK .
+      IF SY-SUBRC EQ 0 .
+
+        LV_AMOUNT =  WA_AUSP_NR-DEC_VALUE_FROM .
+
+
+        WA_TAB_NR-DEC_VALUE_FROM  = LV_AMOUNT .
+
+        CONDENSE  WA_MAT2_NR-DEC_VALUE_FROM NO-GAPS.
+        MODIFY IT_MAT2 FROM WA_MAT2_NR TRANSPORTING DEC_VALUE_FROM .
+      ENDIF.
+    ENDIF.
+    CLEAR: WA_TAB_NR , LV_AMOUNT.
+  ENDLOOP .
+
+
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+  DATA : FORMULA TYPE CHAR255.
+
+
+  CLEAR :  FORMULA .
+  SELECT  SINGLE * FROM  ZPP_FORMULA INTO @DATA(WA_FORMULA)
+    WHERE MATNR   = @W_MATNR
+    AND   WERKS   = @WERKS  .
+
+  IF SY-SUBRC EQ 0 .
+    FORMULA  = WA_FORMULA-FORMULA   .
+  ENDIF.
+
+  CALL FUNCTION V_FM
+    EXPORTING
+      CONTROL_PARAMETERS = CONTROL
+      USER_SETTINGS      = 'X'
+      OUTPUT_OPTIONS     = W_SSFCOMPOP
+      KUNNR              = KUNNR
+      W_MATNR            = W_MATNR
+      W_MAKTX            = W_MAKTX
+      S_BUDAT            = S_BUDAT
+      ORD                = ORD
+      W_HSDAT            = W_HSDAT
+      W_VFDAT            = W_VFDAT
+      W_CHARG            = W_CHARG
+      W_PSMNG            = W_PSMNG
+      W_MEINS            = W_MEINS
+      UNAME              = UNAME
+      RM                 = RM
+      R2                 = R2
+      HTEXT1             = HTEXT1
+      WERKS              = WERKS
+      FORMAT1            = FORMAT1
+      FTEXT1             = FTEXT1
+      MFGRTYPE           = MFGRTYPE
+      MATTYP             = MATTYP
+      FORMULA            = FORMULA
+    TABLES
+      IT_TAB1            = IT_TAB1
+      IT_MAT2            = IT_MAT2
+    EXCEPTIONS
+      FORMATTING_ERROR   = 1
+      INTERNAL_ERROR     = 2
+      SEND_ERROR         = 3
+      USER_CANCELED      = 4
+      OTHERS             = 5.
+
+*    CLEAR : IT_POT2.
+*    CLEAR:  FORMAT, POTQTY11, POTQTY12,AMAKTX, BMAKTX, BMAKTX1,BMAKTX2, AAQTY1,AAQTY2,AAQTY3, MATNR2,MENGE1, COUNT,
+*    MAKTX,AMAKTX3,ADJMATNR.
+*    CLEAR : ADJMATNR.
+
+  CALL FUNCTION 'SSF_CLOSE'.
+
+
+*&---------------------------------------------------------------------*
+*&      Form  ADDITIONAL
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM ADDITIONAL.
+  WA_MAT1-MATNR = MAT1.
+  WA_MAT1-CHARG = CHARG1.
+  WA_MAT1-LGORT = LGORT1.
+  WA_MAT1-MENGE = QTY1.
+*  WA_MAT1-CNT = '1'.
+  COLLECT WA_MAT1 INTO IT_MAT1.
+  CLEAR WA_MAT1.
+
+  WA_MAT1-MATNR = MAT2.
+  WA_MAT1-CHARG = CHARG2.
+  WA_MAT1-LGORT = LGORT2.
+  WA_MAT1-MENGE = QTY2.
+*    WA_MAT1-CNT = '1'.
+  COLLECT WA_MAT1 INTO IT_MAT1.
+  CLEAR WA_MAT1.
+  WA_MAT1-MATNR = MAT3.
+  WA_MAT1-CHARG = CHARG3.
+  WA_MAT1-LGORT = LGORT3.
+  WA_MAT1-MENGE = QTY3.
+*    WA_MAT1-CNT = '1'.
+  COLLECT WA_MAT1 INTO IT_MAT1.
+  CLEAR WA_MAT1.
+  WA_MAT1-MATNR = MAT4.
+  WA_MAT1-CHARG = CHARG4.
+  WA_MAT1-LGORT = LGORT4.
+  WA_MAT1-MENGE = QTY4.
+*  WA_MAT1-CNT = '1'.
+  COLLECT WA_MAT1 INTO IT_MAT1.
+  CLEAR WA_MAT1.
+  WA_MAT1-MATNR = MAT5.
+  WA_MAT1-CHARG = CHARG5.
+  WA_MAT1-LGORT = LGORT5.
+  WA_MAT1-MENGE = QTY5.
+  COLLECT WA_MAT1 INTO IT_MAT1.
+  CLEAR WA_MAT1.
+  WA_MAT1-MATNR = MAT6.
+  WA_MAT1-CHARG = CHARG6.
+  WA_MAT1-LGORT = LGORT6.
+  WA_MAT1-MENGE = QTY6.
+  COLLECT WA_MAT1 INTO IT_MAT1.
+  CLEAR WA_MAT1.
+  WA_MAT1-MATNR = MAT7.
+  WA_MAT1-CHARG = CHARG7.
+  WA_MAT1-LGORT = LGORT7.
+  WA_MAT1-MENGE = QTY7.
+  COLLECT WA_MAT1 INTO IT_MAT1.
+  CLEAR WA_MAT1.
+  WA_MAT1-MATNR = MAT8.
+  WA_MAT1-CHARG = CHARG8.
+  WA_MAT1-LGORT = LGORT8.
+  WA_MAT1-MENGE = QTY8.
+  COLLECT WA_MAT1 INTO IT_MAT1.
+  CLEAR WA_MAT1.
+  WA_MAT1-MATNR = MAT9.
+  WA_MAT1-CHARG = CHARG9.
+  WA_MAT1-LGORT = LGORT9.
+  WA_MAT1-MENGE = QTY9.
+  COLLECT WA_MAT1 INTO IT_MAT1.
+  CLEAR WA_MAT1.
+  WA_MAT1-MATNR = MAT10.
+  WA_MAT1-CHARG = CHARG10.
+  WA_MAT1-LGORT = LGORT10.
+  WA_MAT1-MENGE = QTY10.
+  COLLECT WA_MAT1 INTO IT_MAT1.
+  CLEAR WA_MAT1.
+
+  DELETE IT_MAT1 WHERE MATNR EQ 0.
+
+  LOOP AT IT_MAT1 INTO WA_MAT1.
+    CLEAR : MAT1,SQTY1,CHARG1,LGORT1.
+    MAT1 = WA_MAT1-MATNR.
+    CHARG1 = WA_MAT1-CHARG.
+    LGORT1 = WA_MAT1-LGORT.
+    SQTY1 = WA_MAT1-MENGE.
+*  WRITE : / 'plant',plant.
+    CLEAR : IT_MCHB1,WA_MCHB1,IT_QALS1,WA_QALS1, MAKTX, W_ARTPMS.
+    SELECT * FROM MCHB INTO TABLE IT_MCHB1 WHERE MATNR EQ MAT1 AND CHARG EQ CHARG1 AND LGORT EQ LGORT1 AND WERKS EQ PLANT AND LGORT NE 'CSM' AND CLABS GT 0.
+    IF SY-SUBRC EQ 0.
+      SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT1 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG AND
+        LAGORTCHRG EQ IT_MCHB1-LGORT.
+      IF IT_QALS1 IS INITIAL.
+        SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT1 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG.
+      ENDIF.
+      SORT IT_QALS1 DESCENDING BY PAENDTERM.
+      SELECT * FROM QALS INTO TABLE IT_QALS3 FOR ALL ENTRIES IN IT_MCHB1 WHERE ART EQ '01' AND CHARG EQ IT_MCHB1-CHARG.
+    ENDIF.
+
+    LOOP AT IT_QALS1 INTO WA_QALS1.
+      SELECT SINGLE * FROM JEST WHERE OBJNR EQ WA_QALS1-OBJNR AND STAT EQ 'I0224'.
+      IF SY-SUBRC EQ 0.
+        DELETE IT_QALS1 WHERE PRUEFLOS EQ WA_QALS1-PRUEFLOS.
+      ENDIF.
+    ENDLOOP.
+
+    LOOP AT IT_QALS3 INTO WA_QALS3.
+      SELECT SINGLE * FROM JEST WHERE OBJNR EQ WA_QALS3-OBJNR AND STAT EQ 'I0224'.
+      IF SY-SUBRC EQ 0.
+        DELETE IT_QALS3 WHERE PRUEFLOS EQ WA_QALS3-PRUEFLOS.
+      ENDIF.
+    ENDLOOP.
+
+    READ TABLE IT_TAB1 INTO WA_TAB1 WITH KEY MATNR = MAT1 .
+*    charg = charg1.
+    IF SY-SUBRC EQ 0.
+      READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR CHARG = CHARG1 LGORT = LGORT1.
+      IF SY-SUBRC EQ 0.
+        COUN = 1.
+*        select single * from zpms_art_table where matnr eq wa_mchb1-matnr and to_dt ge sy-datum.
+*        if sy-subrc eq 0.
+*          concatenate zpms_art_table-art_no  zpms_art_table-pms_no into w_artpms.
+*        endif.
+        SELECT SINGLE MAKTX INTO MAKTX FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+        IF WA_MCHB1-CLABS GE SQTY1.
+          SQTY1 = SQTY1.
+          CLEAR: PRUEFLOS.
+          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = CHARG1 LAGORTCHRG = LGORT1.
+          IF SY-SUBRC EQ 0.
+            PRUEFLOS = WA_QALS1-PRUEFLOS.
+*          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+          ENDIF.
+          IF PRUEFLOS EQ 0.
+            READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = CHARG1.
+            IF SY-SUBRC EQ 0.
+              PRUEFLOS = WA_QALS1-PRUEFLOS.
+            ENDIF.
+          ENDIF.
+          CLEAR : NAME1.
+          READ TABLE IT_QALS3 INTO WA_QALS3 WITH KEY CHARG = CHARG1 LAGORTCHRG = LGORT1.
+          IF SY-SUBRC EQ 0.
+            SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ WA_QALS3-LIFNR.
+            IF SY-SUBRC EQ 0.
+              NAME1 = LFA1-NAME1.
+            ENDIF.
+*          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+          ENDIF.
+          IF NAME1 EQ SPACE.
+            READ TABLE IT_QALS3 INTO WA_QALS3 WITH KEY CHARG = CHARG1.
+            IF SY-SUBRC EQ 0.
+              SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ WA_QALS3-LIFNR.
+              IF SY-SUBRC EQ 0.
+                NAME1 = LFA1-NAME1.
+              ENDIF.
+*          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+            ENDIF.
+          ENDIF.
+************************************************************
+**************************specification PMS & RMP ***********************
+          CLEAR : UDDATE.
+          SELECT SINGLE * FROM QAVE WHERE PRUEFLOS EQ PRUEFLOS.
+          IF SY-SUBRC EQ 0.
+            UDDATE = QAVE-VDATUM.
+          ENDIF.
+          IF UDDATE EQ '00000000'.
+            READ TABLE IT_ZQSPECIFICATION INTO WA_ZQSPECIFICATION WITH KEY MATNR = WA_MCHB1-MATNR.
+            IF SY-SUBRC EQ 0.
+              WA_MAT2-PMS_NO = WA_ZQSPECIFICATION-SPECIFICATION.
+              WA_MAT2-ART_NO = WA_ZQSPECIFICATION-ARTWORK.
+              CONDENSE : WA_TAB1-PMS_NO,WA_TAB1-ART_NO.
+            ENDIF.
+          ELSE.
+            SELECT SINGLE * FROM ZQSPECIFICATION WHERE MATNR EQ WA_MCHB1-MATNR AND WERKS EQ WA_MCHB1-WERKS AND EFFECTDT LE UDDATE AND EFFECTENDDT GE UDDATE.
+            IF SY-SUBRC EQ 0.
+              WA_MAT2-PMS_NO = ZQSPECIFICATION-SPECIFICATION.
+              WA_MAT2-ART_NO = ZQSPECIFICATION-ARTWORK.
+              CONDENSE : WA_TAB1-PMS_NO,WA_TAB1-ART_NO.
+            ENDIF.
+          ENDIF.
+*******************************************************************
+          CLEAR : MAKTX1,MAKTX2,MAKTX3,NORMT.
+          SELECT SINGLE * FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+          IF SY-SUBRC EQ 0.
+            MAKTX1 = MAKT-MAKTX.
+          ENDIF.
+          SELECT SINGLE * FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'Z1'.
+          IF SY-SUBRC EQ 0.
+            MAKTX2 = MAKT-MAKTX.
+          ENDIF.
+          SELECT SINGLE * FROM MARA  WHERE MATNR EQ WA_MCHB1-MATNR..
+          IF SY-SUBRC EQ 0.
+            NORMT = MARA-NORMT.
+          ENDIF.
+          CONCATENATE MAKTX1 MAKTX2 NORMT INTO MAKTX3.
+          CONDENSE MAKTX.
+          WA_MAT2-MAKTX = MAKTX3.
+
+          WA_MAT2-COUNT = COUN.
+          WA_MAT2-PRUEFLOS = PRUEFLOS.
+          WA_MAT2-SQTY = SQTY1.
+          WA_MAT2-MEINS = WA_TAB1-MEINS.
+          WA_MAT2-MATNR = WA_MCHB1-MATNR.
+          WA_MAT2-CHARG = WA_MCHB1-CHARG.
+          WA_MAT2-LGORT = WA_MCHB1-LGORT.
+          SELECT SINGLE * FROM MCH1 WHERE MATNR EQ WA_MCHB1-MATNR AND CHARG EQ WA_MCHB1-CHARG. "AND  WERKS EQ WA_MCHB1-WERKS.
+          IF SY-SUBRC EQ 0.
+            CONCATENATE MCH1-HSDAT+4(2) '/' MCH1-HSDAT+0(4) INTO WA_MAT2-HSDAT.
+            CONCATENATE MCH1-VFDAT+4(2) '/' MCH1-VFDAT+0(4) INTO WA_MAT2-VFDAT.
+          ENDIF.
+          CONDENSE : WA_MAT2-HSDAT,WA_MAT2-VFDAT.
+
+          WA_MAT2-LGORT = WA_MCHB1-LGORT.
+          WA_MAT2-NAME1 = NAME1.
+          COLLECT WA_MAT2 INTO IT_MAT2.
+          CLEAR WA_MAT2.
+
+*          call function 'WRITE_FORM'
+*            exporting
+*              element = 'H1'
+*              window  = 'MAIN'.
+        ELSE.
+          SQTY1 = WA_MCHB1-CLABS.
+          CLEAR : PRUEFLOS.
+          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = CHARG1 LAGORTCHRG = LGORT1.
+          IF SY-SUBRC EQ 0.
+            PRUEFLOS = WA_QALS1-PRUEFLOS.
+*          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+          ENDIF.
+          CLEAR : NAME1.
+          READ TABLE IT_QALS3 INTO WA_QALS3 WITH KEY CHARG = CHARG1 LAGORTCHRG = LGORT1.
+          IF SY-SUBRC EQ 0.
+            SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ WA_QALS3-LIFNR.
+            IF SY-SUBRC EQ 0.
+              NAME1 = LFA1-NAME1.
+            ENDIF.
+*          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+          ENDIF.
+
+**************************specification PMS & RMP ***********************
+          CLEAR : UDDATE.
+          SELECT SINGLE * FROM QAVE WHERE PRUEFLOS EQ PRUEFLOS.
+          IF SY-SUBRC EQ 0.
+            UDDATE = QAVE-VDATUM.
+          ENDIF.
+          IF UDDATE EQ '00000000'.
+            READ TABLE IT_ZQSPECIFICATION INTO WA_ZQSPECIFICATION WITH KEY MATNR = WA_MCHB1-MATNR.
+            IF SY-SUBRC EQ 0.
+              WA_MAT2-PMS_NO = WA_ZQSPECIFICATION-SPECIFICATION.
+              WA_MAT2-ART_NO = WA_ZQSPECIFICATION-ARTWORK.
+              CONDENSE : WA_TAB1-PMS_NO,WA_TAB1-ART_NO.
+            ENDIF.
+          ELSE.
+            SELECT SINGLE * FROM ZQSPECIFICATION WHERE MATNR EQ WA_MCHB1-MATNR AND WERKS EQ WA_MCHB1-WERKS AND EFFECTDT LE UDDATE AND EFFECTENDDT GE UDDATE.
+            IF SY-SUBRC EQ 0.
+              WA_MAT2-PMS_NO = ZQSPECIFICATION-SPECIFICATION.
+              WA_MAT2-ART_NO = ZQSPECIFICATION-ARTWORK.
+              CONDENSE : WA_TAB1-PMS_NO,WA_TAB1-ART_NO.
+            ENDIF.
+          ENDIF.
+*******************************************************************
+
+          CLEAR : MAKTX1,MAKTX2,MAKTX3,NORMT.
+          SELECT SINGLE * FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+          IF SY-SUBRC EQ 0.
+            MAKTX1 = MAKT-MAKTX.
+          ENDIF.
+          SELECT SINGLE * FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'Z1'.
+          IF SY-SUBRC EQ 0.
+            MAKTX2 = MAKT-MAKTX.
+          ENDIF.
+          SELECT SINGLE * FROM MARA  WHERE MATNR EQ WA_MCHB1-MATNR..
+          IF SY-SUBRC EQ 0.
+            NORMT = MARA-NORMT.
+          ENDIF.
+          CONCATENATE MAKTX1 MAKTX2 NORMT INTO MAKTX3.
+          CONDENSE MAKTX.
+          WA_MAT2-MAKTX = MAKTX3.
+
+
+          WA_MAT2-COUNT = COUN.
+          WA_MAT2-PRUEFLOS = PRUEFLOS.
+          WA_MAT2-SQTY = SQTY1.
+          WA_MAT2-MEINS = WA_TAB1-MEINS.
+          WA_MAT2-MATNR = WA_MCHB1-MATNR.
+          WA_MAT2-PMS_NO = SPACE.
+          WA_MAT2-ART_NO = SPACE.
+          WA_MAT2-CHARG = WA_MCHB1-CHARG.
+          WA_MAT2-LGORT = WA_MCHB1-LGORT.
+          SELECT SINGLE * FROM MCH1 WHERE MATNR EQ WA_MCHB1-MATNR AND CHARG EQ WA_MCHB1-CHARG ."AND WERKS EQ WA_MCHB1-WERKS.
+          IF SY-SUBRC EQ 0.
+            CONCATENATE MCH1-HSDAT+4(2) '/' MCH1-HSDAT+0(4) INTO WA_MAT2-HSDAT.
+            CONCATENATE MCH1-VFDAT+4(2) '/' MCH1-VFDAT+0(4) INTO WA_MAT2-VFDAT.
+          ENDIF.
+          CONDENSE : WA_MAT2-HSDAT,WA_MAT2-VFDAT.
+          WA_MAT2-LGORT = WA_MCHB1-LGORT.
+          WA_MAT2-NAME1 = NAME1.
+          COLLECT WA_MAT2 INTO IT_MAT2.
+          CLEAR WA_MAT2.
+
+*          call function 'WRITE_FORM'
+*            exporting
+*              element = 'H1'
+*              window  = 'MAIN'.
+          DELETE IT_MCHB1 WHERE MATNR = WA_MCHB1-MATNR AND CHARG = CHARG1 AND LGORT = LGORT1 AND WERKS = WA_MCHB1-WERKS.
+*          AND LGORT = WA_MCHB1-LGORT .
+          READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR CHARG = CHARG1 LGORT = LGORT1.
+          IF SY-SUBRC EQ 0.
+            SQTY2 = WA_MAT1-MENGE - SQTY1.
+            IF WA_MCHB1-CLABS GE SQTY2.
+            ELSE.
+              SQTY2 = WA_MCHB1-CLABS.
+            ENDIF.
+            CLEAR : PRUEFLOS.
+            READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = CHARG1 LAGORTCHRG = LGORT1.
+            IF SY-SUBRC EQ 0.
+              PRUEFLOS = WA_QALS1-PRUEFLOS.
+*            WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+            ENDIF.
+*****************21.4.22
+            CLEAR : NAME1.
+            READ TABLE IT_QALS3 INTO WA_QALS3 WITH KEY CHARG = CHARG1 LAGORTCHRG = LGORT1.
+            IF SY-SUBRC EQ 0.
+              SELECT SINGLE * FROM LFA1 WHERE LIFNR EQ WA_QALS3-LIFNR.
+              IF SY-SUBRC EQ 0.
+                NAME1 = LFA1-NAME1.
+              ENDIF.
+*          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+            ENDIF.
+*****************************
+
+            WA_MAT2-COUNT = COUN.
+            WA_MAT2-MAKTX = MAKTX.
+            WA_MAT2-PRUEFLOS = PRUEFLOS.
+            WA_MAT2-SQTY = SQTY2.
+            WA_MAT2-MEINS = WA_TAB1-MEINS.
+            WA_MAT2-MATNR = WA_MCHB1-MATNR.
+            WA_MAT2-PMS_NO = SPACE.
+            WA_MAT2-ART_NO = SPACE.
+            WA_MAT2-CHARG = WA_MCHB1-CHARG.
+            SELECT SINGLE * FROM MCH1 WHERE MATNR EQ WA_MCHB1-MATNR AND CHARG EQ WA_MCHB1-CHARG. "AND  WERKS EQ WA_MCHB1-WERKS.
+            IF SY-SUBRC EQ 0.
+              CONCATENATE MCH1-HSDAT+4(2) '/' MCH1-HSDAT+0(4) INTO WA_MAT2-HSDAT.
+              CONCATENATE MCH1-VFDAT+4(2) '/' MCH1-VFDAT+0(4) INTO WA_MAT2-VFDAT.
+            ENDIF.
+            CONDENSE : WA_MAT2-HSDAT,WA_MAT2-VFDAT.
+
+            WA_MAT2-LGORT = WA_MCHB1-LGORT.
+            WA_MAT2-NAME1 = NAME1.
+            COLLECT WA_MAT2 INTO IT_MAT2.
+            CLEAR WA_MAT2.
+
+*            call function 'WRITE_FORM'
+*              exporting
+*                element = 'H2'
+*                window  = 'MAIN'.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+  IF PLANT EQ '1000'.
+
+*    call function 'WRITE_FORM'
+*      exporting
+*        element = 'H3'
+*        window  = 'MAIN'.
+  ENDIF.
+*********mat 2*************************
+
+*  CLEAR : IT_MCHB1,WA_MCHB1,IT_QALS1,WA_QALS1,SQTY1, MAKTX, W_ARTPMS.
+*  SELECT * FROM MCHB INTO TABLE IT_MCHB1 WHERE MATNR EQ MAT2 AND WERKS EQ PLANT AND LGORT NE 'CSM' AND CLABS GT 0.
+*  IF SY-SUBRC EQ 0.
+*    SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT2 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG.
+*    SORT IT_QALS1 DESCENDING BY PAENDTERM.
+*  ENDIF.
+*  READ TABLE IT_TAB1 INTO WA_TAB1 WITH KEY MATNR = MAT2.
+*  IF SY-SUBRC EQ 0.
+*    READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*    IF SY-SUBRC EQ 0.
+*      COUN = 2.
+*      SELECT SINGLE * FROM ZPMS_ART_TABLE WHERE MATNR EQ WA_MCHB1-MATNR AND TO_DT GE SY-DATUM.
+*      IF SY-SUBRC EQ 0.
+*        CONCATENATE ZPMS_ART_TABLE-ART_NO  ZPMS_ART_TABLE-PMS_NO INTO W_ARTPMS.
+*      ENDIF.
+*      SELECT SINGLE MAKTX INTO MAKTX FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+*      IF WA_MCHB1-CLABS GE QTY2.
+*        SQTY1 = QTY2.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*      ELSE.
+*        SQTY1 = WA_MCHB1-CLABS.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*        DELETE IT_MCHB1 WHERE MATNR = WA_MCHB1-MATNR AND WERKS = WA_MCHB1-WERKS AND LGORT = WA_MCHB1-LGORT AND CHARG = WA_MCHB1-CHARG.
+*        READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*        IF SY-SUBRC EQ 0.
+*          SQTY2 = QTY2 - SQTY1.
+*          IF WA_MCHB1-CLABS GE SQTY2.
+*          ELSE.
+*            SQTY2 = WA_MCHB1-CLABS.
+*          ENDIF.
+*          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*          IF SY-SUBRC EQ 0.
+**            WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*          ENDIF.
+*          CALL FUNCTION 'WRITE_FORM'
+*            EXPORTING
+*              ELEMENT = 'H2'
+*              WINDOW  = 'MAIN'.
+*        ENDIF.
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.
+*
+**********mat 3*************************
+*
+*  CLEAR : IT_MCHB1,WA_MCHB1,IT_QALS1,WA_QALS1,SQTY1, MAKTX, W_ARTPMS.
+*  SELECT * FROM MCHB INTO TABLE IT_MCHB1 WHERE MATNR EQ MAT3 AND WERKS EQ PLANT AND LGORT NE 'CSM' AND CLABS GT 0.
+*  IF SY-SUBRC EQ 0.
+*    SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT3 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG.
+*    SORT IT_QALS1 DESCENDING BY PAENDTERM.
+*  ENDIF.
+*  READ TABLE IT_TAB1 INTO WA_TAB1 WITH KEY MATNR = MAT3.
+*  IF SY-SUBRC EQ 0.
+*    READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*    IF SY-SUBRC EQ 0.
+*      COUN = 3.
+*      SELECT SINGLE * FROM ZPMS_ART_TABLE WHERE MATNR EQ WA_MCHB1-MATNR AND TO_DT GE SY-DATUM.
+*      IF SY-SUBRC EQ 0.
+*        CONCATENATE ZPMS_ART_TABLE-ART_NO  ZPMS_ART_TABLE-PMS_NO INTO W_ARTPMS.
+*      ENDIF.
+*      SELECT SINGLE MAKTX INTO MAKTX FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+*      IF WA_MCHB1-CLABS GE QTY3.
+*        SQTY1 = QTY3.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*      ELSE.
+*        SQTY1 = WA_MCHB1-CLABS.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*        DELETE IT_MCHB1 WHERE MATNR = WA_MCHB1-MATNR AND WERKS = WA_MCHB1-WERKS AND LGORT = WA_MCHB1-LGORT AND CHARG = WA_MCHB1-CHARG.
+*        READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*        IF SY-SUBRC EQ 0.
+*          SQTY2 = QTY3 - SQTY1.
+*          IF WA_MCHB1-CLABS GE SQTY2.
+*          ELSE.
+*            SQTY2 = WA_MCHB1-CLABS.
+*          ENDIF.
+*          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*          IF SY-SUBRC EQ 0.
+**            WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*          ENDIF.
+*          CALL FUNCTION 'WRITE_FORM'
+*            EXPORTING
+*              ELEMENT = 'H2'
+*              WINDOW  = 'MAIN'.
+*        ENDIF.
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.
+*
+*
+**********mat 4*************************
+*
+*  CLEAR : IT_MCHB1,WA_MCHB1,IT_QALS1,WA_QALS1,SQTY1, MAKTX, W_ARTPMS.
+*  SELECT * FROM MCHB INTO TABLE IT_MCHB1 WHERE MATNR EQ MAT4 AND WERKS EQ PLANT AND LGORT NE 'CSM' AND CLABS GT 0.
+*  IF SY-SUBRC EQ 0.
+*    SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT4 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG.
+*    SORT IT_QALS1 DESCENDING BY PAENDTERM.
+*  ENDIF.
+*  READ TABLE IT_TAB1 INTO WA_TAB1 WITH KEY MATNR = MAT4.
+*  IF SY-SUBRC EQ 0.
+*    READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*    IF SY-SUBRC EQ 0.
+*      COUN = 4.
+*      SELECT SINGLE * FROM ZPMS_ART_TABLE WHERE MATNR EQ WA_MCHB1-MATNR AND TO_DT GE SY-DATUM.
+*      IF SY-SUBRC EQ 0.
+*        CONCATENATE ZPMS_ART_TABLE-ART_NO  ZPMS_ART_TABLE-PMS_NO INTO W_ARTPMS.
+*      ENDIF.
+*      SELECT SINGLE MAKTX INTO MAKTX FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+*      IF WA_MCHB1-CLABS GE QTY4.
+*        SQTY1 = QTY4.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*      ELSE.
+*        SQTY1 = WA_MCHB1-CLABS.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*        DELETE IT_MCHB1 WHERE MATNR = WA_MCHB1-MATNR AND WERKS = WA_MCHB1-WERKS AND LGORT = WA_MCHB1-LGORT AND CHARG = WA_MCHB1-CHARG.
+*        READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*        IF SY-SUBRC EQ 0.
+*          SQTY2 = QTY4 - SQTY1.
+*          IF WA_MCHB1-CLABS GE SQTY2.
+*          ELSE.
+*            SQTY2 = WA_MCHB1-CLABS.
+*          ENDIF.
+*          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*          IF SY-SUBRC EQ 0.
+**            WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*          ENDIF.
+*          CALL FUNCTION 'WRITE_FORM'
+*            EXPORTING
+*              ELEMENT = 'H2'
+*              WINDOW  = 'MAIN'.
+*        ENDIF.
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.
+*
+**********mat 5*************************
+*
+*  CLEAR : IT_MCHB1,WA_MCHB1,IT_QALS1,WA_QALS1,SQTY1, MAKTX, W_ARTPMS.
+*  SELECT * FROM MCHB INTO TABLE IT_MCHB1 WHERE MATNR EQ MAT5 AND WERKS EQ PLANT AND LGORT NE 'CSM' AND CLABS GT 0.
+*  IF SY-SUBRC EQ 0.
+*    SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT5 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG.
+*    SORT IT_QALS1 DESCENDING BY PAENDTERM.
+*  ENDIF.
+*  READ TABLE IT_TAB1 INTO WA_TAB1 WITH KEY MATNR = MAT5.
+*  IF SY-SUBRC EQ 0.
+*    READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*    IF SY-SUBRC EQ 0.
+*      COUN = 5.
+*      SELECT SINGLE * FROM ZPMS_ART_TABLE WHERE MATNR EQ WA_MCHB1-MATNR AND TO_DT GE SY-DATUM.
+*      IF SY-SUBRC EQ 0.
+*        CONCATENATE ZPMS_ART_TABLE-ART_NO  ZPMS_ART_TABLE-PMS_NO INTO W_ARTPMS.
+*      ENDIF.
+*      SELECT SINGLE MAKTX INTO MAKTX FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+*      IF WA_MCHB1-CLABS GE QTY5.
+*        SQTY1 = QTY5.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*      ELSE.
+*        SQTY1 = WA_MCHB1-CLABS.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*        DELETE IT_MCHB1 WHERE MATNR = WA_MCHB1-MATNR AND WERKS = WA_MCHB1-WERKS AND LGORT = WA_MCHB1-LGORT AND CHARG = WA_MCHB1-CHARG.
+*        READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*        IF SY-SUBRC EQ 0.
+*          SQTY2 = QTY5 - SQTY1.
+*          IF WA_MCHB1-CLABS GE SQTY2.
+*          ELSE.
+*            SQTY2 = WA_MCHB1-CLABS.
+*          ENDIF.
+*          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*          IF SY-SUBRC EQ 0.
+**            WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*          ENDIF.
+*          CALL FUNCTION 'WRITE_FORM'
+*            EXPORTING
+*              ELEMENT = 'H2'
+*              WINDOW  = 'MAIN'.
+*        ENDIF.
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.
+*
+*
+**********mat 6*************************
+*
+*  CLEAR : IT_MCHB1,WA_MCHB1,IT_QALS1,WA_QALS1,SQTY1, MAKTX, W_ARTPMS.
+*  SELECT * FROM MCHB INTO TABLE IT_MCHB1 WHERE MATNR EQ MAT6 AND WERKS EQ PLANT AND LGORT NE 'CSM' AND CLABS GT 0.
+*  IF SY-SUBRC EQ 0.
+*    SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT6 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG.
+*    SORT IT_QALS1 DESCENDING BY PAENDTERM.
+*  ENDIF.
+*  READ TABLE IT_TAB1 INTO WA_TAB1 WITH KEY MATNR = MAT6.
+*  IF SY-SUBRC EQ 0.
+*    READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*    IF SY-SUBRC EQ 0.
+*      COUN = 6.
+*      SELECT SINGLE * FROM ZPMS_ART_TABLE WHERE MATNR EQ WA_MCHB1-MATNR AND TO_DT GE SY-DATUM.
+*      IF SY-SUBRC EQ 0.
+*        CONCATENATE ZPMS_ART_TABLE-ART_NO  ZPMS_ART_TABLE-PMS_NO INTO W_ARTPMS.
+*      ENDIF.
+*      SELECT SINGLE MAKTX INTO MAKTX FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+*      IF WA_MCHB1-CLABS GE QTY6.
+*        SQTY1 = QTY6.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*      ELSE.
+*        SQTY1 = WA_MCHB1-CLABS.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*        DELETE IT_MCHB1 WHERE MATNR = WA_MCHB1-MATNR AND WERKS = WA_MCHB1-WERKS AND LGORT = WA_MCHB1-LGORT AND CHARG = WA_MCHB1-CHARG.
+*        READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*        IF SY-SUBRC EQ 0.
+*          SQTY2 = QTY6 - SQTY1.
+*          IF WA_MCHB1-CLABS GE SQTY2.
+*          ELSE.
+*            SQTY2 = WA_MCHB1-CLABS.
+*          ENDIF.
+*          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*          IF SY-SUBRC EQ 0.
+**            WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*          ENDIF.
+*          CALL FUNCTION 'WRITE_FORM'
+*            EXPORTING
+*              ELEMENT = 'H2'
+*              WINDOW  = 'MAIN'.
+*        ENDIF.
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.
+*
+**********mat 7*************************
+*
+*  CLEAR : IT_MCHB1,WA_MCHB1,IT_QALS1,WA_QALS1,SQTY1, MAKTX, W_ARTPMS.
+*  SELECT * FROM MCHB INTO TABLE IT_MCHB1 WHERE MATNR EQ MAT7 AND WERKS EQ PLANT AND LGORT NE 'CSM' AND CLABS GT 0.
+*  IF SY-SUBRC EQ 0.
+*    SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT7 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG.
+*    SORT IT_QALS1 DESCENDING BY PAENDTERM.
+*  ENDIF.
+*  READ TABLE IT_TAB1 INTO WA_TAB1 WITH KEY MATNR = MAT7.
+*  IF SY-SUBRC EQ 0.
+*    READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*    IF SY-SUBRC EQ 0.
+*      COUN = 7.
+*      SELECT SINGLE * FROM ZPMS_ART_TABLE WHERE MATNR EQ WA_MCHB1-MATNR AND TO_DT GE SY-DATUM.
+*      IF SY-SUBRC EQ 0.
+*        CONCATENATE ZPMS_ART_TABLE-ART_NO  ZPMS_ART_TABLE-PMS_NO INTO W_ARTPMS.
+*      ENDIF.
+*      SELECT SINGLE MAKTX INTO MAKTX FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+*      IF WA_MCHB1-CLABS GE QTY7.
+*        SQTY1 = QTY7.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*      ELSE.
+*        SQTY1 = WA_MCHB1-CLABS.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*        DELETE IT_MCHB1 WHERE MATNR = WA_MCHB1-MATNR AND WERKS = WA_MCHB1-WERKS AND LGORT = WA_MCHB1-LGORT AND CHARG = WA_MCHB1-CHARG.
+*        READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*        IF SY-SUBRC EQ 0.
+*          SQTY2 = QTY7 - SQTY1.
+*          IF WA_MCHB1-CLABS GE SQTY2.
+*          ELSE.
+*            SQTY2 = WA_MCHB1-CLABS.
+*          ENDIF.
+*          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*          IF SY-SUBRC EQ 0.
+**            WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*          ENDIF.
+*          CALL FUNCTION 'WRITE_FORM'
+*            EXPORTING
+*              ELEMENT = 'H2'
+*              WINDOW  = 'MAIN'.
+*        ENDIF.
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.
+*
+**********mat 8*************************
+*
+*
+*  CLEAR : IT_MCHB1,WA_MCHB1,IT_QALS1,WA_QALS1,SQTY1, MAKTX, W_ARTPMS.
+*  SELECT * FROM MCHB INTO TABLE IT_MCHB1 WHERE MATNR EQ MAT8 AND WERKS EQ PLANT AND LGORT NE 'CSM' AND CLABS GT 0.
+*  IF SY-SUBRC EQ 0.
+*    SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT8 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG.
+*    SORT IT_QALS1 DESCENDING BY PAENDTERM.
+*  ENDIF.
+*  READ TABLE IT_TAB1 INTO WA_TAB1 WITH KEY MATNR = MAT8.
+*  IF SY-SUBRC EQ 0.
+*    READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*    IF SY-SUBRC EQ 0.
+*      COUN = 8.
+*      SELECT SINGLE * FROM ZPMS_ART_TABLE WHERE MATNR EQ WA_MCHB1-MATNR AND TO_DT GE SY-DATUM.
+*      IF SY-SUBRC EQ 0.
+*        CONCATENATE ZPMS_ART_TABLE-ART_NO  ZPMS_ART_TABLE-PMS_NO INTO W_ARTPMS.
+*      ENDIF.
+*      SELECT SINGLE MAKTX INTO MAKTX FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+*      IF WA_MCHB1-CLABS GE QTY8.
+*        SQTY1 = QTY8.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*      ELSE.
+*        SQTY1 = WA_MCHB1-CLABS.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*        DELETE IT_MCHB1 WHERE MATNR = WA_MCHB1-MATNR AND WERKS = WA_MCHB1-WERKS AND LGORT = WA_MCHB1-LGORT AND CHARG = WA_MCHB1-CHARG.
+*        READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*        IF SY-SUBRC EQ 0.
+*          SQTY2 = QTY8 - SQTY1.
+*          IF WA_MCHB1-CLABS GE SQTY2.
+*          ELSE.
+*            SQTY2 = WA_MCHB1-CLABS.
+*          ENDIF.
+*          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*          IF SY-SUBRC EQ 0.
+**            WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*          ENDIF.
+*          CALL FUNCTION 'WRITE_FORM'
+*            EXPORTING
+*              ELEMENT = 'H2'
+*              WINDOW  = 'MAIN'.
+*        ENDIF.
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.
+*
+*
+**********mat 9*************************
+*
+*  CLEAR : IT_MCHB1,WA_MCHB1,IT_QALS1,WA_QALS1,SQTY1, MAKTX, W_ARTPMS.
+*  SELECT * FROM MCHB INTO TABLE IT_MCHB1 WHERE MATNR EQ MAT9 AND WERKS EQ PLANT AND LGORT NE 'CSM' AND CLABS GT 0.
+*  IF SY-SUBRC EQ 0.
+*    SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT9 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG.
+*    SORT IT_QALS1 DESCENDING BY PAENDTERM.
+*  ENDIF.
+*  READ TABLE IT_TAB1 INTO WA_TAB1 WITH KEY MATNR = MAT9.
+*  IF SY-SUBRC EQ 0.
+*    READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*    IF SY-SUBRC EQ 0.
+*      COUN = 9.
+*      SELECT SINGLE * FROM ZPMS_ART_TABLE WHERE MATNR EQ WA_MCHB1-MATNR AND TO_DT GE SY-DATUM.
+*      IF SY-SUBRC EQ 0.
+*        CONCATENATE ZPMS_ART_TABLE-ART_NO  ZPMS_ART_TABLE-PMS_NO INTO W_ARTPMS.
+*      ENDIF.
+*      SELECT SINGLE MAKTX INTO MAKTX FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+*      IF WA_MCHB1-CLABS GE QTY9.
+*        SQTY1 = QTY9.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*      ELSE.
+*        SQTY1 = WA_MCHB1-CLABS.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*        DELETE IT_MCHB1 WHERE MATNR = WA_MCHB1-MATNR AND WERKS = WA_MCHB1-WERKS AND LGORT = WA_MCHB1-LGORT AND CHARG = WA_MCHB1-CHARG.
+*        READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*        IF SY-SUBRC EQ 0.
+*          SQTY2 = QTY9 - SQTY1.
+*          IF WA_MCHB1-CLABS GE SQTY2.
+*          ELSE.
+*            SQTY2 = WA_MCHB1-CLABS.
+*          ENDIF.
+*          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*          IF SY-SUBRC EQ 0.
+**            WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*          ENDIF.
+*          CALL FUNCTION 'WRITE_FORM'
+*            EXPORTING
+*              ELEMENT = 'H2'
+*              WINDOW  = 'MAIN'.
+*        ENDIF.
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.
+*
+**********mat 10*************************
+*
+*  CLEAR : IT_MCHB1,WA_MCHB1,IT_QALS1,WA_QALS1,SQTY1, MAKTX, W_ARTPMS.
+*  SELECT * FROM MCHB INTO TABLE IT_MCHB1 WHERE MATNR EQ MAT10 AND WERKS EQ PLANT AND LGORT NE 'CSM' AND CLABS GT 0.
+*  IF SY-SUBRC EQ 0.
+*    SELECT * FROM QALS INTO TABLE IT_QALS1 FOR ALL ENTRIES IN IT_MCHB1 WHERE MATNR EQ MAT10 AND WERK EQ PLANT AND CHARG EQ IT_MCHB1-CHARG.
+*    SORT IT_QALS1 DESCENDING BY PAENDTERM.
+*  ENDIF.
+*  READ TABLE IT_TAB1 INTO WA_TAB1 WITH KEY MATNR = MAT10.
+*  IF SY-SUBRC EQ 0.
+*    READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*    IF SY-SUBRC EQ 0.
+*      COUN = 10.
+*      SELECT SINGLE * FROM ZPMS_ART_TABLE WHERE MATNR EQ WA_MCHB1-MATNR AND TO_DT GE SY-DATUM.
+*      IF SY-SUBRC EQ 0.
+*        CONCATENATE ZPMS_ART_TABLE-ART_NO  ZPMS_ART_TABLE-PMS_NO INTO W_ARTPMS.
+*      ENDIF.
+*      SELECT SINGLE MAKTX INTO MAKTX FROM MAKT WHERE MATNR EQ WA_MCHB1-MATNR AND SPRAS EQ 'EN'.
+*      IF WA_MCHB1-CLABS GE QTY10.
+*        SQTY1 = QTY10.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*      ELSE.
+*        SQTY1 = WA_MCHB1-CLABS.
+*        READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*        IF SY-SUBRC EQ 0.
+**          WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*        ENDIF.
+*        CALL FUNCTION 'WRITE_FORM'
+*          EXPORTING
+*            ELEMENT = 'H1'
+*            WINDOW  = 'MAIN'.
+*        DELETE IT_MCHB1 WHERE MATNR = WA_MCHB1-MATNR AND WERKS = WA_MCHB1-WERKS AND LGORT = WA_MCHB1-LGORT AND CHARG = WA_MCHB1-CHARG.
+*        READ TABLE IT_MCHB1 INTO WA_MCHB1 WITH KEY MATNR = WA_TAB1-MATNR.
+*        IF SY-SUBRC EQ 0.
+*          SQTY2 = QTY10 - SQTY1.
+*          IF WA_MCHB1-CLABS GE SQTY2.
+*          ELSE.
+*            SQTY2 = WA_MCHB1-CLABS.
+*          ENDIF.
+*          READ TABLE IT_QALS1 INTO WA_QALS1 WITH KEY MATNR = WA_MCHB1-MATNR CHARG = WA_MCHB1-CHARG.
+*          IF SY-SUBRC EQ 0.
+**            WRITE : 'INSP. LOT', WA_QALS1-PRUEFLOS.
+*          ENDIF.
+*          CALL FUNCTION 'WRITE_FORM'
+*            EXPORTING
+*              ELEMENT = 'H2'
+*              WINDOW  = 'MAIN'.
+*        ENDIF.
+*      ENDIF.
+*    ENDIF.
+*  ENDIF.
+
+ENDFORM.                    "ADDITIONAL
+*&---------------------------------------------------------------------*
+*&      Form  PASS
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM PASS .
+* IF SY-UNAME EQ 'BASIS'.
+*  ELSE.
+*    JANDT+6(2) = '01'.
+*    JANDT+4(2) = '01'.
+*    JANDT+0(4) = '2020'.
+*
+*    IF SY-DATUM GE JANDT.
+*    ELSE.
+*      MESSAGE 'ENTRY ALLOWED AFTER 1st Jan 2020' TYPE 'E'.
+*      EXIT.
+*    ENDIF.
+*  ENDIF.
+
+*  SELECT SINGLE * FROM ZPASSW WHERE PERNR = PERNR.
+*  IF SY-SUBRC EQ 0.
+*
+*    IF SY-UNAME NE ZPASSW-UNAME.  "added on 18.5.23
+*      MESSAGE 'INVALID LOGIN ID' TYPE 'E'.
+*    ENDIF.
+*    V_EN_STRING = ZPASSW-PASSWORD.
+**&———————————————————————** Decryption – String to String*&———————————————————————*
+*    TRY.
+*        CREATE OBJECT O_ENCRYPTOR.
+*        CALL METHOD O_ENCRYPTOR->DECRYPT_STRING2STRING
+*          EXPORTING
+*            THE_STRING = V_EN_STRING
+*          RECEIVING
+*            RESULT     = V_DE_STRING.
+*      CATCH CX_ENCRYPT_ERROR INTO O_CX_ENCRYPT_ERROR.
+*        CALL METHOD O_CX_ENCRYPT_ERROR->IF_MESSAGE~GET_TEXT
+*          RECEIVING
+*            RESULT = V_ERROR_MSG.
+*        MESSAGE V_ERROR_MSG TYPE 'E'.
+*    ENDTRY.
+*    IF V_DE_STRING EQ PASS.
+**      message 'CORRECT PASSWORD' type 'I'.
+*    ELSE.
+*      MESSAGE 'INCORRECT PASSWORD' TYPE 'E'.
+*    ENDIF.
+*  ELSE.
+*    MESSAGE 'NOT VALID USER' TYPE 'E'.
+*    EXIT.
+*  ENDIF.
+*  CLEAR : PASS.
+*  PASS = '   '.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  AUTHORIZATION
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM AUTHORIZATION .
+  AUTHORITY-CHECK OBJECT 'M_BCO_WERK'
+  ID 'WERKS' FIELD WERKS.
+  IF SY-SUBRC <> 0.
+    CONCATENATE 'No authorization for Plant' WERKS INTO MSG
+    SEPARATED BY SPACE.
+    MESSAGE MSG TYPE 'E'.
+  ENDIF.
+ENDFORM.

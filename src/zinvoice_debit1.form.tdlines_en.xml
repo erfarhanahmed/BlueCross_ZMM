@@ -1,0 +1,971 @@
+﻿<?xml version="1.0" encoding="utf-16"?>
+<abapGit version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <TDLINES>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>ADDRESS</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Ship to party address</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>ADDRESSEE</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Ship-to-party :</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>ADDRESS PARAGRAPH S2</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  TITLE    &amp;KUWEV-ANRED&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  NAME     &amp;KUWEV-NAME1&amp;, &amp;KUWEV-NAME2&amp;, &amp;KUWEV-NAME3&amp;, &amp;KUWEV-NAME4&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  STREET   &amp;KUWEV-STRAS&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  POBOX    &amp;KUWEV-PFACH&amp;  CODE &amp;KUWEV-PSTL2&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  CITY     &amp;KUWEV-ORT01&amp;, &amp;KUWEV-ORT02&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  POSTCODE &amp;KUWEV-PSTLZ&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  COUNTRY  &amp;KUWEV-LAND1&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  REGION   &amp;KUWEV-REGIO&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>ENDADDRESS</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Sold-to-party :</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;KUAGV-KUNNR&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;KUAGV-NAME1&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>VENDOR_ADDR</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>ADDRESS PARAGRAPH S2</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  TITLE    &amp;KUWEV-ANRED&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>NAME     &amp;KUWEV-NAME1&amp;, &amp;KUWEV-NAME2&amp;, &amp;KUWEV-NAME3&amp;, &amp;KUWEV-NAME4&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  STREET   &amp;KUWEV-STRAS&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  POBOX    &amp;KUWEV-PFACH&amp;  CODE &amp;KUWEV-PSTL2&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  CITY     &amp;KUWEV-ORT01&amp;, &amp;KUWEV-ORT02&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  POSTCODE &amp;KUWEV-PSTLZ&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  COUNTRY  &amp;KUWEV-LAND1&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  REGION   &amp;KUWEV-REGIO&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>ENDADDRESS</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>ISSUED BY  ..... &amp;J_1IEXCHDR-USNAM&amp;  DATE &amp;J_1IEXCHDRCPUDT&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>AUTHEN</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;3.5&apos; CM WIDTH &apos;6.7&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE> &lt;S2&gt;PRE-AUTHENTICATION&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE> &lt;S2&gt;FOR BLUE CROSS LABORATORIES PVT LTD.&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE> &lt;S2&gt;AUTHORISED SIGNATORY&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;SUPPLY AT :&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>FOOTER</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;1.0&apos; CM WIDTH &apos;32.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>PAGE_NO</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;1.0&apos; CM WIDTH &apos;24.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;S1&gt;BLUE CROSS-BC VALUE (Rs.) : &amp;BCVAL(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;S1&gt;EXCEL-XL VALUE (Rs.)      : &amp;XLVAL(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;SPACE(240)&amp;             TOTAL</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;GST AMOUNT: Rs. &amp;NETWORD2-WORD(C)&amp; ONLY&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;TOTAL AMOUNT: Rs. &amp;NETWORD1-WORD(C)&amp; ONLY&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>HEADER</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;5.0&apos; CM WIDTH &apos;11.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A1</TDFORMAT>
+     <TDLINE> &lt;S2&gt;Supplier&apos;s Name: &amp;WA_TAB3-CNAME1&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A1</TDFORMAT>
+     <TDLINE> &lt;S2&gt;&amp;WA_TAB3-CNAME2(CIZ)&amp; &amp;WA_TAB3-CNAME3(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A1</TDFORMAT>
+     <TDLINE> &lt;S2&gt;&amp;WA_TAB3-CNAME4(CIZ)&amp; GST No. &amp;WA_TAB3-GSTIN1(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A1</TDFORMAT>
+     <TDLINE> &lt;S2&gt;STATE CODE: &amp;WA_TAB3-GSTIN1+0(2)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A1</TDFORMAT>
+     <TDLINE> &lt;S2&gt;MFG. LIC. No. &amp;WA_TAB3-PEXTENSION1(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A1</TDFORMAT>
+     <TDLINE>&amp;ULINE(62)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A1</TDFORMAT>
+     <TDLINE> &lt;S2&gt;Recipient&apos;s Name: &amp;WA_TAB3-NAME1(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A1</TDFORMAT>
+     <TDLINE> &lt;S2&gt;&amp;WA_TAB3-NAME2(CIZ)&amp; &amp;WA_TAB3-NAME3(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A1</TDFORMAT>
+     <TDLINE> &lt;S2&gt;&amp;WA_TAB3-NAME4(CIZ)&amp; &amp;WA_TAB3-ORT01(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>A1</TDFORMAT>
+     <TDLINE> &lt;S2&gt;GST NO.: &amp;WA_TAB3-GSTIN2+0(15)&amp; STATE CODE:&amp;WA_TAB3-GSTIN2+0(2)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>, D.L. No. &amp;z_extension1(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE> &amp;z_j_1icstno+0(30)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE> value = z40 * ( wa_vbrp-fkimg ).&amp;Z_NAME4+0(40)&amp; &amp;z_j_1iLstno+0(30)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>                     &amp;z_extension1&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>INFO</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;5.0&apos; CM WIDTH &apos;4.8&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE> &lt;S2&gt;&amp;TEXT&amp; &amp;WA_TAB3-BELNR&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>AS</TDFORMAT>
+     <TDLINE> &lt;S2&gt;Date: &amp;WA_TAB3-BUDAT&amp; &lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>INFO1</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;5.0&apos; CM WIDTH &apos;9.5&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BITMAP &apos;ZBCLOGO&apos; OBJECT GRAPHICS ID BMAP TYPE BCOL DPI 150</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>MAIN</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>ITEM_VALUES</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;9.50&apos; CM WIDTH &apos;32.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;0.0&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;1.8&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;6.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;8.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;9.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;10.3&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;11.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;13.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;15.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;17.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;19.1&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;21.1&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;23.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;25.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;27.6&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;29.4&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I1</TDFORMAT>
+     <TDLINE>&amp;WA_TAB3-HSN_SAC+0(10)&amp; &amp;WA_TAB3-MAKTX+0(25)&amp; &amp;WA_TAB3-CHARG+0(9)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE> &amp;WA_TAB3-MENGE+0(10)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE> &amp;WA_TAB3-BSTME+0(3)&amp; &amp;WA_TAB3-CNRATE+0(10)&amp; &amp;WA_TAB3-WRBTR+0(12)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE> &amp;WA_TAB3-SGSTRT+0(9)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>&amp;WA_TAB3-SGST+0(10)&amp; &amp;WA_TAB3-CGSTRT+0(9)&amp; &amp;WA_TAB3-CGST+0(10)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE> &amp;WA_TAB3-IGSTRT+0(9)&amp; &amp;WA_TAB3-IGST+0(12)&amp; &amp;WA_TAB3-HWSTE+0(12)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE> &amp;WA_TAB3-TOTVAL+0(12)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;WA_TAB1-ZTCS_RT+0(6)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE> &amp;WA_TAB1-ZTCS+0(8)&amp; &amp;WA_TAB1-TVAL+0(11)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;WA_TAB1-Z20+0(11)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>IF WA_TAB1-LOOSEQTY GT 0.</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>LOOSE_QTY</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I1</TDFORMAT>
+     <TDLINE>&amp;space(90)&amp; LOOSE QUANTITY,,&amp;WA_TAB1-PQTY_L+0(3)&amp;X&amp;WA_TAB1-QTY_L(CIZ)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>ENDIF</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>FREE_QTY_PACK</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I5</TDFORMAT>
+     <TDLINE>,,free qty as per scheme(&amp;FROMQTY+0(4)&amp;+&amp;FREEQTY+0(4)&amp;),,&amp;PQTY+0(3)&amp;X</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>&amp;MUMREZ(CIZ)&amp;,,&amp;J_1IEXCDTL-MENGE+0(6)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>FREE_QTY</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I5</TDFORMAT>
+     <TDLINE>,,free qty as per scheme(&amp;FROMQTY+0(4)&amp;+&amp;FREEQTY+0(4)&amp;),,,,</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>&amp;J_1IEXCDTL-MENGE+0(6)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>TOTALS</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>,,TOTAL ASSESABLE VALUE :</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>,,&amp;TOTVAL&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>,,BASIC DUTY PAYABLE @8% :</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>,,&amp;TOTED16&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>,,------------------</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>,,,,&amp;totalval&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>SERIAL_NO_HDR</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Serial number of debit entry for duty in :</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>SRNOS</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>,,RG23A part II,,&amp;J_1IEXCDTL-RG23ASER(I)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>,,RG23C part II,,&amp;J_1IEXCDTL-RG23CSER(I)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>,,P.L.A.,,&amp;J_1IEXCDTL-RGPLASER(I)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>write include text object statement as the sample given below and give</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>the id of the text element which should be printed</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Text printed before the items are printed</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>HEADER_TEXT_BEFORE_ITEMS</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>INCLUDE DFDGFDGFD  &amp;THEAD-TDNAME&amp; OBJECT J1IS ID 0001 PARAGRAPH SM      APH SM.</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;TLINE-TDLINE&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Text printed after the total excise is printed</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>HEADER_TEXT_AFTER_ITEMS</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;TLINE-TDLINE&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>PAGE_TOTAL</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>PAGE TOTAL,,,,,,,,,,&amp;PAGE_TOTALS-BED(16.2R)&amp;,,&amp;PAGE_TOTALS-SED(16.2R)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>,,&amp;PAGE_TOTALS-AED(16.2R)&amp;,,&amp;PAGE_TOTALS-CESS(16.2R)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>MFG_LIC</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;2.0&apos; CM WIDTH &apos;8.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>SF</TDFORMAT>
+     <TDLINE>Certified that the particulars given above are true and correct</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>AS</TDFORMAT>
+     <TDLINE>&lt;S2&gt; For BLUE CROSS LABORATORIES PVT LTD.&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>AS</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>AS</TDFORMAT>
+     <TDLINE>&lt;S2&gt; AUTHORISED SIGNATORY&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>NEWHEAD</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>XXXXXXXX                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>XXXXXXXX                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>   M.R.P            PTS VALUE   Abat.35%   Asse.Value</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>REGS</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Excise regesteration information of the plant</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Code No.,,&amp;J_1IREGSET-J_1IEXCCD&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Reg. No.,,&amp;J_1IREGSET-J_1IEXCRN&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Range,,&amp;J_1IREGSET-J_1IEXCRG&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Division,,&amp;J_1IREGSET-J_1IEXCDI&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Collectorate,,&amp;J_1IREGSET-J_1IEXCCO&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>TITLE</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>TITLE_TEXT</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Excise Invoice</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>TRP</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;0.5&apos; CM WIDTH &apos;32.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>PAGE_NO</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;0.5&apos; CM WIDTH &apos;32.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;S1&gt;DESP. THRU:- &amp;W_NAME1+0(20)&amp; LOCATION:- &amp;Z_ORT01+0(15)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE> LR NO. &amp;Z_BOLNR&amp;,   &amp;Z_ZFBDT&amp;   NO. OF CASES : &amp;NOCASE&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE> &amp;TOTCASE1&amp; &lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>PAGE_NO</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;S1&gt; &amp;TOTCASE1&amp; VEHICLE NO. &amp;VEHICLENO&amp;  GROSS WEIGHT: NET WEIGHT:&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW1</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&amp;space(50)&amp; &lt;B1&gt;&amp;TEXT2&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>(Issued under sec. 31 of CGST act, 2017 read with rule 48 of CGST Rules,</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I9</TDFORMAT>
+     <TDLINE>&amp;p_text2&amp; &amp;SPACE(30)&amp; PAGE NO. &amp;PAGE&amp; OF &amp;SAPSCRIPT-FORMPAGES&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW2</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>ITEM_VALUES</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;0.9&apos; CM WIDTH &apos;32.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;0.0&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;1.8&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;6.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;8.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;9.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;10.3&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;11.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;13.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;15.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;17.5&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;19.1&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;21.1&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;23.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;25.2&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;27.6&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;29.4&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I1</TDFORMAT>
+     <TDLINE>HSN &amp;space(7)&amp; DESCRIPTION OF GOODS &amp;space(5)&amp; BATCH &amp;SPACE(4)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>  QTY &amp;SPACE(1)&amp; UOM &amp;space(4)&amp; RATE &amp;SPACE(6)&amp; VALUE &amp;SPACE(2)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>  SGST &amp;SPACE(5)&amp; SGST &amp;SPCE(3)&amp; CGST &amp;SPACE(5)&amp; CGST &amp;SPACE(5)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>  IGST &amp;SPACE(6)&amp; IGST &amp;SPACE(6)&amp; TOTAL &amp;SPACE(7)&amp; TOTAL</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  &amp;SPACE(1)&amp; TCS &amp;SPACE(5)&amp; TCS &amp;SPCAE(2)&amp; TOVAL</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I1</TDFORMAT>
+     <TDLINE>&amp;SPACE(62)&amp; PER_UNIT &amp;SPACE(15)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>  % &amp;SPACE(6)&amp; AMOUNT &amp;SPCE(4)&amp; % &amp;SPACE(4)&amp; AMOUNT &amp;SPACE(6)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>  % &amp;SPACE(7)&amp; AMOUNT &amp;SPACE(7)&amp; TAX &amp;SPACE(7)&amp; VALUE</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>  &amp;SPACE(1)&amp; % &amp;SPACE(7)&amp; AMOUNT &amp;SPACE(2)&amp; VALUE</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW3</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;5.0&apos; CM WIDTH &apos;7.7&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;B&gt;BLUE CROSS LABORATORIES PVT LTD.&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;Regd. Office: Peninsula Chambers, Peninsula&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;Corporate Park. G.K. Marg, Lower Parel (West)&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;Mumbai-400013, Maharashtra,INDIA&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;Email: info@bluecrosslabs.com.&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;Website: www.bluecrosslabs.com.&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;CIN: U24230MH1980PTC022825.&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;GST NO. : 27AAACB1549G1ZX&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;S4&gt;PHYSICIAN SAMPLES, NOT FOR SALE&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW4</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>PAGE_NO</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;1.0&apos; CM WIDTH &apos;8.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;3.0&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>BOX XPOS &apos;5.0&apos; CM WIDTH 0 TW FRAME 10 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;SPACE(8)&amp; &amp;ZTOTVAL1(CIZ)&amp; &amp;SPACE(22)&amp; &amp;ZTOTRTAMT1(CIZ)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&amp;SPACE(14)&amp; &amp;ztotrtamt+0(12)&amp; &amp;ZTOTAXVAL1+0(17)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I1</TDFORMAT>
+     <TDLINE>&amp;SPACE(23)&amp; &amp;TTOT+0(17)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW5</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;2.0&apos; CM WIDTH &apos;24.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I9</TDFORMAT>
+     <TDLINE>OBD No.: &amp;Z_RDOC1&amp; &amp;P_TEXT1&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I9</TDFORMAT>
+     <TDLINE>General Warranty under section 19(3) of the Drugs &amp; Cosmetics Act, 1940</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDLINE>&amp; Rules 1945. We, Blue Cross Laboratories Pvt Ltd, being persons</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDLINE>resident in India carrying on business at Mumbai under the name of Blue</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDLINE>Cross Laboratories Pvt Ltd., do hereby give the warranty that the goods</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDLINE>or classes of goods described herein as sold by us do not cont</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>=</TDFORMAT>
+     <TDLINE>ravene in any way, provision of Section 18 of the Drugs &amp; Cosmetics Act, 1940  &amp; Rules 1945.</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>Original-buyer, Duplicate - Transporter , Triplicate - Supplier.</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I9</TDFORMAT>
+     <TDLINE>&quot;No tax is payable in respect of this supply on reverse charge&quot;.</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>&lt;S2&gt;FREE SAMPLES : ITC REVERSED AS PER SEC-17 (5) OF CGST ACT 2017)&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I9</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>I9</TDFORMAT>
+     <TDLINE>&amp;p_text3&amp; &amp;inv&amp; Dated &amp;invdt&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW6</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;1.5&apos; CM WIDTH &apos;6.7&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE> &lt;S2&gt;ORIGINAL FOR RECIPIENT&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE> &lt;S2&gt;DUPLICATE FOR TRANSPORTER&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE> &lt;S2&gt;TRIPLICATE FOR SUPPLIER.&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>WINDOW7</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>BOX HEIGHT &apos;0.5&apos; CM WIDTH &apos;32.0&apos; CM FRAME 7 TW</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>*</TDFORMAT>
+     <TDLINE>Note:- &amp;SGTXT&amp;</TDLINE>
+    </TLINE>
+   </TDLINES>
+  </asx:values>
+ </asx:abap>
+</abapGit>

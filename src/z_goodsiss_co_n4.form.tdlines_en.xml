@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-16"?>
+<abapGit version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <TDLINES>
+    <TLINE>
+     <TDFORMAT>/W</TDFORMAT>
+     <TDLINE>MAIN</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/E</TDFORMAT>
+     <TDLINE>LABEL</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>PROTECT</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;C3&gt;&amp;RPTXT1&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P2</TDFORMAT>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;c4&gt;Product:&amp;t_header-MAKTXM(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;c1&gt;B.No:&amp;t_header-charg&amp; Insp Lot:&amp;t_details-prueflos&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;c1&gt;Comp Code:&amp;p_idnrk(CIZ)&amp; ID No.:&amp;p_charg&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;c4&gt;&amp;w_name(CIZ)&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/*</TDFORMAT>
+     <TDLINE>t_details-maKTXC(40)&amp; &amp;t_details-normt(18)&amp;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;c1&gt;Net Wt: &amp;t_details-menge(CIZ)&amp; &amp;t_details-meins&amp;  Lot No. :&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;c1&gt;Tare Wt:       &amp;t_details-meins&amp; Checked By&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;c1&gt;Gross Wt:       &amp;t_details-meins&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;c1&gt;No. Of Cont.:          / &lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;c1&gt;Iss. On:&amp;t_header-andat&amp; &amp;rptxt2&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>IF &amp;WERKS&amp; EQ &apos;1001&apos;.</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;C2&gt;Format No. ST/GM/008-F3&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>ELSEIF &amp;WERKS&amp; EQ &apos;1000&apos;.</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>P1</TDFORMAT>
+     <TDLINE>&lt;C2&gt;&amp;Format1&amp;&lt;/&gt;</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>ENDIF</TDLINE>
+    </TLINE>
+    <TLINE>
+     <TDFORMAT>/:</TDFORMAT>
+     <TDLINE>ENDPROTECT</TDLINE>
+    </TLINE>
+   </TDLINES>
+  </asx:values>
+ </asx:abap>
+</abapGit>
